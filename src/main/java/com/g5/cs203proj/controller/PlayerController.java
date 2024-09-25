@@ -4,8 +4,8 @@ import java.util.*;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.g5.Knight2MeetYou.entity.Player;
-import com.g5.Knight2MeetYou.service.PlayerService;
+import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.service.PlayerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

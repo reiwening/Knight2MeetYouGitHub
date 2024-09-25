@@ -1,6 +1,6 @@
 package com.g5.cs203proj.entity;
 
-import com.g5.Knight2MeetYou.entity.Player;
+import com.g5.cs203proj.entity.Player;
 import java.util.List;
 
 import jakarta.persistence.Entity;

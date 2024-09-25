@@ -1,6 +1,6 @@
 package com.g5.cs203proj.entity;
 
-import com.g5.Knight2MeetYou.entity.Match;
+import com.g5.cs203proj.entity.Match;
 
 import java.util.List;
 import java.util.ArrayList;
