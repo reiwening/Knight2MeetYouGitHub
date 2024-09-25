@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -22,6 +26,13 @@ public class PlayerController {
         this.playerService = playerService;
     }
 
+    // create a new player
+    @PostMapping("/players")
+    public Player createPlayer(@RequestBody Player player) {
+        return playerService.savePlayer(player);  // Persist the new player using playerService
+    }
+    
+
     // get the player
     @GetMapping("/players/{id}")
     public Player getPlayer(@PathVariable Long id) {
@@ -29,5 +40,24 @@ public class PlayerController {
         if (player == null) throw new PlayerNotFoundException(id);
         return player;
     }
+
+    // get the username of the player
+    @GetMapping("/players/{id}/username")
+    public String getPlayerUsername(@PathVariable Long id ) {
+        Player player = playerService.getPlayerById(id);
+        if(player==null) throw new PlayerNotFoundException(id);
+        return player.getUsername();
+    }
+
+    @PutMapping("players/{id}/username")
+    public Player updatePlayerUsername(@PathVariable Long id, @RequestParam String newUsername) {
+        Player player = playerService.getPlayerById(id);
+        if (player == null) throw new PlayerNotFoundException(id);
+        player.setUsername(newUsername);
+        playerService.savePlayer(player);
+        return player;
+    }
+
+
     
 }

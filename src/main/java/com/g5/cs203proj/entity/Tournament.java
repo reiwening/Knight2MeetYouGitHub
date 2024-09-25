@@ -1,6 +1,7 @@
 package com.g5.cs203proj.entity;
 
 import java.util.*;
+import java.time.LocalDateTime;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -168,7 +169,7 @@ public class Tournament {
         this.registrationCutOff = registrationCutOff;
     }
 
-    public Admin getAdmins() {
+    public Admin getAdmin() {
         return admin;
     }
 

@@ -1,12 +1,18 @@
 package com.g5.cs203proj.service;
 
 import java.util.*;
+import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.entity.Match;
+
 
 public interface PlayerService {
 
     // Player management 
     List<Player> getAllPlayers();
     Player getPlayerById(Long id);
+
+    Player savePlayer(Player player);
 
     Player registerPlayer(Player player);
     Player updatePlayer(Long id, Player updatedPlayer);
