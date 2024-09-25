@@ -169,7 +169,7 @@ public class Tournament {
         this.registrationCutOff = registrationCutOff;
     }
 
-    public Admin getAdmins() {
+    public Admin getAdmin() {
         return admin;
     }
 

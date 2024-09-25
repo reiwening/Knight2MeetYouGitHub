@@ -1,0 +1,20 @@
+GET http://localhost:8080/players/2/username
+
+###
+
+PUT http://localhost:8080/players/2/username
+Content-Type: application/x-www-form-urlencoded
+
+newUsername=NewUsernameHere
+
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "FirstPlayer",
+    "hashedPassword": "yourPasswordHere",
+    "globalEloRating": 1000
+}
+
+

@@ -2,8 +2,12 @@ package com.g5.cs203proj.service;
 
 import org.springframework.stereotype.Service;
 
+import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.controller.PlayerNotFoundException;
 import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.repository.PlayerRepository;
 
 import java.util.*;
 
