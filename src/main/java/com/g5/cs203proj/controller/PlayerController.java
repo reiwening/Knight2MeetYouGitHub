@@ -29,5 +29,19 @@ public class PlayerController {
         if (player == null) throw new PlayerNotFoundException(id);
         return player;
     }
+
+    // get the username of the player
+    @GetMapping("/players/{id}/username")
+    public String getMethodName(@RequestParam String param) {
+        return new String();
+    }
+    
+    public String getPlayerUsername(@PathVariable Long id ) {
+        Player player = playerService.getPlayerById(id);
+        if(player==null) throw new PlayerNotFoundException(id);
+        return player.getUsername();
+    }
+
+
     
 }
