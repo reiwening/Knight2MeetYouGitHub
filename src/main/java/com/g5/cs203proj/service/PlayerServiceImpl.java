@@ -20,6 +20,12 @@ public class PlayerServiceImpl implements PlayerService {
 // override the methods
 
     @Override
+    public Player savePlayer( Player player ) {
+        return playerRepository.save(player);
+    }
+
+
+    @Override
     public boolean authenticatePlayer(String username, String hashedPassword) {
         // TODO Auto-generated method stub
         return false;

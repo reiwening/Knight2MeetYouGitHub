@@ -8,6 +8,8 @@ public interface PlayerService {
     List<Player> getAllPlayers();
     Player getPlayerById(Long id);
 
+    Player savePlayer(Player player);
+
     Player registerPlayer(Player player);
     Player updatePlayer(Long id, Player updatedPlayer);
     Player deletePlayer(Long id);
