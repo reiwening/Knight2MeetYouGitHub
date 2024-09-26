@@ -49,6 +49,14 @@ public class PlayerController {
         return player.getUsername();
     }
 
+    @GetMapping("/players/{id}/globalEloRating")
+    public double getGlobalEloRating(@PathVariable Long id) {
+        Player player = playerService.getPlayerById(id);
+        if(player==null) throw new PlayerNotFoundException(id);
+        return player.getGlobalEloRating();
+    }
+    
+
     // @PutMapping("players/{id}/username")
     // public Player updatePlayerUsername(@PathVariable Long id, @RequestParam String newUsername) {
     //     Player player = playerService.getPlayerById(id);
@@ -75,6 +83,7 @@ public class PlayerController {
         playerService.savePlayer(player);  // Save the updated player
         return player;
     }
+
 
 
     
