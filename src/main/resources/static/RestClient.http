@@ -2,10 +2,22 @@ GET http://localhost:8080/players/2/username
 
 ###
 
-PUT http://localhost:8080/players/2/username
-Content-Type: application/x-www-form-urlencoded
+GET http://localhost:8080/players/5/globalEloRating
 
-newUsername=NewUsernameHere
+###
+
+GET http://localhost:8080/players/4
+
+###
+
+PUT http://localhost:8080/players/1
+Content-Type: application/json
+
+{
+    "username": "NEW USERNAME",
+    "globalEloRating": 5000
+}
+
 
 ###
 POST http://localhost:8080/players
@@ -13,8 +25,19 @@ Content-Type: application/json
 
 {
     "username": "FirstPlayer",
-    "hashedPassword": "yourPasswordHere",
+    "hashedPassword": "Password1",
     "globalEloRating": 1000
+}
+
+###
+
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "SecondPlayer",
+    "hashedPassword": "Password2",
+    "globalEloRating": 2000
 }
 
 

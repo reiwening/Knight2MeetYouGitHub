@@ -49,14 +49,41 @@ public class PlayerController {
         return player.getUsername();
     }
 
-    @PutMapping("players/{id}/username")
-    public Player updatePlayerUsername(@PathVariable Long id, @RequestParam String newUsername) {
+    @GetMapping("/players/{id}/globalEloRating")
+    public double getGlobalEloRating(@PathVariable Long id) {
+        Player player = playerService.getPlayerById(id);
+        if(player==null) throw new PlayerNotFoundException(id);
+        return player.getGlobalEloRating();
+    }
+    
+
+    // @PutMapping("players/{id}/username")
+    // public Player updatePlayerUsername(@PathVariable Long id, @RequestParam String newUsername) {
+    //     Player player = playerService.getPlayerById(id);
+    //     if (player == null) throw new PlayerNotFoundException(id);
+    //     player.setUsername(newUsername);
+    //     playerService.savePlayer(player);
+    //     return player;
+    // }
+
+    @PutMapping("/players/{id}")
+    public Player updatePlayerAttributes(@PathVariable Long id, @RequestBody Map<String, String> updateFields) {
         Player player = playerService.getPlayerById(id);
         if (player == null) throw new PlayerNotFoundException(id);
-        player.setUsername(newUsername);
-        playerService.savePlayer(player);
+
+        // Check for each key in the map and update the corresponding field
+        if (updateFields.containsKey("username")) {
+            player.setUsername(updateFields.get("username"));
+        }
+
+        if (updateFields.containsKey("globalEloRating")) {
+            player.setGlobalEloRating(Double.parseDouble(updateFields.get("globalEloRating")));
+        }
+
+        playerService.savePlayer(player);  // Save the updated player
         return player;
     }
+
 
 
     
