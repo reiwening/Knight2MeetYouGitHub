@@ -1,11 +1,21 @@
-GET http://localhost:8080/players/2/username
+GET http://localhost:8080/players/1/username
 
 ###
 
-PUT http://localhost:8080/players/2/username
-Content-Type: application/x-www-form-urlencoded
+# PUT http://localhost:8080/players/1/username
+# Content-Type: application/x-www-form-urlencoded
+# {
+#     "username": "newFirstPlayer"
+# }
 
-newUsername=NewUsernameHere
+PUT http://localhost:8080/players/1
+Content-Type: application/json
+
+{
+    "username": "newFirstPlayer",
+    "globalEloRating": "1200"
+}
+
 
 ###
 POST http://localhost:8080/players
