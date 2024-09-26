@@ -2,7 +2,7 @@ GET http://localhost:8080/players/2/username
 
 ###
 
-GET http://localhost:8080/players/5/globalEloRating
+GET http://localhost:8080/players/1/globalEloRating
 
 ###
 
@@ -35,9 +35,9 @@ POST http://localhost:8080/players
 Content-Type: application/json
 
 {
-    "username": "SecondPlayer",
-    "hashedPassword": "Password2",
-    "globalEloRating": 2000
+    "username": "ForthPlayer",
+    "hashedPassword": "Password4",
+    "globalEloRating": 5000
 }
 
 
