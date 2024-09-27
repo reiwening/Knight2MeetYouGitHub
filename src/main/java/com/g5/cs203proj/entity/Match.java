@@ -44,8 +44,8 @@ public class Match {
     private boolean isComplete;
     private int eloChange;
 
-    public Match(Tournament tournament) {
-        this.id = null;
+    public Match(Long id, Tournament tournament) {
+        this.id = id;
         this.tournament = tournament;
         this.player1 = null;
         this.player2 = null;
@@ -58,8 +58,8 @@ public class Match {
         this.eloChange = null;
     }
 
-    public Match(Tournament tournament, Player player1, Player player2) {
-        this.id = null;
+    public Match(Long id, Tournament tournament, Player player1, Player player2) {
+        this.id = id;
         this.tournament = tournament;
         this.player1 = player1;
         this.player2 = player2;
@@ -74,8 +74,8 @@ public class Match {
 
 
     // Setter methods
-    public void setMatchId(long matchId) {
-        this.id = matchId;
+    public void setMatchId(Long id) {
+        this.id = id;
     }
 
     public void setTournament(Tournament tournament) {
@@ -90,14 +90,14 @@ public class Match {
         this.player2 = player2;
     }
 
-    public void setStatusP1() {
-        System.out.println("Player 1 Status: Checked-In");
-        this.statusP1 = true;
+    public void setStatusP1(boolean status) {
+        // System.out.println("Player 1 Status: Checked-In");
+        this.statusP1 = status;
     }
     
-    public void setStatusP2() {
-        System.out.println("Player 2 Status: Checked-In");
-        this.statusP2 = true;
+    public void setStatusP2(boolean status) {
+        // System.out.println("Player 2 Status: Checked-In");
+        this.statusP2 = status;
     }
     
     public void setWinner(Player winner) {
@@ -120,6 +120,7 @@ public class Match {
             player2.setPlayerGlobalEloRating(change);
             player1.setPlayerGlobalEloRating(change * -1);
         } else {
+            // might need to change logic for draw depending on how Elo is calc for draws
             player1.setPlayerGlobalEloRating(change);
             player2.setPlayerGlobalEloRating(change);
         }

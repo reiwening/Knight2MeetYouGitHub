@@ -26,23 +26,24 @@ public class MatchController {
         this.matchService = matchService;
     }
 
-    // create a new player
+    // create a new match
     @PostMapping("/matches")
-    public Player createMatch(@RequestBody Player player) {
-        return playerService.savePlayer(player);  // Persist the new player using playerService
+    public Match createMatch(@RequestBody Match match) {
+        // Persist the new match using matchService
+        return matchService.saveMatch(match);
     }
     
 
-    // get the player
-    @GetMapping("/players/{id}")
-    public Player getPlayer(@PathVariable Long id) {
-        Player player = playerService.getPlayerById(id);
-        if (player == null) throw new PlayerNotFoundException(id);
-        return player;
+    // get the match
+    @GetMapping("/matches/{id}")
+    public Match getMatch(@PathVariable Long id) {
+        Match match = matchService.findMatchById(id);
+        if (match == null) throw new MatchNotFoundException(id);
+        return match;
     }
 
     // get the username of the player
-    @GetMapping("/players/{id}/username")
+    @GetMapping("/matches/{id}/username")
     public String getPlayerUsername(@PathVariable Long id ) {
         Player player = playerService.getPlayerById(id);
         if(player==null) throw new PlayerNotFoundException(id);
