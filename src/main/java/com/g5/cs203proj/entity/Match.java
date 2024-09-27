@@ -108,7 +108,7 @@ public class Match {
         this.isComplete = status;
     }
 
-    // 16/9/24: Later do
+    // 27/6/24: method invoked on player class for now, dk if using PlayerController
     public void setEloChange(Player winner) {
         // Some elo change calculation
         double change = 10;
