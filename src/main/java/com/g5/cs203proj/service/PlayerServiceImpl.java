@@ -65,6 +65,13 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    public void setPlayerGlobalEloRating(double change) {
+        // TODO Auto-generated method stub
+        double oldPlayerElo = player.getGlobalEloRating();
+        return player.setGlobalEloRating(oldPlayerElo + change);
+    }
+
+    @Override
     public Queue<Match> getPlayerMatchHistory(Player player) {
         // TODO Auto-generated method stub
         return null;

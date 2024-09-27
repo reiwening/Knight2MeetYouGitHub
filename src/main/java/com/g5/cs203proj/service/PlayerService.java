@@ -21,6 +21,7 @@ public interface PlayerService {
     int getPlayerTournamentRankings(Player player, Tournament tournament); // see parameters  / consider a Map<Player, Integer>
 
     double getPlayerGlobalEloRating(Player player);
+    void setPlayerGlobalEloRating(double change);
     
     // Player Authentication and Availability
     boolean authenticatePlayer(String username, String hashedPassword);

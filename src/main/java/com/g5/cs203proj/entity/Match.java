@@ -1,6 +1,7 @@
 package com.g5.cs203proj.entity;
 
 import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.service.*;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -108,8 +109,20 @@ public class Match {
     }
 
     // 16/9/24: Later do
-    public void setEloChange() {
-        
+    public void setEloChange(Player winner) {
+        // Some elo change calculation
+        double change = 10;
+
+        if (player1 == winner) {
+            player1.setPlayerGlobalEloRating(change);
+            player2.setPlayerGlobalEloRating(change * -1);
+        } else if (player2 == winner) {
+            player2.setPlayerGlobalEloRating(change);
+            player1.setPlayerGlobalEloRating(change * -1);
+        } else {
+            player1.setPlayerGlobalEloRating(change);
+            player2.setPlayerGlobalEloRating(change);
+        }
     }
 
     
@@ -150,8 +163,8 @@ public class Match {
     }
     
     // 16/9/24: Later do 
-    public int getEloChange() {
-        
+    public double getEloChange() {
+        return eloChange;
     }
 
 }

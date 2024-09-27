@@ -34,7 +34,7 @@ public class MatchServiceImpl implements MatchService {
     public void processMatchResult(Match match, Player winner) {
         match.setIsCompleteStatus(true);
         match.setWinner(winner);
-        match.setEloChange();
+        match.setEloChange(winner);
     }
 
 
