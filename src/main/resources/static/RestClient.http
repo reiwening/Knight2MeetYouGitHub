@@ -12,9 +12,9 @@ POST http://localhost:8080/players
 Content-Type: application/json
 
 {
-    "username": "FirstPlayer",
+    "username": "test",
     "hashedPassword": "yourPasswordHere",
-    "globalEloRating": 1000
+    "globalEloRating": 300
 }
 
 
