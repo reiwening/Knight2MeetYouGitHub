@@ -82,6 +82,26 @@ public class Player {
         return username;
     }
 
+    public double getGlobalEloRating() {
+        return globalEloRating;
+    }
+
+
+    public void setGlobalEloRating(double globalEloRating) {
+        this.globalEloRating = globalEloRating;
+    }
+
+
+    public List<Tournament> getTournamentRegistered() {
+        return tournamentRegistered;
+    }
+
+
+    public void setTournamentRegistered(List<Tournament> tournamentRegistered) {
+        this.tournamentRegistered = tournamentRegistered;
+    }
+
+
     public void setUsername(String username) {
         this.username = username;
     }
