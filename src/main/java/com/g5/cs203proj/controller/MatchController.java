@@ -41,7 +41,7 @@ public class MatchController {
     public Match assignMatchPlayers(@PathVariable Long matchId, @RequestBody Player p1, @RequestBody Player p2) {
         //TODO: process PUT request
         Match match = matchService.findMatchById(matchId);
-        if (match == null) throw new MatchNotFoundException(id);
+        if (match == null) throw new MatchNotFoundException(matchId);
 
         matchService.assignPlayersToMatch(match, p1, p2);
         matchService.saveMatch(match);
@@ -58,7 +58,7 @@ public class MatchController {
     }
 
     // process match when it ends
-    @PutMapping("/matches/{id}")
+    @PutMapping("/matches/{id}/updateresults")
     public Match updateMatchResults(@PathVariable Long id, @RequestBody Player winner) {
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);

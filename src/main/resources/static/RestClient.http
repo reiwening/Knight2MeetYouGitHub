@@ -1,12 +1,16 @@
-GET http://localhost:8080/players/2/username
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "FirstPlayer",
+    "hashedPassword": "Password1",
+    "globalEloRating": 1000
+}
 
 ###
 
 GET http://localhost:8080/players/1/globalEloRating
-
-###
-
-GET http://localhost:8080/players/4
 
 ###
 
@@ -16,17 +20,6 @@ Content-Type: application/json
 {
     "username": "NEW USERNAME",
     "globalEloRating": 5000
-}
-
-
-###
-POST http://localhost:8080/players
-Content-Type: application/json
-
-{
-    "username": "FirstPlayer",
-    "hashedPassword": "Password1",
-    "globalEloRating": 1000
 }
 
 ###
@@ -40,7 +33,9 @@ Content-Type: application/json
     "globalEloRating": 5000
 }
 
+###
 
+GET http://localhost:8080/players/4
 
 
 
@@ -48,7 +43,6 @@ Content-Type: application/json
 
 
 ###
-// create test player1 alex
 POST http://localhost:8080/players
 Content-Type: application/json
 
@@ -59,7 +53,6 @@ Content-Type: application/json
 }
 
 ###
-// create test player2 bob
 POST http://localhost:8080/players
 Content-Type: application/json
 
@@ -70,16 +63,14 @@ Content-Type: application/json
 }
 
 ###
-// create first match with id: 1 but no players
 POST http://localhost:8080/matches
 Content-Type: application/json
 
 {
-    "id": 1,
+    "id": 1
 }
 
 ###
-// assign players to created match with id: 1
 PUT http://localhost:8080/matches/1
 Content-Type: application/json
 
@@ -100,12 +91,10 @@ Content-Type: application/json
 }
 
 ###
-// retrieve match of id: 1
 GET http://localhost:8080/matches/1
 
 ###
-// update match result at the end
-PUT http://localhost:8080/matches/1
+PUT http://localhost:8080/matches/1/updateresults
 Content-Type: application/json
 
 {
