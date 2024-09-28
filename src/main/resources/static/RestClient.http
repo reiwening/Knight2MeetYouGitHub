@@ -41,3 +41,79 @@ Content-Type: application/json
 }
 
 
+
+
+
+
+
+
+###
+// create test player1 alex
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "Alex",
+    "hashedPassword": "Password1",
+    "globalEloRating": 1000
+}
+
+###
+// create test player2 bob
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "Bob",
+    "hashedPassword": "Password2",
+    "globalEloRating": 1200
+}
+
+###
+// create first match with id: 1 but no players
+POST http://localhost:8080/matches
+Content-Type: application/json
+
+{
+    "id": 1,
+}
+
+###
+// assign players to created match with id: 1
+PUT http://localhost:8080/matches/1
+Content-Type: application/json
+
+{
+    "player1": 
+    // Have to pass in a player object, not just a name (String)
+    {
+        "username": "Alex",
+        "hashedPassword": "Password1",
+        "globalEloRating": 1000
+    },
+    "player2": 
+    {
+        "username": "Bob",
+        "hashedPassword": "Password2",
+        "globalEloRating": 1200
+    }
+}
+
+###
+// retrieve match of id: 1
+GET http://localhost:8080/matches/1
+
+###
+// update match result at the end
+PUT http://localhost:8080/matches/1
+Content-Type: application/json
+
+{
+    "winner": 
+    // Have to pass in a player object, not just a name (String)
+    {
+        "username": "Bob",
+        "hashedPassword": "Password2",
+        "globalEloRating": 1200
+    }
+}

@@ -42,7 +42,27 @@ public class Match {
     private Player winner;
     
     private boolean isComplete;
-    private int eloChange;
+    private Double eloChange;
+
+    // Default constructor
+    public Match() {
+
+    }
+
+    // Other constructors, getters, setters, etc.
+    public Match(Long id, Player player1, Player player2) {
+        this.id = id;
+        this.tournament = null;
+        this.player1 = player1;
+        this.player2 = player2;
+
+        this.statusP1 = false;
+        this.statusP2 = false;
+
+        this.winner = null;
+        this.isComplete = false;
+        this.eloChange = null;
+    }
 
     public Match(Long id, Tournament tournament) {
         this.id = id;
@@ -114,15 +134,15 @@ public class Match {
         double change = 10;
 
         if (player1 == winner) {
-            player1.setPlayerGlobalEloRating(change);
-            player2.setPlayerGlobalEloRating(change * -1);
+            player1.setGlobalEloRating(player1.getGlobalEloRating() + change);
+            player2.setGlobalEloRating(player2.getGlobalEloRating() + change * -1);
         } else if (player2 == winner) {
-            player2.setPlayerGlobalEloRating(change);
-            player1.setPlayerGlobalEloRating(change * -1);
+            player2.setGlobalEloRating(player2.getGlobalEloRating() + change);
+            player1.setGlobalEloRating(player1.getGlobalEloRating() + change * -1);
         } else {
             // might need to change logic for draw depending on how Elo is calc for draws
-            player1.setPlayerGlobalEloRating(change);
-            player2.setPlayerGlobalEloRating(change);
+            player1.setGlobalEloRating(player1.getGlobalEloRating() + change);
+            player2.setGlobalEloRating(player2.getGlobalEloRating() + change);
         }
     }
 
@@ -131,7 +151,7 @@ public class Match {
 
 
     // Getter methods
-    public long getMatchId() {
+    public Long getMatchId() {
         return id;
     }
 
@@ -164,7 +184,7 @@ public class Match {
     }
     
     // 16/9/24: Later do 
-    public double getEloChange() {
+    public Double getEloChange() {
         return eloChange;
     }
 
