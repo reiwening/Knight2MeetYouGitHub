@@ -42,50 +42,15 @@ public class MatchController {
         return match;
     }
 
-    // get the username of the player
-    @GetMapping("/matches/{id}/username")
-    public String getPlayerUsername(@PathVariable Long id ) {
-        Player player = playerService.getPlayerById(id);
-        if(player==null) throw new PlayerNotFoundException(id);
-        return player.getUsername();
+    // process match when it ends
+    @PutMapping("/matches/{id}")
+    public Match updateMatchResults(@PathVariable Long id, @RequestBody Player winner) {
+        Match match = matchService.findMatchById(id);
+        if (match == null) throw new MatchNotFoundException(id);
+
+        // call processMatchResult in MatchServiceImpl
+        matchService.processMatchResult(match, winner);
+        matchService.saveMatch(match);
+        return match;
     }
-
-    @GetMapping("/players/{id}/globalEloRating")
-    public double getGlobalEloRating(@PathVariable Long id) {
-        Player player = playerService.getPlayerById(id);
-        if(player==null) throw new PlayerNotFoundException(id);
-        return player.getGlobalEloRating();
-    }
-    
-
-    // @PutMapping("players/{id}/username")
-    // public Player updatePlayerUsername(@PathVariable Long id, @RequestParam String newUsername) {
-    //     Player player = playerService.getPlayerById(id);
-    //     if (player == null) throw new PlayerNotFoundException(id);
-    //     player.setUsername(newUsername);
-    //     playerService.savePlayer(player);
-    //     return player;
-    // }
-
-    @PutMapping("/players/{id}")
-    public Player updatePlayerAttributes(@PathVariable Long id, @RequestBody Map<String, String> updateFields) {
-        Player player = playerService.getPlayerById(id);
-        if (player == null) throw new PlayerNotFoundException(id);
-
-        // Check for each key in the map and update the corresponding field
-        if (updateFields.containsKey("username")) {
-            player.setUsername(updateFields.get("username"));
-        }
-
-        if (updateFields.containsKey("globalEloRating")) {
-            player.setGlobalEloRating(Double.parseDouble(updateFields.get("globalEloRating")));
-        }
-
-        playerService.savePlayer(player);  // Save the updated player
-        return player;
-    }
-
-
-
-    
 }
