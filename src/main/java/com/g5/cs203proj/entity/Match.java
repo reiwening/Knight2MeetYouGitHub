@@ -61,7 +61,7 @@ public class Match {
 
         this.winner = null;
         this.isComplete = false;
-        this.eloChange = null;
+        this.eloChange = null; 
     }
 
     public Match(Long id, Tournament tournament) {
