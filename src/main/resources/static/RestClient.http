@@ -25,9 +25,9 @@ Content-Type: application/json
 
 {
 
-    "username": "FirstPlayer",
+    "username": "thirdPlayer",
     "hashedPassword": "Password1",
-    "globalEloRating": 1000
+    "globalEloRating": 3000
 
 }
 
