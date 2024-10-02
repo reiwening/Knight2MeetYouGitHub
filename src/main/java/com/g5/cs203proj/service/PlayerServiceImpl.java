@@ -1,5 +1,8 @@
 package com.g5.cs203proj.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.g5.cs203proj.entity.Player;
@@ -20,8 +23,8 @@ public class PlayerServiceImpl implements PlayerService {
     public PlayerServiceImpl( PlayerRepository playerRepository ) {
         this.playerRepository = playerRepository;
     }
-    
-// override the methods
+
+// override the methods for PlayerService interface
 
     @Override
     public Player savePlayer( Player player ) {
