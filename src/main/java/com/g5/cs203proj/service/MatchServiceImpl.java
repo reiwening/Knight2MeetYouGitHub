@@ -62,9 +62,12 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void assignPlayersToMatch(Match match, Player p1, Player p2) {
-        match.setPlayer1(p1);
-        match.setPlayer2(p2);
+    public void assignPlayerToMatch(Match match, Player player) {
+        if (match.getPlayer1() == null) {
+            match.setPlayer1(player);
+        } else if (match.getPlayer2() == null) {
+            match.setPlayer2(player);
+        }
     }
 
     @Override

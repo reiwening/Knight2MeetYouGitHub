@@ -30,6 +30,10 @@ public interface PlayerService {
     Queue<Match> getPlayerMatchHistory(Player player);
     List<Tournament> getTournamentRegistered(Player player);
     List<Tournament> getActiveTournamentRegistered(Player player);
+
+    List<Match> getMatchesAsPlayer1(Player player);
+    List<Match> getMatchesAsPlayer2(Player player);
+    Match addMatchToPlayerHistory(Player player, Match match);
     
     
 }

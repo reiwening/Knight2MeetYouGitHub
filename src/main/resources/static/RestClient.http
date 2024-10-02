@@ -67,6 +67,14 @@ POST http://localhost:8080/matches
 Content-Type: application/json
 
 {
+    
+}
+
+###
+PUT http://localhost:8080/matches/1
+Content-Type: application/json
+
+{
     "id": 1
 }
 
@@ -75,19 +83,7 @@ PUT http://localhost:8080/matches/1
 Content-Type: application/json
 
 {
-    "player1": 
-    // Have to pass in a player object, not just a name (String)
-    {
-        "username": "Alex",
-        "hashedPassword": "Password1",
-        "globalEloRating": 1000
-    },
-    "player2": 
-    {
-        "username": "Bob",
-        "hashedPassword": "Password2",
-        "globalEloRating": 1200
-    }
+    "id": 2
 }
 
 ###
@@ -98,11 +94,5 @@ PUT http://localhost:8080/matches/1/updateresults
 Content-Type: application/json
 
 {
-    "winner": 
-    // Have to pass in a player object, not just a name (String)
-    {
-        "username": "Bob",
-        "hashedPassword": "Password2",
-        "globalEloRating": 1200
-    }
+    "id": 2
 }
