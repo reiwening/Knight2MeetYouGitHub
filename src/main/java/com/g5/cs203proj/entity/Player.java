@@ -1,5 +1,6 @@
 package com.g5.cs203proj.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.g5.cs203proj.entity.Match;
 
 import java.util.*;
@@ -138,18 +139,22 @@ public class Player implements UserDetails   {
 
     // need to implement all methods in UserDetails first 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
     @Override
+    @JsonIgnore
     public boolean isEnabled() {
         return true;
     }

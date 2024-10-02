@@ -26,7 +26,7 @@ Content-Type: application/json
 
 {
 
-    "username": "lmao",
+    "username": "i want to faint",
     "password": "Password1",
     "authorities": "ROLE_USER",
     "globalEloRating": 3000
