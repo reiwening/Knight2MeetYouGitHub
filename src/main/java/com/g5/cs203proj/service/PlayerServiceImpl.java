@@ -26,10 +26,13 @@ public class PlayerServiceImpl implements PlayerService {
 
 // override the methods for PlayerService interface
 
-    @Override
-    public Player savePlayer( Player player ) {
-        return playerRepository.save(player);
-    }
+// @Override
+// public Player savePlayer( Player player ) {
+//     // Hash the password before saving the player
+//     String hashedPassword = encoder().encode(player.getPassword());
+//     player.setPasswordEncoder()
+//     return playerRepository.save(player);
+// }
 
 
     @Override

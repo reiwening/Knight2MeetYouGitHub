@@ -20,13 +20,15 @@ Content-Type: application/json
 
 
 ###
+# Authorization: Basic Player1:Password1
 POST http://localhost:8080/players
 Content-Type: application/json
 
 {
 
-    "username": "Player1",
-    "hashedPassword": "Password1",
+    "username": "lmao",
+    "password": "Password1",
+    "authorities": "ROLE_USER",
     "globalEloRating": 3000
 
 }
@@ -38,7 +40,7 @@ Content-Type: application/json
 
 {
     "username": "ForthPlayer",
-    "hashedPassword": "Password4",
+    "password": "Password4",
     "globalEloRating": 5000
 }
 

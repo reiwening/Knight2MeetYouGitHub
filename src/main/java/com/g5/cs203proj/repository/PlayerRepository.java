@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
-    
+    // define a derived query to find user by username
+    Optional<Player> findByUsername(String username);
     
 }

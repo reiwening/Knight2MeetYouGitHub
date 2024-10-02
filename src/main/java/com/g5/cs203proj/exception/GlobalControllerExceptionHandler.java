@@ -47,9 +47,10 @@ public class GlobalControllerExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex){
-        Map<String, Object> body = new Hashmap<>();
-        body.put("error", :"Username not found");
+        Map<String, Object> body = new HashMap<>();
+        body.put("error: ","Username not found");
         body.put("username: ", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
 }
