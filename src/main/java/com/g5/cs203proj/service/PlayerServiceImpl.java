@@ -94,6 +94,12 @@ public class PlayerServiceImpl implements PlayerService {
         return null;
     }
 
+    @Override
+    public void setPlayerGlobalEloRating(Player player, double newRating) {
+        player.setGlobalEloRating(newRating);
+        playerRepository.save(player);  // Save the player with the updated Elo rating
+    }
+    
    
     
     

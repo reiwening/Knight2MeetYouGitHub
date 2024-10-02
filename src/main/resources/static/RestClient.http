@@ -10,7 +10,7 @@ GET http://localhost:8080/players/100
 
 ###
 
-PUT http://localhost:8080/players/1
+PUT http://localhost:8080/players/abc
 Content-Type: application/json
 
 {
