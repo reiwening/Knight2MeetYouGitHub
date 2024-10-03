@@ -12,22 +12,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.g5.cs203proj.service.PlayerDetailsServiceImpl;
+import com.g5.cs203proj.service.PlayerDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private PlayerDetailsServiceImpl playerDetailsServiceImpl;
+    private PlayerDetailsService playerDetailsService;
 
-    public SecurityConfig(PlayerDetailsServiceImpl playerSvc){
-        this.playerDetailsServiceImpl = playerSvc;
+    public SecurityConfig(PlayerDetailsService playerSvc){
+        this.playerDetailsService = playerSvc;
     }
 
     @Bean 
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(playerDetailsServiceImpl);
+        authProvider.setUserDetailsService(playerDetailsService);
         authProvider.setPasswordEncoder(bCryptPasswordEncoder());
         return authProvider;
     }

@@ -8,18 +8,18 @@ import org.springframework.stereotype.Service;
 import com.g5.cs203proj.repository.PlayerRepository;
 
 @Service
-public class PlayerDetailsServiceImpl implements UserDetailsService {
+public class PlayerDetailsService implements UserDetailsService {
 
     private final PlayerRepository playerRepository;
 
-    public PlayerDetailsServiceImpl(PlayerRepository playerRepository) {
+    public PlayerDetailsService(PlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username)  throws UsernameNotFoundException {
         return playerRepository.findByUsername(username)
-                               .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            .orElseThrow(() -> new UsernameNotFoundException("User '" + username + "' not found"));
     }
 
     

@@ -1,8 +1,10 @@
 package com.g5.cs203proj.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.g5.cs203proj.entity.Player;
@@ -18,22 +20,54 @@ import java.util.*;
 public class PlayerServiceImpl implements PlayerService {
 
     private PlayerRepository playerRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before storing the password 
+                                                         // provided in the `SecurityConfig` Class
 
     // constructor 
-    public PlayerServiceImpl( PlayerRepository playerRepository ) {
+    public PlayerServiceImpl( PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder ) {
         this.playerRepository = playerRepository;
+        this.bCryptPasswordEncoder= bCryptPasswordEncoder;
     }
 
 // override the methods for PlayerService interface
 
-// @Override
-// public Player savePlayer( Player player ) {
-//     // Hash the password before saving the player
-//     String hashedPassword = encoder().encode(player.getPassword());
-//     player.setPasswordEncoder()
-//     return playerRepository.save(player);
-// }
+    @Override
+    public Player savePlayer( Player player ) {
+        return playerRepository.save(player);
+    }
 
+    public Player registerPlayer(Player playerToRegister ) {
+        Optional<Player> existingPlayer = findPlayerByUsername(playerToRegister.getUsername()); 
+        if (existingPlayer.isPresent()) {
+            return null;
+        } 
+
+        playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
+
+        /* else we have to save to the DB */
+        return savePlayer(playerToRegister);
+
+    }
+    
+    @Override
+    public Optional<Player> findPlayerByUsername(String username) {
+        return playerRepository.findByUsername(username);  // Repository method to find player by username
+    }
+
+//////////////////////////////////////////////////////////////////////////////////
+    
+    @Override
+    @PreAuthorize("#id == principal.id") // only the user with that ID can change his or her setting 
+    public Player updatePlayer(Long id, Player updatedPlayer) {
+        // Optional<Player> existingPlayer = playerRepository.findById(id);
+        // if ( ! existingPlayer.isPresent() ) {
+        //     return null;
+        // } 
+        // // whatever fields you need to update 
+        // existingPlayer.setUsername(updatedPlayer.getUsername());
+        // return playerRepository.save(existingPlayer);
+        return null;
+    }
 
     @Override
     public boolean authenticatePlayer(String username, String hashedPassword) {
@@ -88,17 +122,6 @@ public class PlayerServiceImpl implements PlayerService {
         return null;
     }
 
-    @Override
-    public Player registerPlayer(Player player) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Player updatePlayer(Long id, Player updatedPlayer) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public void setPlayerGlobalEloRating(Player player, double newRating) {

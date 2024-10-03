@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.exception.PlayerNotFoundException;
 import com.g5.cs203proj.repository.PlayerRepository;
+import com.g5.cs203proj.service.PlayerDetailsService;
 import com.g5.cs203proj.service.PlayerService;
 
 import jakarta.validation.Valid;
@@ -26,40 +27,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 public class PlayerController {
-    // private PlayerService playerService;
-    private PlayerRepository playerRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before storing the password 
-                                                         // provided in the `SecurityConfig` Class
+    private PlayerService playerService;
+    
 
     @Autowired
-    public PlayerController(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder ) {
-        this.playerRepository = playerRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    public PlayerController(PlayerService playerService) {
+        this.playerService = playerService;
+        
     }
 
 
     // create a new player
     @PostMapping("/players")
     public ResponseEntity<?> createPlayer(@Valid @RequestBody Player player) {
-        // Check if the username already exists
-        Optional<Player> existingPlayer = playerRepository.findByUsername(player.getUsername());
-        if (existingPlayer.isPresent()) {
+            // Check if the player already exists
+            Player existingPlayer = playerService.registerPlayer(player); 
+            
+            if (existingPlayer == null) {
             // Return a bad request or conflict status with a meaningful message
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
-        }
+        } /* else means that it is save to register this player */
         
         // Hash the password before saving
-        player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-        Player savedPlayer = playerRepository.save(player);
+        // player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
         
-        return ResponseEntity.ok(savedPlayer);  // Return the saved player with a 200 OK status
+        return ResponseEntity.ok(existingPlayer);  // Return the saved player with a 200 OK status
     }
-    // @PostMapping("/players")
-    // public Player createPlayer( @Valid @RequestBody Player player) {
-    //     player.setPassword(encoder.encode(player.getPassword()));
-    //     return playerRepository.save(player);  // Persist the new player using playerRepo
-    // }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 
     // // get the player

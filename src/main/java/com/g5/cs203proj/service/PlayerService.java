@@ -12,11 +12,10 @@ public interface PlayerService {
     List<Player> getAllPlayers();
     Player getPlayerById(Long id);
 
-    // Player savePlayer(Player player);
-
-    Player registerPlayer(Player player);
+    Player savePlayer( Player player );
     Player updatePlayer(Long id, Player updatedPlayer);
     Player deletePlayer(Long id);
+    Player registerPlayer(Player playerToRegister );
 
     int getPlayerTournamentRankings(Player player, Tournament tournament); // see parameters  / consider a Map<Player, Integer>
 
@@ -30,6 +29,7 @@ public interface PlayerService {
     Queue<Match> getPlayerMatchHistory(Player player);
     List<Tournament> getTournamentRegistered(Player player);
     List<Tournament> getActiveTournamentRegistered(Player player);
+    Optional<Player> findPlayerByUsername(String username);
     
     
 }
