@@ -28,7 +28,7 @@ public class SecurityConfig {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(playerDetailsServiceImpl);
-        authProvider.setPasswordEncoder(encoder());
+        authProvider.setPasswordEncoder(bCryptPasswordEncoder());
         return authProvider;
     }
 
@@ -49,8 +49,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public BCryptPasswordEncoder encoder() {
-        // auto-generate a random salt internally
+    public BCryptPasswordEncoder bCryptPasswordEncoder() { // use the default no-argument constructor that helps to generate a random salt and hash password
         return new BCryptPasswordEncoder();
     }
        

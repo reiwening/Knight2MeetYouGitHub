@@ -28,12 +28,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class PlayerController {
     // private PlayerService playerService;
     private PlayerRepository playerRepository;
-    private BCryptPasswordEncoder encoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before storing the password 
+                                                         // provided in the `SecurityConfig` Class
 
     @Autowired
-    public PlayerController(PlayerRepository playerRepository, BCryptPasswordEncoder encoder ) {
+    public PlayerController(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder ) {
         this.playerRepository = playerRepository;
-        this.encoder = encoder;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
 
@@ -48,7 +49,7 @@ public class PlayerController {
         }
         
         // Hash the password before saving
-        player.setPassword(encoder.encode(player.getPassword()));
+        player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
         Player savedPlayer = playerRepository.save(player);
         
         return ResponseEntity.ok(savedPlayer);  // Return the saved player with a 200 OK status
