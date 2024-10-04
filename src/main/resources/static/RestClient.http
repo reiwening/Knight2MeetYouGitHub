@@ -26,16 +26,17 @@ Content-Type: application/json
 
 {
 
-    "username": "Player1",
-    "password": "Password1",
+    "username": "Player3",
+    "password": "Password3",
     "authorities": "ROLE_USER",
     "globalEloRating": 3000
 }
 
 ###
 
-GET http://localhost:8080/players/Player2
-Authorization: Basic UGxheWVyMTpQYXNzd29yZDE=
+GET http://localhost:8080/players/Player1
+#this is for player 1 
+Authorization: Basic UGxheWVyMTpQYXNzd29yZDE= 
 
 ###
 

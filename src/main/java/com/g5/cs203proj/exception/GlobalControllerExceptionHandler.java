@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,6 +52,14 @@ public class GlobalControllerExceptionHandler {
         body.put("error: ","Username not found");
         body.put("username: ", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleForbiddenRequest(AccessDeniedException ex){
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "You are not allowed to access information from other players");
+        body.put("details", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
     }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.g5.cs203proj.service.PlayerDetailsService;
 
@@ -19,9 +20,12 @@ import com.g5.cs203proj.service.PlayerDetailsService;
 public class SecurityConfig {
 
     private PlayerDetailsService playerDetailsService;
+    private AccessDeniedHandler accessDeniedHandler; // Add the custom access denied handler
+
 
     public SecurityConfig(PlayerDetailsService playerSvc){
         this.playerDetailsService = playerSvc;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
 
     @Bean 
@@ -40,6 +44,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
                 .anyRequest().authenticated()
+            )
+            .exceptionHandling(customizer -> customizer
+                .accessDeniedHandler(accessDeniedHandler)  // Use custom access denied handler
             )
         .httpBasic(Customizer.withDefaults())
         .csrf(csrf -> csrf.disable())

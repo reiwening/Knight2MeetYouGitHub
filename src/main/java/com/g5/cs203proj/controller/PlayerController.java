@@ -11,12 +11,14 @@ import com.g5.cs203proj.service.PlayerDetailsService;
 import com.g5.cs203proj.service.PlayerService;
 
 import jakarta.validation.Valid;
-
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.security.core.Authentication;
+
 
 
 
@@ -54,16 +58,36 @@ public class PlayerController {
 
     // Player would be able to retrieve his/her information when player inputs username
     @GetMapping("/players/{username}")
-    public Optional<Player> getPlayer(@PathVariable String username) {
-        // Check if the player already exists
+    public ResponseEntity<Player>  getPlayer(@PathVariable String username) {
+        // Get the currently authenticated user's username
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName();  // The logged-in username
+
+        // Check if the authenticated user is requesting their own data
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("You are trying to access data for Player: " + username);
+        }
+
         Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
-        if(existingPlayer.isPresent()) {
-            //then we return player details 
-            return existingPlayer;
-        } else {
+        if(!existingPlayer.isPresent()) {
             throw new UsernameNotFoundException(username);
         }
+
+        // If they are allowed and username in found in DB 
+        Player player = existingPlayer.get();
+        return ResponseEntity.ok(player);
     }
+
+
+// // Check if the player already exists
+// Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
+// if(existingPlayer.isPresent()) {
+//     //then we return player details 
+//     return existingPlayer;
+// } else {
+//     throw new UsernameNotFoundException(username);
+// }
+// }
     
 }
 
