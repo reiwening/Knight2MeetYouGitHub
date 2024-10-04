@@ -37,6 +37,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests((authz) -> authz 
                 .requestMatchers(HttpMethod.POST, "/players").permitAll()
+                .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
                 .anyRequest().authenticated()
             )

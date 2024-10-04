@@ -26,12 +26,16 @@ Content-Type: application/json
 
 {
 
-    "username": "i want to faint",
+    "username": "Player1",
     "password": "Password1",
     "authorities": "ROLE_USER",
     "globalEloRating": 3000
-
 }
+
+###
+
+GET http://localhost:8080/players/Player2
+Authorization: Basic UGxheWVyMTpQYXNzd29yZDE=
 
 ###
 

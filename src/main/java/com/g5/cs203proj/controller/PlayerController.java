@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,12 +49,22 @@ public class PlayerController {
             // Return a bad request or conflict status with a meaningful message
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
         } /* else means that it is save to register this player */
-        
-        // Hash the password before saving
-        // player.setPassword(bCryptPasswordEncoder.encode(player.getPassword()));
-        
         return ResponseEntity.ok(existingPlayer);  // Return the saved player with a 200 OK status
     }
+
+    // Player would be able to retrieve his/her information when player inputs username
+    @GetMapping("/players/{username}")
+    public Optional<Player> getPlayer(@PathVariable String username) {
+        // Check if the player already exists
+        Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
+        if(existingPlayer.isPresent()) {
+            //then we return player details 
+            return existingPlayer;
+        } else {
+            throw new UsernameNotFoundException(username);
+        }
+    }
+    
 }
 
 
