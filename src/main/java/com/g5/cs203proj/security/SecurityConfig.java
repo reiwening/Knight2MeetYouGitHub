@@ -50,10 +50,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authz) -> authz 
-                .requestMatchers(HttpMethod.POST, "/players").permitAll()
+                .requestMatchers(HttpMethod.GET, "/players/admins").hasRole("ADMIN") // spring convention is "ADMIN" , not "ROLE_ADMIN"
+                .requestMatchers(HttpMethod.GET, "/players/users").hasRole("ADMIN") 
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
-                .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
+                .requestMatchers(HttpMethod.PUT, "/players").authenticated()
+                .requestMatchers(HttpMethod.POST, "/players").permitAll()
                 .requestMatchers(HttpMethod.GET, "/players").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
                 .anyRequest().authenticated()
             )
             .exceptionHandling(customizer -> customizer

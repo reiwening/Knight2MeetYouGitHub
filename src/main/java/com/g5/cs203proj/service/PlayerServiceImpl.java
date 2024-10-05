@@ -15,6 +15,8 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.repository.PlayerRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -59,10 +61,34 @@ public class PlayerServiceImpl implements PlayerService {
         return playerRepository.findAll();
     }
 
-//////////////////////////////////////////////////////////////////////////////////
+
+    private boolean hasRole(Player player, String role){
+        return player.getAuthorities().stream()
+                                      .anyMatch(authority -> authority.getAuthority().equals(role));
+    }
     
-    @Override
-    @PreAuthorize("#id == principal.id") // only the user with that ID can change his or her setting 
+    @Override 
+    public List<Player> getAllAdmins() {
+        List<Player> allPlayers = getAllPlayers();
+        List<Player> admins = allPlayers.stream()
+                                        .filter( player -> hasRole(player, "ROLE_ADMIN"))
+                                        .collect(Collectors.toList());
+        return admins;
+    }
+
+    @Override 
+    public List<Player> getAllPlayerUsers() {
+        List<Player> allPlayers = getAllPlayers();
+        List<Player> users = allPlayers.stream()
+                                        .filter( player -> hasRole(player, "ROLE_USER"))
+                                        .collect(Collectors.toList());
+        return users;
+    }
+
+    
+
+//////////////////////////////////////////////////////////////////////////////////
+
     public Player updatePlayer(Long id, Player updatedPlayer) {
         // Optional<Player> existingPlayer = playerRepository.findById(id);
         // if ( ! existingPlayer.isPresent() ) {
@@ -146,6 +172,7 @@ public class PlayerServiceImpl implements PlayerService {
         }
         return player.addMatchesAsPlayer2(match);
     }
+
     
     
 }

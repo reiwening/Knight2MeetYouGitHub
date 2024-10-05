@@ -18,15 +18,4 @@ public class RestTemplateClient {
                 .basicAuthentication("Player1", "Password1")
                 .build();
     }
-
-
-    // // This method should take a String URI and create a player
-    // public Player addPlayerAutomatically(final String URI) {
-    //     Player player = new Player("Player1", "Password1", "ROLE_USER");
-    //     final Player returned = template.postForObject(URI, player, Player.class);
-    //     return returned;
-    // }
-    
-
-    
 }

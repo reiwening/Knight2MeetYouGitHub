@@ -16,7 +16,8 @@ public interface PlayerService {
     Player updatePlayer(Long id, Player updatedPlayer);
     Player deletePlayer(Long id);
     Player registerPlayer(Player playerToRegister );
-
+    List<Player> getAllAdmins() ;
+    List<Player> getAllPlayerUsers();
     int getPlayerTournamentRankings(Player player, Tournament tournament); // see parameters  / consider a Map<Player, Integer>
 
     double getPlayerGlobalEloRating(Player player);

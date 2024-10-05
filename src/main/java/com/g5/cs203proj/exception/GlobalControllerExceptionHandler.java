@@ -54,12 +54,21 @@ public class GlobalControllerExceptionHandler {
     //     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     // }
 
-    // @ExceptionHandler(AccessDeniedException.class)
-    // public ResponseEntity<Object> handleForbiddenRequest(AccessDeniedException ex){
-    //     Map<String, Object> body = new HashMap<>();
-    //     body.put("error", "You are not allowed to access information from other players");
-    //     body.put("details", ex.getMessage());
-    //     return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
-    // }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleForbiddenRequest(AccessDeniedException ex){
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "forbidden");
+        body.put("details", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException ex){
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "invalid inputs");
+        body.put("details", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
 
 }
