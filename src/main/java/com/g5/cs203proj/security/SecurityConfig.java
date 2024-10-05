@@ -1,6 +1,7 @@
 package com.g5.cs203proj.security;
 
 import org.springframework.security.config.Customizer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.g5.cs203proj.service.PlayerDetailsService;
@@ -19,13 +21,21 @@ import com.g5.cs203proj.service.PlayerDetailsService;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private AuthenticationEntryPoint authenticationEntryPoint;
+
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;
+
+    @Autowired
     private PlayerDetailsService playerDetailsService;
-    private AccessDeniedHandler accessDeniedHandler; // Add the custom access denied handler
 
 
+    @Autowired
     public SecurityConfig(PlayerDetailsService playerSvc){
         this.playerDetailsService = playerSvc;
-        this.accessDeniedHandler = accessDeniedHandler;
+// this.accessDeniedHandler = accessDeniedHandler;
+// this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean 
@@ -43,10 +53,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/players").permitAll()
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
+                .requestMatchers(HttpMethod.GET, "players").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(customizer -> customizer
-                .accessDeniedHandler(accessDeniedHandler)  // Use custom access denied handler
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler) 
             )
         .httpBasic(Customizer.withDefaults())
         .csrf(csrf -> csrf.disable())

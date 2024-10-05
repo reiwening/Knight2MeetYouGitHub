@@ -5,6 +5,7 @@ import java.util.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.PlayerNotFoundException;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.PlayerDetailsService;
@@ -69,27 +70,18 @@ public class PlayerController {
         }
 
         Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
-        if(!existingPlayer.isPresent()) {
-            throw new UsernameNotFoundException(username);
-        }
+if(!existingPlayer.isPresent()) {
+    throw new UsernameNotFoundException(username);
+}
 
         // If they are allowed and username in found in DB 
         Player player = existingPlayer.get();
         return ResponseEntity.ok(player);
     }
 
-
-// // Check if the player already exists
-// Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
-// if(existingPlayer.isPresent()) {
-//     //then we return player details 
-//     return existingPlayer;
-// } else {
-//     throw new UsernameNotFoundException(username);
-// }
-// }
-    
 }
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -100,14 +92,6 @@ public class PlayerController {
     //     Player player = playerService.getPlayerById(id);
     //     if (player == null) throw new PlayerNotFoundException(id);
     //     return player;
-    // }
-
-    // // get the username of the player
-    // @GetMapping("/players/{id}/username")
-    // public String getPlayerUsername(@PathVariable Long id ) {
-    //     Player player = playerService.getPlayerById(id);
-    //     if(player==null) throw new PlayerNotFoundException(id);
-    //     return player.getUsername();
     // }
 
     // @GetMapping("/players/{id}/globalEloRating")

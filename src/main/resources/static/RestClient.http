@@ -26,27 +26,19 @@ Content-Type: application/json
 
 {
 
-    "username": "Player3",
-    "password": "Password3",
+    "username": "Player1",
+    "password": "Password1",
     "authorities": "ROLE_USER",
     "globalEloRating": 3000
 }
 
 ###
 
-GET http://localhost:8080/players/Player1
+GET http://localhost:8080/players/Player2
 #this is for player 1 
-Authorization: Basic UGxheWVyMTpQYXNzd29yZDE= 
+Authorization: Basic UGxheWVyMzpQYXNzd29yZDM=
+# UGxheWVyMzpQYXNzd29yZDM=
+# Basic UGxheWVyMTpQYXNzd29yZDE= 
 
 ###
-
-POST http://localhost:8080/players
-Content-Type: application/json
-
-{
-    "username": "ForthPlayer",
-    "password": "Password4",
-    "globalEloRating": 5000
-}
-
-
+GET http://localhost:8080/players

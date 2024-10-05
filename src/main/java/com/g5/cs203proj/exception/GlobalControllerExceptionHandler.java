@@ -46,20 +46,20 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex){
-        Map<String, Object> body = new HashMap<>();
-        body.put("error: ","Username not found");
-        body.put("username: ", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }
+    // @ExceptionHandler(UsernameNotFoundException.class)
+    // public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex){
+    //     Map<String, Object> body = new HashMap<>();
+    //     body.put("error: ","Username not found");
+    //     body.put("username: ", ex.getMessage());
+    //     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    // }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleForbiddenRequest(AccessDeniedException ex){
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", "You are not allowed to access information from other players");
-        body.put("details", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
-    }
+    // @ExceptionHandler(AccessDeniedException.class)
+    // public ResponseEntity<Object> handleForbiddenRequest(AccessDeniedException ex){
+    //     Map<String, Object> body = new HashMap<>();
+    //     body.put("error", "You are not allowed to access information from other players");
+    //     body.put("details", ex.getMessage());
+    //     return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    // }
 
 }

@@ -54,6 +54,11 @@ public class PlayerServiceImpl implements PlayerService {
         return playerRepository.findByUsername(username);  // Repository method to find player by username
     }
 
+    @Override
+    public List<Player> getAllPlayers() {
+        return playerRepository.findAll();
+    }
+
 //////////////////////////////////////////////////////////////////////////////////
     
     @Override
@@ -87,11 +92,6 @@ public class PlayerServiceImpl implements PlayerService {
         return null;
     }
 
-    @Override
-    public List<Player> getAllPlayers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public Player getPlayerById(Long id) {
