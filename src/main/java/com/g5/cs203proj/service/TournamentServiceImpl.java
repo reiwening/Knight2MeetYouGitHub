@@ -91,8 +91,12 @@ public class TournamentServiceImpl implements TournamentService {
     // Player management
 
     @Override
-    public Tournament registerPlayer(Player player, Long tournamentId) {
+    public Tournament registerPlayer(Long playerId, Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
+        Player player = playerRepository.findById(playerId).orElse(null);
+        if (player == null){
+            throw new PlayerNotFoundException(playerId);
+        }
         if (tournament.getRegisteredPlayers().size() < tournament.getMaxPlayers()) {
             tournament.getRegisteredPlayers().add(player);
             return tournamentRepository.save(tournament);

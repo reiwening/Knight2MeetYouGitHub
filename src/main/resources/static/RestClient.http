@@ -7,7 +7,7 @@ Content-Type: application/x-www-form-urlencoded
 
 newUsername=NewUsernameHere
 
-###
+### creating players
 POST http://localhost:8080/players
 Content-Type: application/json
 
@@ -15,6 +15,79 @@ Content-Type: application/json
     "username": "FirstPlayer",
     "hashedPassword": "yourPasswordHere",
     "globalEloRating": 1000
+}
+
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "SecondPlayer",
+    "hashedPassword": "yourPasswordHere",
+    "globalEloRating": 1000
+}
+
+
+### creating tournament
+POST http://localhost:8080/tournaments
+Content-Type: application/json
+
+{
+    "name": "tourney1",
+    "tournamentStatus" : "registration",
+    "maxPlayers" : 5,
+    "minElo" : 0,
+    "maxElo" : 1000
+
+}
+
+### 
+GET http://localhost:8080/tournaments
+
+### add players to tournament
+POST http://localhost:8080/tournaments/1/players
+Content-Type: application/json
+
+1
+
+###
+POST http://localhost:8080/tournaments/1/players
+Content-Type: application/json
+
+2
+
+### see players in tournament
+GET http://localhost:8080/tournaments/1/players
+
+### remove player 2 from tournament 1
+DELETE http://localhost:8080/tournaments/1/players/2
+Content-Type: application/json
+
+2
+
+### updating elo range
+PUT http://localhost:8080/tournaments/1/elo-range?minElo=0&maxElo=2001
+Content-Type: application/json
+
+###
+PUT http://localhost:8080/tournaments/1/elo-range
+Content-Type: application/json
+
+0
+12
+
+###
+DELETE http://localhost:8080/tournaments/1
+
+### 
+PUT http://localhost:8080/tournaments/100
+Content-Type: application/json
+
+{
+    "name": "change3",
+    "tournamentStatus" : "completed",
+    "maxPlayers" : 5
+
 }
 
 

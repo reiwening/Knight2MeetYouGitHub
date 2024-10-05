@@ -53,7 +53,7 @@ public class TournamentController {
     }
 
     // Get all registerable tournaments
-    @GetMapping("/tournaments")
+    @GetMapping("/tournaments/reg")
     public List<Tournament> getAllRegisterableTournaments() {
         return tournamentService.getAllRegisterableTournaments();
     }
@@ -71,14 +71,14 @@ public class TournamentController {
     }
 
     // Register a player to a tournament
-    @PostMapping("/tournaments/{id}/players")
-    public Tournament registerPlayer(@PathVariable Long id, @RequestBody Player player) {
-        return tournamentService.registerPlayer(player, id);
+    @PostMapping("/tournaments/{tournamentId}/players")
+    public Tournament registerPlayer(@PathVariable Long tournamentId, @RequestBody Long playerId) {
+        return tournamentService.registerPlayer(playerId, tournamentId);
     }
 
     // Remove a player from a tournament
-    @PostMapping("/tournaments/{tournamentId}/players/{playerId}")
-    public Tournament removePlayer(@PathVariable (value = "tournamentId") Long tournamentId, @PathVariable (value = "playerId") Long playerId) {
+    @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
+    public Tournament removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
         return tournamentService.removePlayer(playerId, tournamentId);
     }
 

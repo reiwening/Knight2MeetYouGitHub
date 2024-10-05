@@ -25,7 +25,7 @@ public interface TournamentService {
     
 
 //player management
-    Tournament registerPlayer(Player player, Long tournamentId);
+    Tournament registerPlayer(Long playerId, Long tournamentId);
     Tournament removePlayer(Long playerId, Long tournamentId);
     List<Player> getRegisteredPlayers(Long tournamentId);
 
