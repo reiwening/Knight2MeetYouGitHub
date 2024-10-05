@@ -139,7 +139,7 @@ public class PlayerController {
             // player.setGlobalEloRating(Double.parseDouble(updateFields.get("globalEloRating")));
         }
 
-        playerService.savePlayer(player);  // Save the updated player
+        playerService.savePlayer(player);  // Save the updated player in DB
         return player;
     }
 

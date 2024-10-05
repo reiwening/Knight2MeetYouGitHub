@@ -65,6 +65,16 @@ public class Player implements UserDetails   {
     @Transient // This field is not persisted directly, but computed
     private List<Match> matchHistory;
 
+    public List<Tournament> getTournamentRegistered() {
+        return tournamentRegistered;
+    }
+
+
+    public void setTournamentRegistered(List<Tournament> tournamentRegistered) {
+        this.tournamentRegistered = tournamentRegistered;
+    }
+
+
     public Player() {
         // Default constructor required for deserialization
     }

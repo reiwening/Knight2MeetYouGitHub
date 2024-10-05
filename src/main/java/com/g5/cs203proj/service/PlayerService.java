@@ -23,11 +23,8 @@ public interface PlayerService {
     double getPlayerGlobalEloRating(Player player);
     void setPlayerGlobalEloRating(Player player, double change); // not sure if we need this method
     
-    // Player Authentication and Availability
-    boolean authenticatePlayer(String username, String hashedPassword);
-    
     // Participation
-    Queue<Match> getPlayerMatchHistory(Player player);
+    List<Match> getPlayerMatchHistory(Player player);
     List<Tournament> getTournamentRegistered(Player player);
     List<Tournament> getActiveTournamentRegistered(Player player);
     Optional<Player> findPlayerByUsername(String username);

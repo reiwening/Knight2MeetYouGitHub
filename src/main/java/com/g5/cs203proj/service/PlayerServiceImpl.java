@@ -85,76 +85,54 @@ public class PlayerServiceImpl implements PlayerService {
         return users;
     }
 
-    
-
-//////////////////////////////////////////////////////////////////////////////////
-
-    public Player updatePlayer(Long id, Player updatedPlayer) {
-        // Optional<Player> existingPlayer = playerRepository.findById(id);
-        // if ( ! existingPlayer.isPresent() ) {
-        //     return null;
-        // } 
-        // // whatever fields you need to update 
-        // existingPlayer.setUsername(updatedPlayer.getUsername());
-        // return playerRepository.save(existingPlayer);
-        return null;
-    }
-
-    @Override
-    public boolean authenticatePlayer(String username, String hashedPassword) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Player deletePlayer(Long id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Tournament> getActiveTournamentRegistered(Player player) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
     @Override
     public Player getPlayerById(Long id) {
         return playerRepository.findById(id).orElse(null);
     }
-
-    @Override
-    public double getPlayerGlobalEloRating(Player player) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public Queue<Match> getPlayerMatchHistory(Player player) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public int getPlayerTournamentRankings(Player player, Tournament tournament) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public List<Tournament> getTournamentRegistered(Player player) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
+    
     @Override
     public void setPlayerGlobalEloRating(Player player, double newRating) {
         player.setGlobalEloRating(newRating);
         playerRepository.save(player);  // Save the player with the updated Elo rating
     }
+
+    @Override
+    public double getPlayerGlobalEloRating(Player player) {
+        return player.getGlobalEloRating();
+    }
     
+    @Override
+    public List<Tournament> getTournamentRegistered(Player player) {
+        return player.getTournamentRegistered();
+    }
+
+    @Override
+    public List<Match> getPlayerMatchHistory(Player player) {
+        return player.getMatchHistory();
+    }
+
+//////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public Player updatePlayer(Long id, Player updatedPlayer) {
+        return null;
+    }
+
+    @Override
+    public Player deletePlayer(Long id) {
+        return null;
+    }
+
+    @Override
+    public int getPlayerTournamentRankings(Player player, Tournament tournament) {
+        return 0;
+    }
+
+    @Override
+    public List<Tournament> getActiveTournamentRegistered(Player player) {
+        return null;
+    }
+ 
     @Override
     public List<Match> getMatchesAsPlayer1(Player player) {
         return player.getMatchesAsPlayer1();
@@ -172,7 +150,4 @@ public class PlayerServiceImpl implements PlayerService {
         }
         return player.addMatchesAsPlayer2(match);
     }
-
-    
-    
 }
