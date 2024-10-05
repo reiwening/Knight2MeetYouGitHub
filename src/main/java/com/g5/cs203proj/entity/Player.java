@@ -84,6 +84,11 @@ public class Player implements UserDetails   {
         this.password = password;
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
+
     public double getGlobalEloRating() {
         return globalEloRating;
     }
@@ -159,5 +164,24 @@ public class Player implements UserDetails   {
         return true;
     }
 
+
+// Why?
+    public List<Match> getMatchesAsPlayer1() {
+        return matchesAsPlayer1;
+    }
+
+    public Match addMatchesAsPlayer1(Match match) {
+        this.matchesAsPlayer1.add(match);
+        return match;
+    }
+
+    public List<Match> getMatchesAsPlayer2() {
+        return matchesAsPlayer2;
+    }
+
+    public Match addMatchesAsPlayer2(Match match) {
+        this.matchesAsPlayer2.add(match);
+        return match;
+    }
     
 }

@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/players").permitAll()
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
-                .requestMatchers(HttpMethod.GET, "players").permitAll()
+                .requestMatchers(HttpMethod.GET, "/players").permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(customizer -> customizer

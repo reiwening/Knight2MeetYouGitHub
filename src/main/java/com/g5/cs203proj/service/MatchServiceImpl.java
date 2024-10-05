@@ -62,9 +62,12 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void assignPlayersToMatch(Match match, Player p1, Player p2) {
-        match.setPlayer1(p1);
-        match.setPlayer2(p2);
+    public void assignPlayerToMatch(Match match, Player player) {
+        if (match.getPlayer1() == null) {
+            match.setPlayer1(player);
+        } else if (match.getPlayer2() == null) {
+            match.setPlayer2(player);
+        }
     }
 
     @Override
@@ -81,21 +84,21 @@ public class MatchServiceImpl implements MatchService {
     public List<Match> getMatchesForTournament(Tournament tournament) {
         // TODO Auto-generated method stub
         return null;
-    }
+    };
 
     // Need import the Player & Tournament packages to call their functions
     @Override
     public List<Match> getMatchesForPlayer(Player player) {
         // TODO Auto-generated method stub
         return null;
-    }
+    };
 
     // Returns true if notification sent successfully
     @Override
     public boolean sendMatchStartNotification() {
         // TODO Auto-generated method stub
         return false;
-    }
+    };
 
     // View check-in status for both players for a match
     @Override
@@ -104,5 +107,5 @@ public class MatchServiceImpl implements MatchService {
             return true;
         }
         return false;
-    }
+    };
 }

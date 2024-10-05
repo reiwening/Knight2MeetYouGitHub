@@ -79,6 +79,12 @@ if(!existingPlayer.isPresent()) {
         return ResponseEntity.ok(player);
     }
 
+    @GetMapping("players")
+    public List<Player>  getAllPlayers() {
+        return playerService.getAllPlayers();
+    }
+
+
 }
 
 

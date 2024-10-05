@@ -42,3 +42,38 @@ Authorization: Basic UGxheWVyMzpQYXNzd29yZDM=
 
 ###
 GET http://localhost:8080/players
+
+###
+POST http://localhost:8080/matches
+Content-Type: application/json
+
+{
+
+}
+
+###
+PUT http://localhost:8080/matches/1
+Content-Type: application/json
+
+{
+    "id": 1
+}
+
+###
+PUT http://localhost:8080/matches/1
+Content-Type: application/json
+
+{
+    "id": 2
+}
+
+###
+GET http://localhost:8080/matches/1
+
+###
+PUT http://localhost:8080/matches/1/updateresults
+Content-Type: application/json
+
+{
+    "id": 2
+}

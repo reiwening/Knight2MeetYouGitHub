@@ -129,7 +129,23 @@ public class PlayerServiceImpl implements PlayerService {
         playerRepository.save(player);  // Save the player with the updated Elo rating
     }
     
-   
+    @Override
+    public List<Match> getMatchesAsPlayer1(Player player) {
+        return player.getMatchesAsPlayer1();
+    }
+
+    @Override
+    public List<Match> getMatchesAsPlayer2(Player player) {
+        return player.getMatchesAsPlayer2();
+    }
+
+    @Override
+    public Match addMatchToPlayerHistory(Player player, Match match) {
+        if (match.getPlayer1() == player) {
+            return player.addMatchesAsPlayer1(match);
+        }
+        return player.addMatchesAsPlayer2(match);
+    }
     
     
 }

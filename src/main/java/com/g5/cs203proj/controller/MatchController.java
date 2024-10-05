@@ -8,7 +8,7 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
-import com.g5.cs203proj.exception.MatchNotFoundException;
+import com.g5.cs203proj.exception.PlayerNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 
-
 @RestController
 public class MatchController {
+    @Autowired
     private MatchService matchService;
+
+    @Autowired
     private PlayerService playerService;
 
     @Autowired
@@ -38,15 +40,25 @@ public class MatchController {
         return matchService.saveMatch(match);
     }
 
+
     // assign players to created match
     @PutMapping("matches/{id}")
-    public Match assignMatchPlayers(@PathVariable Long matchId, @RequestBody Player p1, @RequestBody Player p2) {
+    public Match assignMatchPlayers(@PathVariable Long id, @RequestBody Player player) {
         //TODO: process PUT request
-        Match match = matchService.findMatchById(matchId);
-        if (match == null) throw new MatchNotFoundException(matchId);
+        Match match = matchService.findMatchById(id);
+        if (match == null) throw new MatchNotFoundException(id);
 
-        matchService.assignPlayersToMatch(match, p1, p2);
+        Player managedPlayer = playerService.getPlayerById(player.getId());
+        if (managedPlayer == null) throw new PlayerNotFoundException(player.getId());
+        // System.out.println(managedPlayer.getUsername());
+
+        matchService.assignPlayerToMatch(match, managedPlayer);
         matchService.saveMatch(match);
+
+        playerService.addMatchToPlayerHistory(managedPlayer, match);
+        playerService.savePlayer(managedPlayer);
+        // System.out.println(managedPlayer.getUsername());
+
         return match;
     }
 
@@ -64,6 +76,10 @@ public class MatchController {
     public Match updateMatchResults(@PathVariable Long id, @RequestBody Player winner) {
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);
+
+        Player managedPlayer = playerService.getPlayerById(winner.getId());
+
+        if (managedPlayer == null) throw new PlayerNotFoundException(winner.getId());
 
         // call processMatchResult in MatchServiceImpl
         matchService.processMatchResult(match, winner);
