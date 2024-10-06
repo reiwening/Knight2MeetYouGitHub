@@ -10,12 +10,12 @@ GET http://localhost:8080/players/4
 
 ###
 
-PUT http://localhost:8080/players/1
+PUT http://localhost:8080/players/3
 Content-Type: application/json
 
 {
     "username": "NEW USERNAME",
-    "globalEloRating": 5000
+    "globalEloRating": "5000"
 }
 
 
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 {
 
-    "username": "thirdPlayer",
+    "username": "3",
     "hashedPassword": "Password1",
     "globalEloRating": 3000
 
@@ -91,8 +91,13 @@ Content-Type: application/json
 2
 
 ### updating elo range
-PUT http://localhost:8080/tournaments/1/elo-range?minElo=0&maxElo=2001
+PUT http://localhost:8080/tournaments/1/elo-range
 Content-Type: application/json
+
+{
+    "minElo" : 0,
+    "maxElo" : 2100
+}
 
 ###
 PUT http://localhost:8080/tournaments/1/elo-range

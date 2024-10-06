@@ -1,7 +1,7 @@
 package com.g5.cs203proj.entity;
 
 import com.g5.cs203proj.entity.Match;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import java.util.ArrayList;
 import jakarta.persistence.Entity;
@@ -26,6 +26,7 @@ public class Player {
     private double globalEloRating;
 
     @ManyToMany 
+    // @JsonIgnore
     @JoinTable(
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 
@@ -91,7 +92,7 @@ public class Player {
         this.globalEloRating = globalEloRating;
     }
 
-
+    
     public List<Tournament> getTournamentRegistered() {
         return tournamentRegistered;
     }

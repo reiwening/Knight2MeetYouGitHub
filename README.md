@@ -3,5 +3,3 @@
 ### To get to the h2 database console, run the spring boot and type this in your browser : http://localhost:8080/h2-console
 
 #### JDBC URL : jdbc:h2:mem:testdb , username : username ,  password = password
-
-uiwfoiuwenfoiewufnwifljnk

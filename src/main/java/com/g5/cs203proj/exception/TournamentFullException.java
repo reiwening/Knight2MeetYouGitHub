@@ -1,4 +1,4 @@
-package com.g5.cs203proj.controller;
+package com.g5.cs203proj.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -58,12 +58,14 @@ public class TournamentController {
         return tournamentService.getAllRegisterableTournaments();
     }
 
+    //havent test yet
     // Start or cancel a tournament based on registration cutoff
     @PostMapping("/tournaments/{id}")
     public Tournament startOrCancelTournament(@PathVariable Long id) {
         return tournamentService.startOrCancelTournament(id);
     }
 
+    //havent tested
     // Get tournament rankings by ID
     @GetMapping("/tournaments/{id}/rankings") //not sure of this is mapping
     public Map<Long, Integer> getTournamentRankings(@PathVariable Long id) {
@@ -109,20 +111,22 @@ public class TournamentController {
         return tournamentService.setTournamentStyle(id, style);
     }
 
+    //test later
     // Update the player range (min/max players)
     @PutMapping("/tournaments/{id}/player-range")
     public Tournament setTournamentPlayerRange(
         @PathVariable Long id, @RequestParam int minPlayers, @RequestParam int maxPlayers) {
         return tournamentService.setTournamentPlayerRange(id, minPlayers, maxPlayers);
     }
-
+//not working yet
     // Update the registration cutoff time
     @PutMapping("/tournaments/{id}/registration-cutoff")
     public Tournament setTournamentRegistrationCutOff(
-        @PathVariable Long id, @RequestParam LocalDateTime registrationCutOff) {
+        @PathVariable Long id, @RequestBody LocalDateTime registrationCutOff) {
         return tournamentService.setTournamentRegistrationCutOff(id, registrationCutOff);
     }
-
+    
+//test later
     // Update the tournament admin
     @PutMapping("/tournaments/{id}/admin")
     public Tournament setAdmin(

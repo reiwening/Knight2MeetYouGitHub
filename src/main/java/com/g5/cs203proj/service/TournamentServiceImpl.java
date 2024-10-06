@@ -1,9 +1,6 @@
 package com.g5.cs203proj.service;
 
-import com.g5.cs203proj.controller.PlayerNotFoundException;
-import com.g5.cs203proj.controller.PlayerNotInTournamentException;
-import com.g5.cs203proj.controller.TournamentFullException;
-import com.g5.cs203proj.controller.TournmentNotFoundException;
+import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
