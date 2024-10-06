@@ -127,11 +127,6 @@ public class PlayerServiceImpl implements PlayerService {
     //     return player.setGlobalEloRating(oldPlayerElo + change);
     // }
 
-    @Override
-    public void setPlayerGlobalEloRating(Player player, double change){
-        
-    }
-
 
     @Override
     public Player updatePlayer(Long id, Player updatedPlayer) {
@@ -153,16 +148,6 @@ public class PlayerServiceImpl implements PlayerService {
         return null;
     }
  
-    @Override
-    public List<Match> getMatchesAsPlayer1(Player player) {
-        return player.getMatchesAsPlayer1();
-    }
-
-    @Override
-    public List<Match> getMatchesAsPlayer2(Player player) {
-        return player.getMatchesAsPlayer2();
-    }
-
     @Override
     public List<Match> getMatchesAsPlayer1(Player player) {
         return player.getMatchesAsPlayer1();

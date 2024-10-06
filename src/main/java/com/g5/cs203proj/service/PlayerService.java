@@ -21,7 +21,7 @@ public interface PlayerService {
     int getPlayerTournamentRankings(Player player, Tournament tournament); // see parameters  / consider a Map<Player, Integer>
 
     double getPlayerGlobalEloRating(Player player);
-    // void setPlayerGlobalEloRating(Player player, double change);
+    void setPlayerGlobalEloRating(Player player, double change);
 
     
     // Participation

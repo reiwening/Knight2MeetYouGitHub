@@ -75,11 +75,6 @@ public class Player implements UserDetails   {
     @JsonIgnore
     private List<Match> matchHistory;
 
-    public List<Tournament> getTournamentRegistered() {
-        return tournamentRegistered;
-    }
-
-
     public void setTournamentRegistered(List<Tournament> tournamentRegistered) {
         this.tournamentRegistered = tournamentRegistered;
     }
@@ -149,13 +144,7 @@ public class Player implements UserDetails   {
 
     public void setUsername(String username) {
         this.username = username;
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public double getGlobalEloRating() {
-        return globalEloRating;
+        
     }
 
     @Override
@@ -188,18 +177,12 @@ public class Player implements UserDetails   {
     @JsonIgnore
     public boolean isEnabled() {
         return true;
-
+    }
     
     public List<Tournament> getTournamentRegistered() {
         return tournamentRegistered;
 
     }
-
-    public List<Match> getMatchesAsPlayer1() {
-        return matchesAsPlayer1;
-    }
-
-
 
     public List<Match> getMatchesAsPlayer1() {
         return matchesAsPlayer1;
@@ -212,7 +195,6 @@ public class Player implements UserDetails   {
     }
 
 
-
     public List<Match> getMatchesAsPlayer2() {
         return matchesAsPlayer2;
     }
@@ -222,14 +204,5 @@ public class Player implements UserDetails   {
         return match;
     }
 
-
-    public List<Match> getMatchesAsPlayer2() {
-        return matchesAsPlayer2;
-    }
-
-    public Match addMatchesAsPlayer2(Match match) {
-        this.matchesAsPlayer2.add(match);
-        return match;
-    }
-    
 }
+
