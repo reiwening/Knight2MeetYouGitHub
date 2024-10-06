@@ -54,10 +54,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/players/users").hasRole("ADMIN") 
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/players").authenticated()
-                .requestMatchers(HttpMethod.POST, "/players").permitAll()
-                .requestMatchers(HttpMethod.GET, "/players").permitAll()
+                // .requestMatchers(HttpMethod.POST, "/players").permitAll()
+                // .requestMatchers(HttpMethod.GET, "/players").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
             .exceptionHandling(customizer -> customizer
                 .authenticationEntryPoint(authenticationEntryPoint)
