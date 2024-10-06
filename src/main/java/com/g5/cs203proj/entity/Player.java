@@ -172,8 +172,6 @@ public class Player implements UserDetails   {
         return true;
     }
 
-
-// Why?
     public List<Match> getMatchesAsPlayer1() {
         return matchesAsPlayer1;
     }

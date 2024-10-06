@@ -71,6 +71,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+   
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() { // use the default no-argument constructor that helps to generate a random salt and hash password
         return new BCryptPasswordEncoder();
