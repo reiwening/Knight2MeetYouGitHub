@@ -1,5 +1,6 @@
 package com.g5.cs203proj.entity;
 
+import com.fasterxml.jackson.annotation.*;
 import com.g5.cs203proj.entity.Match;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
@@ -33,13 +34,19 @@ public class Player {
         inverseJoinColumns = @JoinColumn(name = "tournament_id"))
     private List<Tournament> tournamentRegistered;
 
+    
     @OneToMany(mappedBy = "player1")
+    @JsonIgnore
     private List<Match> matchesAsPlayer1;
 
+    
     @OneToMany(mappedBy = "player2")
+    @JsonIgnore
     private List<Match> matchesAsPlayer2;
 
+    
     @Transient // This field is not persisted directly, but computed
+    @JsonIgnore
     private List<Match> matchHistory;
 
     
@@ -83,6 +90,10 @@ public class Player {
         return username;
     }
 
+    public Long getId() {
+        return this.id;
+    }
+
     public double getGlobalEloRating() {
         return globalEloRating;
     }
@@ -102,6 +113,23 @@ public class Player {
         this.tournamentRegistered = tournamentRegistered;
     }
 
+    public List<Match> getMatchesAsPlayer1() {
+        return matchesAsPlayer1;
+    }
+
+    public Match addMatchesAsPlayer1(Match match) {
+        this.matchesAsPlayer1.add(match);
+        return match;
+    }
+
+    public List<Match> getMatchesAsPlayer2() {
+        return matchesAsPlayer2;
+    }
+
+    public Match addMatchesAsPlayer2(Match match) {
+        this.matchesAsPlayer2.add(match);
+        return match;
+    }
 
     public void setUsername(String username) {
         this.username = username;

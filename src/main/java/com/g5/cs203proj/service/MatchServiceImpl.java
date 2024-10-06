@@ -27,7 +27,6 @@ public class MatchServiceImpl implements MatchService {
         this.matchRepository = matchRepository;
     }
 
-
     /* Methods */
 
 
@@ -62,15 +61,26 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void assignPlayersToMatch(Match match, Player p1, Player p2) {
-        match.setPlayer1(p1);
-        match.setPlayer2(p2);
+    public void assignPlayerToMatch(Match match, Player player) {
+        if (match.getPlayer1() == null) {
+            match.setPlayer1(player);
+        } else if (match.getPlayer2() == null) {
+            match.setPlayer2(player);
+        }
     }
 
     @Override
-    public void processMatchResult(Match match, Player winner) {
+    public void processMatchResult(Match match, Player winner, boolean isDraw) {
         match.setIsCompleteStatus(true);
-        match.setWinner(winner);
+        match.setDraw(isDraw);
+
+        if (isDraw) {
+            match.setWinner(null);  // No winner in case of a draw
+        } else {
+            match.setWinner(winner);
+        }
+        
+        // Elo change uses isDraw attribute from Match. If draw, will auto calculate
         match.setEloChange(winner);
     }
 
@@ -88,6 +98,7 @@ public class MatchServiceImpl implements MatchService {
     public List<Match> getMatchesForPlayer(Player player) {
         // TODO Auto-generated method stub
         return null;
+
     }
 
     // Returns true if notification sent successfully
@@ -96,6 +107,7 @@ public class MatchServiceImpl implements MatchService {
         // TODO Auto-generated method stub
         return false;
     }
+
 
     // View check-in status for both players for a match
     @Override
@@ -106,3 +118,4 @@ public class MatchServiceImpl implements MatchService {
         return false;
     }
 }
+

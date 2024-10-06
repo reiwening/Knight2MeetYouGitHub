@@ -29,7 +29,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
 
-    @Override
+    @Override   
     public boolean authenticatePlayer(String username, String hashedPassword) {
         // TODO Auto-generated method stub
         return false;
@@ -68,6 +68,13 @@ public class PlayerServiceImpl implements PlayerService {
         return 0;
     }
 
+    // @Override
+    // public void setPlayerGlobalEloRating(Player player, double change) {
+    //     // TODO Auto-generated method stub
+    //     double oldPlayerElo = player.getGlobalEloRating();
+    //     return player.setGlobalEloRating(oldPlayerElo + change);
+    // }
+
     @Override
     public void setPlayerGlobalEloRating(Player player, double change){
         
@@ -103,7 +110,23 @@ public class PlayerServiceImpl implements PlayerService {
         return null;
     }
 
-   
+    @Override
+    public List<Match> getMatchesAsPlayer1(Player player) {
+        return player.getMatchesAsPlayer1();
+    }
+
+    @Override
+    public List<Match> getMatchesAsPlayer2(Player player) {
+        return player.getMatchesAsPlayer2();
+    }
+
+    @Override
+    public Match addMatchToPlayerHistory(Player player, Match match) {
+        if (match.getPlayer1() == player) {
+            return player.addMatchesAsPlayer1(match);
+        }
+        return player.addMatchesAsPlayer2(match);
+    }
     
     
 }

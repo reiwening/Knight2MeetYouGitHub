@@ -6,16 +6,15 @@ import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.entity.Match;
 
 public interface MatchService {
-
     // createMatch returns (long) id of the newly created match
     // long createMatch();
 
     Match saveMatch(Match match);
     // Match deleteMatch(Long id);
     Match findMatchById(Long id);
-
-    void assignPlayersToMatch(Match match, Player p1, Player p2);
-    void processMatchResult(Match match, Player winner);
+    
+    void assignPlayerToMatch(Match match, Player player);
+    void processMatchResult(Match match, Player winner, boolean isDraw);
 
     List<Match> getMatchesForTournament(Tournament tournament);
     List<Match> getMatchesForPlayer(Player player);
