@@ -39,6 +39,7 @@ public class MatchController {
         // Persist the new match using matchService
         return matchService.saveMatch(match);
     }
+    
 
 
     // assign players to created match
@@ -58,7 +59,6 @@ public class MatchController {
         playerService.addMatchToPlayerHistory(managedPlayer, match);
         playerService.savePlayer(managedPlayer);
         // System.out.println(managedPlayer.getUsername());
-
         return match;
     }
 
@@ -67,23 +67,32 @@ public class MatchController {
     public Match getMatch(@PathVariable Long id) {
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);
-
         return match;
     }
 
     // process match when it ends
     @PutMapping("/matches/{id}/updateresults")
-    public Match updateMatchResults(@PathVariable Long id, @RequestBody Player winner) {
+    public Match updateMatchResults(
+        @PathVariable Long id, 
+        @RequestParam boolean isDraw, 
+        @RequestBody(required = false) Player winner) {
+        
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);
 
-        Player managedPlayer = playerService.getPlayerById(winner.getId());
+        if (isDraw) {
+            // Handle the draw scenario
+            matchService.processMatchResult(match, null, true);
+        } else {
+            // Handle the winner scenario
+            Player managedPlayer = playerService.getPlayerById(winner.getId());
+            if (managedPlayer == null) throw new PlayerNotFoundException(winner.getId());
+            matchService.processMatchResult(match, managedPlayer, false);
+        }
 
-        if (managedPlayer == null) throw new PlayerNotFoundException(winner.getId());
-
-        // call processMatchResult in MatchServiceImpl
-        matchService.processMatchResult(match, winner);
         matchService.saveMatch(match);
         return match;
     }
+
 }
+

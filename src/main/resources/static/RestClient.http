@@ -1,4 +1,13 @@
-GET http://localhost:8080/players/2/username
+//Player Testing
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "FirstPlayer",
+    "hashedPassword": "Password1",
+    "globalEloRating": 1000
+}
 
 ###
 
@@ -6,11 +15,7 @@ GET http://localhost:8080/players/1/globalEloRating
 
 ###
 
-GET http://localhost:8080/players/100
-
-###
-
-PUT http://localhost:8080/players/abc
+PUT http://localhost:8080/players/1
 Content-Type: application/json
 
 {
@@ -18,37 +23,54 @@ Content-Type: application/json
     "globalEloRating": 5000
 }
 
-
 ###
-# Authorization: Basic Player1:Password1
+
 POST http://localhost:8080/players
 Content-Type: application/json
 
 {
-
-    "username": "Player1",
-    "password": "Password1",
-    "authorities": "ROLE_USER",
-    "globalEloRating": 3000
+    "username": "ForthPlayer",
+    "hashedPassword": "Password4",
+    "globalEloRating": 5000
 }
 
 ###
 
-GET http://localhost:8080/players/Player2
-#this is for player 1 
-Authorization: Basic UGxheWVyMzpQYXNzd29yZDM=
-# UGxheWVyMzpQYXNzd29yZDM=
-# Basic UGxheWVyMTpQYXNzd29yZDE= 
+GET http://localhost:8080/players/4
+
+
+
+
+
+//Match testing
 
 ###
-GET http://localhost:8080/players
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "Alex",
+    "hashedPassword": "Password1",
+    "globalEloRating": 3000
+
+}
+
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "Bob",
+    "hashedPassword": "Password2",
+    "globalEloRating": 1200
+}
 
 ###
 POST http://localhost:8080/matches
 Content-Type: application/json
 
 {
-
+    
 }
 
 ###
@@ -70,10 +92,48 @@ Content-Type: application/json
 ###
 GET http://localhost:8080/matches/1
 
+//test match updating when not draw
 ###
-PUT http://localhost:8080/matches/1/updateresults
+PUT http://localhost:8080/matches/1/updateresults?isDraw=false
 Content-Type: application/json
 
 {
     "id": 2
 }
+
+//creating a new match
+###
+POST http://localhost:8080/matches
+Content-Type: application/json
+
+{
+    
+}
+
+//player player 1 into match 2
+###
+PUT http://localhost:8080/matches/2
+Content-Type: application/json
+
+{
+    "id": 1
+}
+
+//putting player 2 into match 2
+###
+PUT http://localhost:8080/matches/2
+Content-Type: application/json
+
+{
+    "id": 2
+}
+
+###
+GET http://localhost:8080/matches/2
+
+//test match updating when draw
+###
+PUT http://localhost:8080/matches/2/updateresults?isDraw=true
+Content-Type: application/json
+
+{}

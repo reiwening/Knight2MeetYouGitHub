@@ -44,6 +44,7 @@ public class PlayerServiceImpl implements PlayerService {
             return null;
         } 
 
+
         playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
 
         /* else we have to save to the DB */
@@ -54,6 +55,11 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public Optional<Player> findPlayerByUsername(String username) {
         return playerRepository.findByUsername(username);  // Repository method to find player by username
+
+    }
+
+    public void setPlayerRepository(PlayerRepository playerRepository) {
+        this.playerRepository = playerRepository;
     }
 
     @Override
@@ -111,7 +117,21 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getMatchHistory();
     }
 
+
 //////////////////////////////////////////////////////////////////////////////////
+
+    // @Override
+    // public void setPlayerGlobalEloRating(Player player, double change) {
+    //     // TODO Auto-generated method stub
+    //     double oldPlayerElo = player.getGlobalEloRating();
+    //     return player.setGlobalEloRating(oldPlayerElo + change);
+    // }
+
+    @Override
+    public void setPlayerGlobalEloRating(Player player, double change){
+        
+    }
+
 
     @Override
     public Player updatePlayer(Long id, Player updatedPlayer) {
@@ -133,6 +153,16 @@ public class PlayerServiceImpl implements PlayerService {
         return null;
     }
  
+    @Override
+    public List<Match> getMatchesAsPlayer1(Player player) {
+        return player.getMatchesAsPlayer1();
+    }
+
+    @Override
+    public List<Match> getMatchesAsPlayer2(Player player) {
+        return player.getMatchesAsPlayer2();
+    }
+
     @Override
     public List<Match> getMatchesAsPlayer1(Player player) {
         return player.getMatchesAsPlayer1();

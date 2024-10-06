@@ -21,12 +21,14 @@ public interface PlayerService {
     int getPlayerTournamentRankings(Player player, Tournament tournament); // see parameters  / consider a Map<Player, Integer>
 
     double getPlayerGlobalEloRating(Player player);
-    void setPlayerGlobalEloRating(Player player, double change); // not sure if we need this method
+    // void setPlayerGlobalEloRating(Player player, double change);
+
     
     // Participation
     List<Match> getPlayerMatchHistory(Player player);
     List<Tournament> getTournamentRegistered(Player player);
     List<Tournament> getActiveTournamentRegistered(Player player);
+
     Optional<Player> findPlayerByUsername(String username);
 
     List<Match> getMatchesAsPlayer1(Player player);

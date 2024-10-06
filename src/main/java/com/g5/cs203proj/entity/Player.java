@@ -13,6 +13,9 @@ import jakarta.validation.constraints.Pattern;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.*;
+import java.util.List;
+import java.util.ArrayList;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -50,19 +53,26 @@ public class Player implements UserDetails   {
     private double globalEloRating;
 
     @ManyToMany 
+    @JsonIgnore
     @JoinTable(
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "tournament_id"))
     private List<Tournament> tournamentRegistered;
 
+    
     @OneToMany(mappedBy = "player1")
+    @JsonIgnore
     private List<Match> matchesAsPlayer1;
 
+    
     @OneToMany(mappedBy = "player2")
+    @JsonIgnore
     private List<Match> matchesAsPlayer2;
 
+    
     @Transient // This field is not persisted directly, but computed
+    @JsonIgnore
     private List<Match> matchHistory;
 
     public List<Tournament> getTournamentRegistered() {
@@ -136,8 +146,16 @@ public class Player implements UserDetails   {
         return username;
     }
 
+
     public void setUsername(String username) {
         this.username = username;
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public double getGlobalEloRating() {
+        return globalEloRating;
     }
 
     @Override
@@ -170,16 +188,40 @@ public class Player implements UserDetails   {
     @JsonIgnore
     public boolean isEnabled() {
         return true;
+
+    
+    public List<Tournament> getTournamentRegistered() {
+        return tournamentRegistered;
+
     }
 
     public List<Match> getMatchesAsPlayer1() {
         return matchesAsPlayer1;
     }
 
+
+
+    public List<Match> getMatchesAsPlayer1() {
+        return matchesAsPlayer1;
+    }
+
+
     public Match addMatchesAsPlayer1(Match match) {
         this.matchesAsPlayer1.add(match);
         return match;
     }
+
+
+
+    public List<Match> getMatchesAsPlayer2() {
+        return matchesAsPlayer2;
+    }
+
+    public Match addMatchesAsPlayer2(Match match) {
+        this.matchesAsPlayer2.add(match);
+        return match;
+    }
+
 
     public List<Match> getMatchesAsPlayer2() {
         return matchesAsPlayer2;
