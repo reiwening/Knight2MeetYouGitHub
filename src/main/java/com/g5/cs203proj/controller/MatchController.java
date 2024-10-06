@@ -8,7 +8,7 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
-import com.g5.cs203proj.exception.MatchNotFoundException;
+import com.g5.cs203proj.exception.PlayerNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 
 
 
@@ -41,6 +40,7 @@ public class MatchController {
         return matchService.saveMatch(match);
     }
     
+
 
     // assign players to created match
     @PutMapping("matches/{id}")

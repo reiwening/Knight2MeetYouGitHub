@@ -10,4 +10,8 @@ public class PlayerNotFoundException extends RuntimeException {
     public PlayerNotFoundException(Long id) {
         super(id.toString());
     }
+
+    public PlayerNotFoundException(String username) {
+        super(username);
+    }
 }

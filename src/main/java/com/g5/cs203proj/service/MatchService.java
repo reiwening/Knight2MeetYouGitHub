@@ -12,9 +12,15 @@ public interface MatchService {
     Match saveMatch(Match match);
     // Match deleteMatch(Long id);
     Match findMatchById(Long id);
+
+
+    void assignPlayerToMatch(Match match, Player player);
+    void processMatchResult(Match match, Player winner);
+
     
     void assignPlayerToMatch(Match match, Player player);
     void processMatchResult(Match match, Player winner, boolean isDraw);
+
 
     List<Match> getMatchesForTournament(Tournament tournament);
     List<Match> getMatchesForPlayer(Player player);

@@ -137,5 +137,3 @@ PUT http://localhost:8080/matches/2/updateresults?isDraw=true
 Content-Type: application/json
 
 {}
-
-
