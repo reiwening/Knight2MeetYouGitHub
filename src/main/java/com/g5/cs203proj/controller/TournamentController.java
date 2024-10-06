@@ -20,6 +20,7 @@ public class TournamentController {
         this.tournamentService = tournamentService;
     }
 
+    //test: ok
     // Create a new tournament
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/tournaments")
@@ -27,6 +28,7 @@ public class TournamentController {
         return tournamentService.createTournament(tournament);
     }
 
+    //test: ok
     // Update a tournament by ID
     @PutMapping("/tournaments/{id}")
     public Tournament updateTournament(
@@ -34,24 +36,28 @@ public class TournamentController {
         return tournamentService.updateTournament(id, updatedTournament);
     }
 
+    //test: ok
     // Delete a tournament by ID
     @DeleteMapping("/tournaments/{id}")
     public void deleteTournament(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
     }
 
+    //test: ok
     // Get a specific tournament by ID
     @GetMapping("/tournaments/{id}")
     public Tournament getTournamentById(@PathVariable Long id) {
         return tournamentService.getTournamentById(id);
     }
 
+    //test: ok
     // Get all tournaments
     @GetMapping("/tournaments")
     public List<Tournament> getAllTournaments() {
         return tournamentService.getAllTournaments();
     }
 
+    //test: ok
     // Get all registerable tournaments
     @GetMapping("/tournaments/reg")
     public List<Tournament> getAllRegisterableTournaments() {
@@ -72,24 +78,28 @@ public class TournamentController {
         return tournamentService.getTournamentRankings(id);
     }
 
+    //test: ok
     // Register a player to a tournament
     @PostMapping("/tournaments/{tournamentId}/players")
-    public Tournament registerPlayer(@PathVariable Long tournamentId, @RequestBody Long playerId) {
+    public Tournament registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
         return tournamentService.registerPlayer(playerId, tournamentId);
     }
 
+    //test: ok
     // Remove a player from a tournament
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
     public Tournament removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
         return tournamentService.removePlayer(playerId, tournamentId);
     }
 
+    //test: ok
     // Get a list of registered players in a tournament
     @GetMapping("/tournaments/{id}/players")
     public List<Player> getRegisteredPlayers(@PathVariable Long id) {
         return tournamentService.getRegisteredPlayers(id);
     }
 
+    //test: ok
     // Update the Elo range for the tournament
     @PutMapping("/tournaments/{id}/elo-range") //not sure about mapping
     public Tournament setTournamentEloRange(
@@ -97,6 +107,7 @@ public class TournamentController {
         return tournamentService.setTournamentEloRange(id, minElo, maxElo);
     }
 
+    //test: ok
     // Update the tournament status
     @PutMapping("/tournaments/{id}/status")
     public Tournament setTournamentStatus(
@@ -104,6 +115,7 @@ public class TournamentController {
         return tournamentService.setTournamentStatus(id, status);
     }
 
+    //test: ok
     // Update the tournament style
     @PutMapping("/tournaments/{id}/style")
     public Tournament setTournamentStyle(
@@ -118,15 +130,17 @@ public class TournamentController {
         @PathVariable Long id, @RequestParam int minPlayers, @RequestParam int maxPlayers) {
         return tournamentService.setTournamentPlayerRange(id, minPlayers, maxPlayers);
     }
-//not working yet
+
+    //test: ok
     // Update the registration cutoff time
     @PutMapping("/tournaments/{id}/registration-cutoff")
     public Tournament setTournamentRegistrationCutOff(
-        @PathVariable Long id, @RequestBody LocalDateTime registrationCutOff) {
+        @PathVariable Long id, @RequestParam int day, @RequestParam int month, @RequestParam int year, @RequestParam int minute, @RequestParam int hour) {
+        LocalDateTime registrationCutOff = LocalDateTime.of(year, month, day, hour, minute);
         return tournamentService.setTournamentRegistrationCutOff(id, registrationCutOff);
     }
-    
-//test later
+
+    //test later
     // Update the tournament admin
     @PutMapping("/tournaments/{id}/admin")
     public Tournament setAdmin(
@@ -134,6 +148,7 @@ public class TournamentController {
         return tournamentService.setAdmin(id, newAdmin);
     }
 
+    //test: ok
     // Update the tournament name
     @PutMapping("/tournaments/{id}/name")
     public Tournament setName(

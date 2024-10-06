@@ -26,7 +26,7 @@ public class Player {
     private double globalEloRating;
 
     @ManyToMany 
-    // @JsonIgnore
+    @JsonIgnore
     @JoinTable(
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 
