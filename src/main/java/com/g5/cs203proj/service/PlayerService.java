@@ -22,6 +22,7 @@ public interface PlayerService {
 
     double getPlayerGlobalEloRating(Player player);
     // void setPlayerGlobalEloRating(Player player, double change);
+
     
     // Player Authentication and Availability
     boolean authenticatePlayer(String username, String hashedPassword);

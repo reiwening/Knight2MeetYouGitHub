@@ -3,6 +3,7 @@ package com.g5.cs203proj.entity;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.*;
 import java.util.List;
+import com.g5.cs203proj.service.*;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -110,7 +111,7 @@ public class Match {
     public void setPlayer1(Player player1) {
         this.player1 = player1;
     }
-    
+
     public void setPlayer2(Player player2) {
         this.player2 = player2;
     }
@@ -119,12 +120,12 @@ public class Match {
         // System.out.println("Player 1 Status: Checked-In");
         this.statusP1 = status;
     }
-    
+
     public void setStatusP2(boolean status) {
         // System.out.println("Player 2 Status: Checked-In");
         this.statusP2 = status;
     }
-    
+
     public void setWinner(Player winner) {
         this.winner = winner;
     }
@@ -171,7 +172,7 @@ public class Match {
     public Player getPlayer1() {
         return player1;
     }
-    
+
     public Player getPlayer2() {
         return player2;
     }
@@ -179,7 +180,7 @@ public class Match {
     public boolean getStatusP1() {
         return statusP1;
     }
-    
+
     public boolean getStatusP2() {
         return statusP2;
     }

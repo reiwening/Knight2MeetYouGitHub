@@ -51,7 +51,8 @@ Content-Type: application/json
 {
     "username": "Alex",
     "hashedPassword": "Password1",
-    "globalEloRating": 1000
+    "globalEloRating": 3000
+
 }
 
 ###

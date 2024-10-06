@@ -6,7 +6,6 @@ import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.entity.Match;
 
 public interface MatchService {
-    
     // createMatch returns (long) id of the newly created match
     // long createMatch();
 

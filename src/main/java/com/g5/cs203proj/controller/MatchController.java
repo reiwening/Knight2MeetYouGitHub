@@ -8,6 +8,7 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
+import com.g5.cs203proj.exception.MatchNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -57,7 +59,6 @@ public class MatchController {
         playerService.addMatchToPlayerHistory(managedPlayer, match);
         playerService.savePlayer(managedPlayer);
         // System.out.println(managedPlayer.getUsername());
-
         return match;
     }
 
@@ -66,7 +67,6 @@ public class MatchController {
     public Match getMatch(@PathVariable Long id) {
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);
-        
         return match;
     }
 
@@ -95,3 +95,4 @@ public class MatchController {
     }
 
 }
+
