@@ -76,7 +76,7 @@ public class Player implements UserDetails   {
 
 
     public Player() {
-        // Default constructor required for deserialization
+    
     }
     
 
@@ -129,8 +129,6 @@ public class Player implements UserDetails   {
         }
         return matchHistory;
     }
-
-    
 
     
     @Override
