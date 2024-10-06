@@ -1,6 +1,7 @@
 package com.g5.cs203proj.entity;
 
 import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.service.*;
 import java.util.List;
 import com.g5.cs203proj.service.*;
 
@@ -12,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.*;
 
 @Entity
 public class Match {
@@ -20,7 +22,6 @@ public class Match {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     @ManyToOne
     @JoinColumn(name = "tournament_id")
@@ -41,6 +42,8 @@ public class Match {
     @JoinColumn(name = "winner_id")
     private Player winner;
     
+    private boolean isDraw;
+
     private boolean isComplete;
     private Double eloChange;
 
@@ -60,6 +63,7 @@ public class Match {
         this.statusP2 = false;
 
         this.winner = null;
+        this.isDraw = false;  // Initialize as not a draw
         this.isComplete = false;
         this.eloChange = null;
     }
@@ -74,6 +78,7 @@ public class Match {
         this.statusP2 = false;
 
         this.winner = null;
+        this.isDraw = false;  // Initialize as not a draw
         this.isComplete = false;
         this.eloChange = null;
     }
@@ -88,6 +93,7 @@ public class Match {
         this.statusP2 = false;
 
         this.winner = null;
+        this.isDraw = false;  // Initialize as not a draw
         this.isComplete = false;
         this.eloChange = null;
     }
@@ -124,31 +130,35 @@ public class Match {
         this.winner = winner;
     }
 
+    public void setDraw(boolean isDraw) {
+        this.isDraw = isDraw;
+    }
+
     public void setIsCompleteStatus(boolean status) {
         this.isComplete = status;
     }
 
     // 27/6/24: method invoked on player class for now, dk if using PlayerController
     public void setEloChange(Player winner) {
-        // Some elo change calculation
-        double change = 10;
-
-        if (player1 == winner) {
-            player1.setGlobalEloRating(player1.getGlobalEloRating() + change);
-            player2.setGlobalEloRating(player2.getGlobalEloRating() + change * -1);
-        } else if (player2 == winner) {
-            player2.setGlobalEloRating(player2.getGlobalEloRating() + change);
-            player1.setGlobalEloRating(player1.getGlobalEloRating() + change * -1);
-        } else {
-            // might need to change logic for draw depending on how Elo is calc for draws
-            player1.setGlobalEloRating(player1.getGlobalEloRating() + change);
-            player2.setGlobalEloRating(player2.getGlobalEloRating() + change);
-        }
+        double kFactor = 32.0;
+        double ratingP1 = player1.getGlobalEloRating();
+        double ratingP2 = player2.getGlobalEloRating();
+    
+        double expectedP1 = 1 / (1 + Math.pow(10, (ratingP2 - ratingP1) / 400));
+        double expectedP2 = 1 / (1 + Math.pow(10, (ratingP1 - ratingP2) / 400));
+    
+        double scoreP1 = isDraw ? 0.5 : (player1 == winner ? 1 : 0);
+        double scoreP2 = isDraw ? 0.5 : (player2 == winner ? 1 : 0);
+    
+        double newRatingP1 = Math.round(ratingP1 + kFactor * (scoreP1 - expectedP1));
+        double newRatingP2 = Math.round(ratingP2 + kFactor * (scoreP2 - expectedP2));
+    
+        player1.setGlobalEloRating(newRatingP1);
+        player2.setGlobalEloRating(newRatingP2);
+    
+        this.eloChange = Math.abs(newRatingP1 - ratingP1);
     }
-
-
-
-
+    
 
     // Getter methods
     public Long getMatchId() {
@@ -179,11 +189,14 @@ public class Match {
         return winner;
     }
 
+    public boolean getDraw(){
+        return isDraw;
+    }
+
     public boolean getIsCompleteStatus() {
         return isComplete;
     }
-
-    // 16/9/24: Later do 
+    
     public Double getEloChange() {
         return eloChange;
     }

@@ -21,7 +21,8 @@ public interface PlayerService {
     int getPlayerTournamentRankings(Player player, Tournament tournament); // see parameters  / consider a Map<Player, Integer>
 
     double getPlayerGlobalEloRating(Player player);
-    void setPlayerGlobalEloRating(Player player, double change); // not sure if we need this method
+    // void setPlayerGlobalEloRating(Player player, double change);
+
     
     // Player Authentication and Availability
     boolean authenticatePlayer(String username, String hashedPassword);
@@ -30,6 +31,10 @@ public interface PlayerService {
     Queue<Match> getPlayerMatchHistory(Player player);
     List<Tournament> getTournamentRegistered(Player player);
     List<Tournament> getActiveTournamentRegistered(Player player);
+
+    List<Match> getMatchesAsPlayer1(Player player);
+    List<Match> getMatchesAsPlayer2(Player player);
+    Match addMatchToPlayerHistory(Player player, Match match);
     
     
 }

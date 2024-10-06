@@ -1,12 +1,17 @@
-GET http://localhost:8080/players/2/username
+//Player Testing
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "FirstPlayer",
+    "hashedPassword": "Password1",
+    "globalEloRating": 1000
+}
 
 ###
 
 GET http://localhost:8080/players/1/globalEloRating
-
-###
-
-GET http://localhost:8080/players/4
 
 ###
 
@@ -16,19 +21,6 @@ Content-Type: application/json
 {
     "username": "NEW USERNAME",
     "globalEloRating": 5000
-}
-
-
-###
-POST http://localhost:8080/players
-Content-Type: application/json
-
-{
-
-    "username": "thirdPlayer",
-    "hashedPassword": "Password1",
-    "globalEloRating": 3000
-
 }
 
 ###
@@ -41,5 +33,109 @@ Content-Type: application/json
     "hashedPassword": "Password4",
     "globalEloRating": 5000
 }
+
+###
+
+GET http://localhost:8080/players/4
+
+
+
+
+
+//Match testing
+
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "Alex",
+    "hashedPassword": "Password1",
+    "globalEloRating": 3000
+
+}
+
+###
+POST http://localhost:8080/players
+Content-Type: application/json
+
+{
+    "username": "Bob",
+    "hashedPassword": "Password2",
+    "globalEloRating": 1200
+}
+
+###
+POST http://localhost:8080/matches
+Content-Type: application/json
+
+{
+    
+}
+
+###
+PUT http://localhost:8080/matches/1
+Content-Type: application/json
+
+{
+    "id": 1
+}
+
+###
+PUT http://localhost:8080/matches/1
+Content-Type: application/json
+
+{
+    "id": 2
+}
+
+###
+GET http://localhost:8080/matches/1
+
+//test match updating when not draw
+###
+PUT http://localhost:8080/matches/1/updateresults?isDraw=false
+Content-Type: application/json
+
+{
+    "id": 2
+}
+
+//creating a new match
+###
+POST http://localhost:8080/matches
+Content-Type: application/json
+
+{
+    
+}
+
+//player player 1 into match 2
+###
+PUT http://localhost:8080/matches/2
+Content-Type: application/json
+
+{
+    "id": 1
+}
+
+//putting player 2 into match 2
+###
+PUT http://localhost:8080/matches/2
+Content-Type: application/json
+
+{
+    "id": 2
+}
+
+###
+GET http://localhost:8080/matches/2
+
+//test match updating when draw
+###
+PUT http://localhost:8080/matches/2/updateresults?isDraw=true
+Content-Type: application/json
+
+{}
 
 
