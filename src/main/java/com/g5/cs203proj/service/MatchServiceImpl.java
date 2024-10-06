@@ -98,8 +98,8 @@ public class MatchServiceImpl implements MatchService {
     public List<Match> getMatchesForPlayer(Player player) {
         // TODO Auto-generated method stub
         return null;
-
     }
+
 
     // Returns true if notification sent successfully
     @Override

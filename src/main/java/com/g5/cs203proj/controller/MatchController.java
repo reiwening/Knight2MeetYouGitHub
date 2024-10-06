@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 
-
 @RestController
 public class MatchController {
     @Autowired
@@ -41,6 +40,7 @@ public class MatchController {
         return matchService.saveMatch(match);
     }
     
+
 
     // assign players to created match
     @PutMapping("matches/{id}")

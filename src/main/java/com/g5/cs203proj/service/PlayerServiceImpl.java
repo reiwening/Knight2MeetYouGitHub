@@ -1,5 +1,10 @@
 package com.g5.cs203proj.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.g5.cs203proj.entity.Player;
@@ -10,29 +15,47 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.repository.PlayerRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
     private PlayerRepository playerRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before storing the password 
+                                                         // provided in the `SecurityConfig` Class
 
     // constructor 
-    public PlayerServiceImpl( PlayerRepository playerRepository ) {
+    public PlayerServiceImpl( PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder ) {
         this.playerRepository = playerRepository;
+        this.bCryptPasswordEncoder= bCryptPasswordEncoder;
     }
-    
-// override the methods
+
+// override the methods for PlayerService interface
 
     @Override
     public Player savePlayer( Player player ) {
         return playerRepository.save(player);
     }
 
+    public Player registerPlayer(Player playerToRegister ) {
+        Optional<Player> existingPlayer = findPlayerByUsername(playerToRegister.getUsername()); 
+        if (existingPlayer.isPresent()) {
+            return null;
+        } 
 
-    @Override   
-    public boolean authenticatePlayer(String username, String hashedPassword) {
-        // TODO Auto-generated method stub
-        return false;
+
+        playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
+
+        /* else we have to save to the DB */
+        return savePlayer(playerToRegister);
+
+    }
+    
+    @Override
+    public Optional<Player> findPlayerByUsername(String username) {
+        return playerRepository.findByUsername(username);  // Repository method to find player by username
+
     }
 
     public void setPlayerRepository(PlayerRepository playerRepository) {
@@ -40,33 +63,62 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Player deletePlayer(Long id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Tournament> getActiveTournamentRegistered(Player player) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public List<Player> getAllPlayers() {
-        // TODO Auto-generated method stub
-        return null;
+        return playerRepository.findAll();
+    }
+
+
+    private boolean hasRole(Player player, String role){
+        return player.getAuthorities().stream()
+                                      .anyMatch(authority -> authority.getAuthority().equals(role));
+    }
+    
+    @Override 
+    public List<Player> getAllAdmins() {
+        List<Player> allPlayers = getAllPlayers();
+        List<Player> admins = allPlayers.stream()
+                                        .filter( player -> hasRole(player, "ROLE_ADMIN"))
+                                        .collect(Collectors.toList());
+        return admins;
+    }
+
+    @Override 
+    public List<Player> getAllPlayerUsers() {
+        List<Player> allPlayers = getAllPlayers();
+        List<Player> users = allPlayers.stream()
+                                        .filter( player -> hasRole(player, "ROLE_USER"))
+                                        .collect(Collectors.toList());
+        return users;
     }
 
     @Override
     public Player getPlayerById(Long id) {
         return playerRepository.findById(id).orElse(null);
     }
+    
+    @Override
+    public void setPlayerGlobalEloRating(Player player, double newRating) {
+        player.setGlobalEloRating(newRating);
+        playerRepository.save(player);  // Save the player with the updated Elo rating
+    }
 
     @Override
     public double getPlayerGlobalEloRating(Player player) {
-        // TODO Auto-generated method stub
-        return 0;
+        return player.getGlobalEloRating();
     }
+    
+    @Override
+    public List<Tournament> getTournamentRegistered(Player player) {
+        return player.getTournamentRegistered();
+    }
+
+    @Override
+    public List<Match> getPlayerMatchHistory(Player player) {
+        return player.getMatchHistory();
+    }
+
+
+//////////////////////////////////////////////////////////////////////////////////
 
     // @Override
     // public void setPlayerGlobalEloRating(Player player, double change) {
@@ -75,41 +127,27 @@ public class PlayerServiceImpl implements PlayerService {
     //     return player.setGlobalEloRating(oldPlayerElo + change);
     // }
 
+
     @Override
-    public void setPlayerGlobalEloRating(Player player, double change){
-        
+    public Player updatePlayer(Long id, Player updatedPlayer) {
+        return null;
     }
 
     @Override
-    public Queue<Match> getPlayerMatchHistory(Player player) {
-        // TODO Auto-generated method stub
+    public Player deletePlayer(Long id) {
         return null;
     }
 
     @Override
     public int getPlayerTournamentRankings(Player player, Tournament tournament) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     @Override
-    public List<Tournament> getTournamentRegistered(Player player) {
-        // TODO Auto-generated method stub
+    public List<Tournament> getActiveTournamentRegistered(Player player) {
         return null;
     }
-
-    @Override
-    public Player registerPlayer(Player player) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Player updatePlayer(Long id, Player updatedPlayer) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+ 
     @Override
     public List<Match> getMatchesAsPlayer1(Player player) {
         return player.getMatchesAsPlayer1();
@@ -127,6 +165,4 @@ public class PlayerServiceImpl implements PlayerService {
         }
         return player.addMatchesAsPlayer2(match);
     }
-    
-    
 }

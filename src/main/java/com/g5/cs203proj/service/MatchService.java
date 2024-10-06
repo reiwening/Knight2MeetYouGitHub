@@ -16,6 +16,7 @@ public interface MatchService {
     void assignPlayerToMatch(Match match, Player player);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
+
     List<Match> getMatchesForTournament(Tournament tournament);
     List<Match> getMatchesForPlayer(Player player);
 
