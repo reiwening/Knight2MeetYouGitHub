@@ -1,3 +1,4 @@
+//Player Testing
 ###
 POST http://localhost:8080/players
 Content-Type: application/json
@@ -41,6 +42,7 @@ GET http://localhost:8080/players/4
 
 
 
+//Match testing
 
 ###
 POST http://localhost:8080/players
@@ -89,11 +91,50 @@ Content-Type: application/json
 ###
 GET http://localhost:8080/matches/1
 
+//test match updating when not draw
 ###
-PUT http://localhost:8080/matches/1/updateresults
+PUT http://localhost:8080/matches/1/updateresults?isDraw=false
 Content-Type: application/json
 
 {
-    "username" : "testing",
     "id": 2
 }
+
+//creating a new match
+###
+POST http://localhost:8080/matches
+Content-Type: application/json
+
+{
+    
+}
+
+//player player 1 into match 2
+###
+PUT http://localhost:8080/matches/2
+Content-Type: application/json
+
+{
+    "id": 1
+}
+
+//putting player 2 into match 2
+###
+PUT http://localhost:8080/matches/2
+Content-Type: application/json
+
+{
+    "id": 2
+}
+
+###
+GET http://localhost:8080/matches/2
+
+//test match updating when draw
+###
+PUT http://localhost:8080/matches/2/updateresults?isDraw=true
+Content-Type: application/json
+
+{}
+
+

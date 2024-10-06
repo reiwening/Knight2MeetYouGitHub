@@ -71,9 +71,17 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void processMatchResult(Match match, Player winner) {
+    public void processMatchResult(Match match, Player winner, boolean isDraw) {
         match.setIsCompleteStatus(true);
-        match.setWinner(winner);
+        match.setDraw(isDraw);
+
+        if (isDraw) {
+            match.setWinner(null);  // No winner in case of a draw
+        } else {
+            match.setWinner(winner);
+        }
+        
+        // Elo change uses isDraw attribute from Match. If draw, will auto calculate
         match.setEloChange(winner);
     }
 
