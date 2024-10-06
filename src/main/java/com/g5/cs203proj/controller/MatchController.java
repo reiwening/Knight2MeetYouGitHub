@@ -81,7 +81,7 @@ public class MatchController {
         if (managedPlayer == null) throw new PlayerNotFoundException(winner.getId());
 
         // call processMatchResult in MatchServiceImpl
-        matchService.processMatchResult(match, winner);
+        matchService.processMatchResult(match, managedPlayer);
         matchService.saveMatch(match);
         return match;
     }

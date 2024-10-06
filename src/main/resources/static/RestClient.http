@@ -94,5 +94,6 @@ PUT http://localhost:8080/matches/1/updateresults
 Content-Type: application/json
 
 {
+    "username" : "testing",
     "id": 2
 }
