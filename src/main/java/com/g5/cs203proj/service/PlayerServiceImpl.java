@@ -35,6 +35,10 @@ public class PlayerServiceImpl implements PlayerService {
         return false;
     }
 
+    public void setPlayerRepository(PlayerRepository playerRepository) {
+        this.playerRepository = playerRepository;
+    }
+
     @Override
     public Player deletePlayer(Long id) {
         // TODO Auto-generated method stub
@@ -70,6 +74,11 @@ public class PlayerServiceImpl implements PlayerService {
     //     double oldPlayerElo = player.getGlobalEloRating();
     //     return player.setGlobalEloRating(oldPlayerElo + change);
     // }
+
+    @Override
+    public void setPlayerGlobalEloRating(Player player, double change){
+        
+    }
 
     @Override
     public Queue<Match> getPlayerMatchHistory(Player player) {

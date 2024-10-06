@@ -16,12 +16,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 
+import com.g5.cs203proj.entity.Match;
+import com.g5.cs203proj.entity.Player;
+
 @Entity
 public class Tournament {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="tournament_name")
     private String name;
     
     @OneToMany
