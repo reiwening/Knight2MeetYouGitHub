@@ -121,6 +121,11 @@ public class Tournament {
         return registeredPlayers;
     }
 
+    //why when i put this in, creating a tournament gives this error (Could not write JSON: Cannot invoke "java.util.List.size()" because "this.registeredPlayers" is null)
+    // public int getRegisteredPlayerCount(){
+    //     return registeredPlayers.size();
+    // }
+
     public void setRegisteredPlayers(List<Player> registeredPlayers) {
         this.registeredPlayers = registeredPlayers;
     }

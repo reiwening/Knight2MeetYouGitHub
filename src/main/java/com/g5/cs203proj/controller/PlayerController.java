@@ -49,7 +49,6 @@ public class PlayerController {
     public ResponseEntity<?> createPlayer(@Valid @RequestBody Player player) {
             // Check if the player already exists
             Player existingPlayer = playerService.registerPlayer(player); 
-            
             if (existingPlayer == null) {
             // Return a bad request or conflict status with a meaningful message
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
