@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -165,6 +169,15 @@ public class TournamentController {
     public List<ArrayList<String>> getTournamentMatches(@PathVariable Long tournamentId) {
         return tournamentService.getTournamentMatchHistory(tournamentId);
     }
+
+    //test:
+    // Add a test match to a tournament
+    @PostMapping("/tournaments/{tournamentId}/matches")
+    public boolean testPostMatch(@PathVariable Long tournamentId, @RequestBody Match match) {
+        //TODO: process POST request
+        return tournamentService.addTestMatchToTournament(tournamentId, match);
+    }
+    
     
 }
 

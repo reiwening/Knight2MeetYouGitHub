@@ -4,6 +4,8 @@ import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
 
+import jakarta.validation.OverridesAttribute;
+
 import org.hibernate.mapping.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,7 +141,7 @@ public class TournamentServiceImpl implements TournamentService {
         List<Match> matches = tournament.getTournamentMatchHistory();
         
         // Add each match's info to a list of all matches' info
-        List<ArrayList<String>> detailedMatchInfo = new List<ArrayList<String>>();
+        List<ArrayList<String>> detailedMatchInfo = new ArrayList<ArrayList<String>>();
         ArrayList<String> matchInfo = new ArrayList<String>();
         for (Match m : matches) {
             // Combine each match's info into 1 ArrayList
@@ -158,6 +160,13 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         return detailedMatchInfo;
+    }
+
+    @Override
+    public boolean addTestMatchToTournament(Long tournamentId, Match match) {
+        Tournament t = getTournamentById(tournamentId);
+        t.addTestMatch(match);
+        return true;
     }
 
     @Override

@@ -83,6 +83,14 @@ public class Player implements UserDetails   {
     public Player() {
     
     }
+
+    public Player(Long id, String username, String password) {
+        // this.id = id;
+        this.username = username;
+        // this.authorities =authorities;
+        this.password = password;
+        this.id = id;
+    }
     
 
     public Player(String username, String password, String authorities) {

@@ -2,6 +2,7 @@ package com.g5.cs203proj.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.g5.cs203proj.entity.Admin;
@@ -32,7 +33,8 @@ public interface TournamentService {
 
 //match management
     void scheduleMatches(Long tournamentId);
-    List<Match> getTournamentMatchHistory(Long tournamentId);
+    List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId);
+    boolean addTestMatchToTournament(Long tournamentId, Match match);
     void sendMatchNotification(Long tournamentId, List<Match> matches);
         //uses sendNotification inside MatchService
 

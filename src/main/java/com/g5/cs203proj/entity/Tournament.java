@@ -97,6 +97,10 @@ public class Tournament {
         return tournamentMatchHistory;
     }
 
+    public void addTestMatch(Match m) {
+        this.tournamentMatchHistory.add(m);
+    }
+
     public void setTournamentMatchHistory(List<Match> tournamentMatchHistory) {
         this.tournamentMatchHistory = tournamentMatchHistory;
     }
