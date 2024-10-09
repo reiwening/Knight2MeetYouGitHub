@@ -3,6 +3,8 @@ package com.g5.cs203proj.service;
 import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
+
+import org.hibernate.mapping.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -131,9 +133,31 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Match> getTournamentMatchHistory(Long tournamentId) {
+    public List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId) {
+        // Extract matches for a tournament
         Tournament tournament = getTournamentById(tournamentId);
-        return tournament.getTournamentMatchHistory();
+        List<Match> matches = tournament.getTournamentMatchHistory();
+        
+        // Add each match's info to a list of all matches' info
+        List<ArrayList<String>> detailedMatchInfo = new List<ArrayList<String>>();
+        ArrayList<String> matchInfo = new ArrayList<String>();
+        for (Match m : matches) {
+            // Combine each match's info into 1 ArrayList
+            String matchId = "" + m.getMatchId();
+            String p1 = m.getPlayer1().getUsername();
+            String p2 = m.getPlayer2().getUsername();
+            String winner = m.getWinner().getUsername();
+            String eloChange = "" + m.getEloChange();
+
+            matchInfo.add(matchId);
+            matchInfo.add(p1);
+            matchInfo.add(p2);
+            matchInfo.add(winner);
+            matchInfo.add(eloChange);
+            detailedMatchInfo.add(matchInfo);
+        }
+
+        return detailedMatchInfo;
     }
 
     @Override

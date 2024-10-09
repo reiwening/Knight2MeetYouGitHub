@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 public class TournamentController {
@@ -155,5 +158,13 @@ public class TournamentController {
         @PathVariable Long id, @RequestParam String newName) {
         return tournamentService.setName(id, newName);
     }
+
+    //test: ongoing
+    // Get all matches in a tournaments with players, winner, elo change
+    @GetMapping("/tournaments/{tournamentId}/matches")
+    public List<ArrayList<String>> getTournamentMatches(@PathVariable Long tournamentId) {
+        return tournamentService.getTournamentMatchHistory(tournamentId);
+    }
+    
 }
 
