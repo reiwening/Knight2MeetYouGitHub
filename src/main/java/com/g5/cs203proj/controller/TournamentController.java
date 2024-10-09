@@ -163,14 +163,14 @@ public class TournamentController {
         return tournamentService.setName(id, newName);
     }
 
-    //test: ongoing
+    //test: awaiting matchmaking to be done before can be tested
     // Get all matches in a tournaments with players, winner, elo change
     @GetMapping("/tournaments/{tournamentId}/matches")
     public List<ArrayList<String>> getTournamentMatches(@PathVariable Long tournamentId) {
         return tournamentService.getTournamentMatchHistory(tournamentId);
     }
 
-    //test:
+    //test: working so returns true
     // Add a test match to a tournament
     @PostMapping("/tournaments/{tournamentId}/matches")
     public boolean testPostMatch(@PathVariable Long tournamentId, @RequestBody Match match) {

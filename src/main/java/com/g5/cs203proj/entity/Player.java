@@ -84,12 +84,12 @@ public class Player implements UserDetails   {
     
     }
 
-    public Player(Long id, String username, String password) {
-        // this.id = id;
+    // for testing get matches of a tournament
+    public Player(Long id, String username) {
+        this.id = id;
         this.username = username;
         // this.authorities =authorities;
-        this.password = password;
-        this.id = id;
+        // this.password = password;
     }
     
 
