@@ -1,5 +1,6 @@
 package com.g5.cs203proj.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,10 +12,12 @@ import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.exception.MatchNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
+import com.g5.cs203proj.exception.NotEnoughPlayersException;
 
 
 /**
@@ -72,13 +75,39 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void assignPlayerToMatch(Match match, Player player) {
-        if (match.getPlayer1() == null) {
-            match.setPlayer1(player);
-        } else if (match.getPlayer2() == null) {
-            match.setPlayer2(player);
+    public Match assignRandomPlayers( Long matchId ){
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new MatchNotFoundException(matchId)); // so the match needs to be created first 
+
+        // get the list of all available players 
+        List<Player> availablePlayers = playerService.getAllPlayerUsers(); // THE PLAYERS CANNOT BE IN AN ONGOING MATCH TOO
+        int playerCount = availablePlayers.size();
+        if ( playerCount < 2 ) {
+            throw new NotEnoughPlayersException(playerCount);
         }
+        Collections.shuffle(availablePlayers);
+        Player p1 = availablePlayers.get(0);
+        Player p2 = availablePlayers.get(1);
+        match.setPlayer1(p1);
+        match.setPlayer2(p2);
+        matchRepository.save(match);
+
+        // then we need to add the players to match histories
+        p1.addMatchesAsPlayer1(match);
+        p2.addMatchesAsPlayer2(match);
+        playerService.savePlayer(p1);
+        playerService.savePlayer(p2);
+        return match;
+
     }
+
+// @Override
+// public void assignPlayerToMatch(Match match, Player player) {
+//     if (match.getPlayer1() == null) {
+//         match.setPlayer1(player);
+//     } else if (match.getPlayer2() == null) {
+//         match.setPlayer2(player);
+//     }
+// }
 
     @Override
     public void processMatchResult(Match match, Player winner, boolean isDraw) {
@@ -133,6 +162,7 @@ public class MatchServiceImpl implements MatchService {
     public MatchDTO convertToDTO(Match match) {
 
         MatchDTO matchDTO = new MatchDTO();
+
         matchDTO.setId(match.getMatchId());
         matchDTO.setPlayer1Id(match.getPlayer1().getId());
         matchDTO.setPlayer2Id(match.getPlayer2().getId());
@@ -148,6 +178,7 @@ public class MatchServiceImpl implements MatchService {
     }
 
     public Match convertToEntity(MatchDTO matchDTO) {
+
         Match match = new Match();
 
         Player player1 = playerService.getPlayerById(matchDTO.getPlayer1Id());

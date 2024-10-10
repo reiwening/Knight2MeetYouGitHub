@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
@@ -57,7 +58,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Tournament getTournamentById(Long tournamentId) {
         return tournamentRepository.findById(tournamentId)
-            .orElseThrow(() -> new TournmentNotFoundException(tournamentId));
+            .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
     }
 
     @Override
@@ -89,6 +90,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     // Player management
 
+// check if it is okay to throw exceptions here... 
     @Override
     public Tournament registerPlayer(Long playerId, Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
@@ -96,12 +98,31 @@ public class TournamentServiceImpl implements TournamentService {
         if (player == null){
             throw new PlayerNotFoundException(playerId);
         }
-        if (tournament.getRegisteredPlayers().size() < tournament.getMaxPlayers()) {
-            tournament.getRegisteredPlayers().add(player);
-            return tournamentRepository.save(tournament);
-        } else {
+
+        if (tournament.getRegisteredPlayers().size() >= tournament.getMaxPlayers()) {
             throw new TournamentFullException(tournamentId);
         }
+        
+        // if the tournament is not in the "REGISTRATION" status
+        if ( !getAllRegisterableTournaments().contains(tournament) ){
+            throw new TournamentNotRegisterableException("" + tournament.getName());  
+        }
+
+        // if player already signed up for the tournament 
+        if (player.getTournamentRegistered().contains(tournament)){
+            throw new TournamentAlreadyRegisteredException("You have already registered for " + tournament.getName());
+        }
+
+        // Add the tournament to the player's registered tournaments
+        player.getTournamentRegistered().add(tournament);
+
+        // Add the player to the tournament's list of participants (if needed)
+        tournament.getRegisteredPlayers().add(player);
+
+        // Save both player and tournament
+        playerRepository.save(player);
+        return tournamentRepository.save(tournament);
+
     }
 
     @Override

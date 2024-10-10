@@ -13,53 +13,39 @@ import com.g5.cs203proj.exception.PlayerNotFoundException;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.repository.PlayerRepository;
+import com.g5.cs203proj.service.TournamentService;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
     private PlayerRepository playerRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before storing the password 
+    private TournamentService tournamentService;
+    private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before
+                                                         // storing the password
                                                          // provided in the `SecurityConfig` Class
 
-    // constructor 
-    public PlayerServiceImpl( PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder ) {
+    // constructor
+    public PlayerServiceImpl(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+            TournamentService tournamentService) {
         this.playerRepository = playerRepository;
-        this.bCryptPasswordEncoder= bCryptPasswordEncoder;
+        this.tournamentService = tournamentService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-// override the methods for PlayerService interface
+    // override the methods for PlayerService interface
 
     @Override
-    public Player savePlayer( Player player ) {
+    public Player savePlayer(Player player) {
         return playerRepository.save(player);
     }
 
-    public Player registerPlayer(Player playerToRegister ) {
-        Optional<Player> existingPlayer = findPlayerByUsername(playerToRegister.getUsername()); 
-        if (existingPlayer.isPresent()) {
-            return null;
-        } 
-
-
-        playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
-
-        /* else we have to save to the DB */
-        return savePlayer(playerToRegister);
-
-    }
-    
     @Override
     public Optional<Player> findPlayerByUsername(String username) {
-        return playerRepository.findByUsername(username);  // Repository method to find player by username
+        return playerRepository.findByUsername(username); // Repository method to find player by username
 
-    }
-
-    public void setPlayerRepository(PlayerRepository playerRepository) {
-        this.playerRepository = playerRepository;
     }
 
     @Override
@@ -67,27 +53,26 @@ public class PlayerServiceImpl implements PlayerService {
         return playerRepository.findAll();
     }
 
-
-    private boolean hasRole(Player player, String role){
+    private boolean hasRole(Player player, String role) {
         return player.getAuthorities().stream()
-                                      .anyMatch(authority -> authority.getAuthority().equals(role));
+                .anyMatch(authority -> authority.getAuthority().equals(role));
     }
-    
-    @Override 
+
+    @Override
     public List<Player> getAllAdmins() {
         List<Player> allPlayers = getAllPlayers();
         List<Player> admins = allPlayers.stream()
-                                        .filter( player -> hasRole(player, "ROLE_ADMIN"))
-                                        .collect(Collectors.toList());
+                .filter(player -> hasRole(player, "ROLE_ADMIN"))
+                .collect(Collectors.toList());
         return admins;
     }
 
-    @Override 
+    @Override
     public List<Player> getAllPlayerUsers() {
         List<Player> allPlayers = getAllPlayers();
         List<Player> users = allPlayers.stream()
-                                        .filter( player -> hasRole(player, "ROLE_USER"))
-                                        .collect(Collectors.toList());
+                .filter(player -> hasRole(player, "ROLE_USER"))
+                .collect(Collectors.toList());
         return users;
     }
 
@@ -95,21 +80,16 @@ public class PlayerServiceImpl implements PlayerService {
     public Player getPlayerById(Long id) {
         return playerRepository.findById(id).orElse(null);
     }
-    
+
     @Override
     public void setPlayerGlobalEloRating(Player player, double newRating) {
         player.setGlobalEloRating(newRating);
-        playerRepository.save(player);  // Save the player with the updated Elo rating
+        playerRepository.save(player); // Save the player with the updated Elo rating
     }
 
     @Override
     public double getPlayerGlobalEloRating(Player player) {
         return player.getGlobalEloRating();
-    }
-    
-    @Override
-    public List<Tournament> getTournamentRegistered(Player player) {
-        return player.getTournamentRegistered();
     }
 
     @Override
@@ -117,16 +97,12 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getMatchHistory();
     }
 
+    //////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////
-
-    // @Override
-    // public void setPlayerGlobalEloRating(Player player, double change) {
-    //     // TODO Auto-generated method stub
-    //     double oldPlayerElo = player.getGlobalEloRating();
-    //     return player.setGlobalEloRating(oldPlayerElo + change);
-    // }
-
+    @Override
+    public List<Tournament> getTournamentRegistered(Player player) {
+        return player.getTournamentRegistered();
+    }
 
     @Override
     public Player updatePlayer(Long id, Player updatedPlayer) {
@@ -147,22 +123,18 @@ public class PlayerServiceImpl implements PlayerService {
     public List<Tournament> getActiveTournamentRegistered(Player player) {
         return null;
     }
- 
-    @Override
-    public List<Match> getMatchesAsPlayer1(Player player) {
-        return player.getMatchesAsPlayer1();
-    }
 
-    @Override
-    public List<Match> getMatchesAsPlayer2(Player player) {
-        return player.getMatchesAsPlayer2();
-    }
-
-    @Override
-    public Match addMatchToPlayerHistory(Player player, Match match) {
-        if (match.getPlayer1() == player) {
-            return player.addMatchesAsPlayer1(match);
-        }
-        return player.addMatchesAsPlayer2(match);
+    public Player registerPlayer(Player playerToRegister ) {
+        Optional<Player> existingPlayer = findPlayerByUsername(playerToRegister.getUsername()); 
+        if (existingPlayer.isPresent()) {
+            return null;
+        } 
+    
+    
+        playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
+    
+        /* else we have to save to the DB */
+        return savePlayer(playerToRegister);
+    
     }
 }

@@ -19,6 +19,7 @@ public class TournamentDTO {
 
     private Map<Long, Integer> rankings;
     private int maxPlayers;
+    
     public Long getTournamentId() {
         return tournamentId;
     }

@@ -5,6 +5,7 @@ import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.service.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -82,7 +83,7 @@ public class TournamentController {
 //havent test yet
     // Start or cancel a tournament based on registration cutoff
     @PostMapping("/tournaments/{id}")
-    public Tournament startOrCancelTournament(@PathVariable Long id) {
+    public TournamentDTO startOrCancelTournament(@PathVariable Long id) {
         Tournament tournament = tournamentService.startOrCancelTournament(id);
         return tournamentService.convertToDTO(tournament); // return DTO
 
@@ -95,7 +96,8 @@ public class TournamentController {
         return tournamentService.getTournamentRankings(id);
     }
 
-    //test: ok
+    // test: later !! (reiwen)
+    // CHECK FOR THE DIFFERENT LOGIC TO REGISTER A PLAYER
     // Register a player to a tournament
     @PostMapping("/tournaments/{tournamentId}/players")
     public TournamentDTO registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {

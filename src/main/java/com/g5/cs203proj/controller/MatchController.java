@@ -39,73 +39,82 @@ public class MatchController {
     //     this.matchService = matchService;
     // }
 
-// create a new match
-    @PostMapping("/matches")
-    public MatchDTO createMatch(@RequestBody MatchDTO matchDTO) {
-        // so that json body only needs a matchDTO
-        Match match = matchService.convertToEntity(matchDTO);
-        // save match in DB
-        Match savedMatch = matchService.saveMatch(match);
+    // create a new match, given a tournament ID
+    // havent assign my 2 players yet
+    @PostMapping("/matches/{tournamentId}")
+    public MatchDTO createMatchForTournament(@PathVariable Long tournamentId) {
+        // Find the tournament by ID
+        Tournament tournament = tournamentService.getTournamentById(tournamentId);
+        if (tournament == null) {
+            throw new TournamentNotFoundException(tournamentId);  // Custom exception
+        }
         
-        // Convert the saved Match entity back to MatchDTO to include any generated fields (like ID)
+        // Create a new Match with the specified tournament
+        Match newMatch = new Match();
+        newMatch.setTournament(tournament);
+        
+        // Save the match in the database
+        Match savedMatch = matchService.saveMatch(newMatch);
+        
+        // Convert the saved Match entity back to DTO and return it
         MatchDTO savedMatchDTO = matchService.convertToDTO(savedMatch);
         return savedMatchDTO;
-
     }
+// @PostMapping("/matches")
+// public MatchDTO createMatch(@RequestBody MatchDTO matchDTO) {
+//     // so that json body only needs a matchDTO
+//     Match match = matchService.convertToEntity(matchDTO);
+//     // save match in DB
+//     Match savedMatch = matchService.saveMatch(match);
+    
+//     // Convert the saved Match entity back to MatchDTO to include any generated fields (like ID)
+//     MatchDTO savedMatchDTO = matchService.convertToDTO(savedMatch);
+//     return savedMatchDTO;
+
+// }
     
 
 
-    // assign players to created match
-    @PutMapping("matches/{id}")
-    public Match assignMatchPlayers(@PathVariable Long id, @RequestBody Player player) {
-        //TODO: process PUT request
-        Match match = matchService.findMatchById(id);
-        if (match == null) throw new MatchNotFoundException(id);
-
-        Player managedPlayer = playerService.getPlayerById(player.getId());
-        if (managedPlayer == null) throw new PlayerNotFoundException(player.getId());
-        // System.out.println(managedPlayer.getUsername());
-
-        matchService.assignPlayerToMatch(match, managedPlayer);
-        matchService.saveMatch(match);
-
-        playerService.addMatchToPlayerHistory(managedPlayer, match);
-        playerService.savePlayer(managedPlayer);
-        // System.out.println(managedPlayer.getUsername());
-        return match;
+    // assign 2 random players to a create match for a tournament 
+    @PutMapping("matches/{id}/random-players")
+    public MatchDTO assignRandomPlayersToMatch(@PathVariable Long id){
+       
+        Match match = matchService.assignRandomPlayers(id);
+        return matchService.convertToDTO(match);
     }
+
 
     // get the match
     @GetMapping("/matches/{id}")
-    public Match getMatch(@PathVariable Long id) {
+    public MatchDTO getMatch(@PathVariable Long id) {
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);
-        return match;
+        return matchService.convertToDTO(match);  
     }
 
     // process match when it ends
     @PutMapping("/matches/{id}/updateresults")
-    public Match updateMatchResults(
+    public MatchDTO updateMatchResults(
         @PathVariable Long id, 
         @RequestParam boolean isDraw, 
         @RequestBody(required = false) Player winner) {
         
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);
-
+    
         if (isDraw) {
-            // Handle the draw scenario
             matchService.processMatchResult(match, null, true);
         } else {
-            // Handle the winner scenario
             Player managedPlayer = playerService.getPlayerById(winner.getId());
             if (managedPlayer == null) throw new PlayerNotFoundException(winner.getId());
             matchService.processMatchResult(match, managedPlayer, false);
         }
-
+    
         matchService.saveMatch(match);
-        return match;
+        return matchService.convertToDTO(match);  // Return MatchDTO instead of Match
     }
+
+    // get all matches 
 
 }
 

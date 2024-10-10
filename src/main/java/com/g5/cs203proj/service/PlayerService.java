@@ -31,9 +31,9 @@ public interface PlayerService {
 
     Optional<Player> findPlayerByUsername(String username);
 
-    List<Match> getMatchesAsPlayer1(Player player);
-    List<Match> getMatchesAsPlayer2(Player player);
-    Match addMatchToPlayerHistory(Player player, Match match);
-    
+    // List<Match> getMatchesAsPlayer1(Player player);
+    // List<Match> getMatchesAsPlayer2(Player player);
+    // Match addMatchToPlayerHistory(Player player, Match match);
+    // boolean registerPlayerForTournament(String username, Long tournamentId) ;
     
 }
