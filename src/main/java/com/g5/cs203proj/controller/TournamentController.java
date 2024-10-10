@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class TournamentController {
@@ -35,9 +36,11 @@ public class TournamentController {
     //test: ok
     // Update a tournament by ID
     @PutMapping("/tournaments/{id}")
-    public Tournament updateTournament(
-        @PathVariable Long id, @RequestBody Tournament updatedTournament) {
-        return tournamentService.updateTournament(id, updatedTournament);
+    public TournamentDTO updateTournament(
+        @PathVariable Long id, @RequestBody TournamentDTO updatedTournamentDTO) {
+        Tournament updatedTournament = tournamentService.convertToEntity(updatedTournamentDTO);
+        Tournament savedTournament = tournamentService.updateTournament(id, updatedTournament);
+        return tournamentService.convertToDTO(savedTournament); // return DTO
     }
 
     //test: ok
@@ -50,32 +53,42 @@ public class TournamentController {
     //test: ok
     // Get a specific tournament by ID
     @GetMapping("/tournaments/{id}")
-    public Tournament getTournamentById(@PathVariable Long id) {
-        return tournamentService.getTournamentById(id);
+    public TournamentDTO getTournamentById(@PathVariable Long id) {
+        Tournament tournament = tournamentService.getTournamentById(id);
+        return tournamentService.convertToDTO(tournament); // return DTO
     }
+
 
     //test: ok
     // Get all tournaments
     @GetMapping("/tournaments")
-    public List<Tournament> getAllTournaments() {
-        return tournamentService.getAllTournaments();
+    public List<TournamentDTO> getAllTournaments() {
+        List<Tournament> tournaments = tournamentService.getAllTournaments();
+        return tournaments.stream()
+                        .map(tournamentService::convertToDTO) // Convert to DTO
+                        .collect(Collectors.toList());
     }
 
     //test: ok
     // Get all registerable tournaments
     @GetMapping("/tournaments/reg")
-    public List<Tournament> getAllRegisterableTournaments() {
-        return tournamentService.getAllRegisterableTournaments();
+    public List<TournamentDTO> getAllRegisterableTournaments() {
+        List<Tournament> tournaments = tournamentService.getAllRegisterableTournaments();
+        return tournaments.stream()
+                        .map(tournamentService::convertToDTO) // Convert to DTO
+                        .collect(Collectors.toList());
     }
 
-    //havent test yet
+//havent test yet
     // Start or cancel a tournament based on registration cutoff
     @PostMapping("/tournaments/{id}")
     public Tournament startOrCancelTournament(@PathVariable Long id) {
-        return tournamentService.startOrCancelTournament(id);
+        Tournament tournament = tournamentService.startOrCancelTournament(id);
+        return tournamentService.convertToDTO(tournament); // return DTO
+
     }
 
-    //havent tested
+//havent tested
     // Get tournament rankings by ID
     @GetMapping("/tournaments/{id}/rankings") //not sure of this is mapping
     public Map<Long, Integer> getTournamentRankings(@PathVariable Long id) {
@@ -85,15 +98,17 @@ public class TournamentController {
     //test: ok
     // Register a player to a tournament
     @PostMapping("/tournaments/{tournamentId}/players")
-    public Tournament registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
-        return tournamentService.registerPlayer(playerId, tournamentId);
+    public TournamentDTO registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
+        Tournament updatedTournament = tournamentService.registerPlayer(playerId, tournamentId);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
 
     //test: ok
     // Remove a player from a tournament
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
-    public Tournament removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
-        return tournamentService.removePlayer(playerId, tournamentId);
+    public TournamentDTO removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
+        Tournament updatedTournament = tournamentService.removePlayer(playerId, tournamentId);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
 
     //test: ok
@@ -105,59 +120,70 @@ public class TournamentController {
 
     //test: ok
     // Update the Elo range for the tournament
-    @PutMapping("/tournaments/{id}/elo-range") //not sure about mapping
-    public Tournament setTournamentEloRange(
+    @PutMapping("/tournaments/{id}/elo-range")
+    public TournamentDTO setTournamentEloRange(
         @PathVariable Long id, @RequestParam int minElo, @RequestParam int maxElo) {
-        return tournamentService.setTournamentEloRange(id, minElo, maxElo);
+        Tournament updatedTournament = tournamentService.setTournamentEloRange(id, minElo, maxElo);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
 
+    
+    
     //test: ok
     // Update the tournament status
     @PutMapping("/tournaments/{id}/status")
-    public Tournament setTournamentStatus(
-        @PathVariable Long id, @RequestParam String status) {
-        return tournamentService.setTournamentStatus(id, status);
+    public TournamentDTO setTournamentStatus(@PathVariable Long id, @RequestParam String status) {
+        Tournament updatedTournament = tournamentService.setTournamentStatus(id, status);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
-
+        
     //test: ok
     // Update the tournament style
     @PutMapping("/tournaments/{id}/style")
-    public Tournament setTournamentStyle(
+    public TournamentDTO setTournamentStyle(
         @PathVariable Long id, @RequestParam String style) {
-        return tournamentService.setTournamentStyle(id, style);
+        Tournament updatedTournament = tournamentService.setTournamentStyle(id, style);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
 
-    //test later
+
+    // test: ok
     // Update the player range (min/max players)
     @PutMapping("/tournaments/{id}/player-range")
-    public Tournament setTournamentPlayerRange(
+    public TournamentDTO setTournamentPlayerRange(
         @PathVariable Long id, @RequestParam int minPlayers, @RequestParam int maxPlayers) {
-        return tournamentService.setTournamentPlayerRange(id, minPlayers, maxPlayers);
+        Tournament updatedTournament = tournamentService.setTournamentPlayerRange(id, minPlayers, maxPlayers);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
 
-    //test: ok
-    // Update the registration cutoff time
-    @PutMapping("/tournaments/{id}/registration-cutoff")
-    public Tournament setTournamentRegistrationCutOff(
-        @PathVariable Long id, @RequestParam int day, @RequestParam int month, @RequestParam int year, @RequestParam int minute, @RequestParam int hour) {
-        LocalDateTime registrationCutOff = LocalDateTime.of(year, month, day, hour, minute);
-        return tournamentService.setTournamentRegistrationCutOff(id, registrationCutOff);
-    }
 
     //test later
-    // Update the tournament admin
-    @PutMapping("/tournaments/{id}/admin")
-    public Tournament setAdmin(
-        @PathVariable Long id, @RequestBody Admin newAdmin) {
-        return tournamentService.setAdmin(id, newAdmin);
+    // Update the registration cutoff time
+    @PutMapping("/tournaments/{id}/registration-cutoff")
+    public TournamentDTO setTournamentRegistrationCutOff(
+        @PathVariable Long id, @RequestParam int day, @RequestParam int month, 
+        @RequestParam int year, @RequestParam int minute, @RequestParam int hour) {
+        LocalDateTime registrationCutOff = LocalDateTime.of(year, month, day, hour, minute);
+        Tournament updatedTournament = tournamentService.setTournamentRegistrationCutOff(id, registrationCutOff);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
 
-    //test: ok
-    // Update the tournament name
+
+    //test later, NOT SURE ABT ADMIN 
+    // Update the tournament admin
+@PutMapping("/tournaments/{id}/admin")
+public Tournament setAdmin(
+    @PathVariable Long id, @RequestBody Admin newAdmin) {
+    return tournamentService.setAdmin(id, newAdmin);
+}
+
+    // test 
     @PutMapping("/tournaments/{id}/name")
-    public Tournament setName(
+    public TournamentDTO setName(
         @PathVariable Long id, @RequestParam String newName) {
-        return tournamentService.setName(id, newName);
+        Tournament updatedTournament = tournamentService.setName(id, newName);
+        return tournamentService.convertToDTO(updatedTournament); // return DTO
     }
+    
 }
 
