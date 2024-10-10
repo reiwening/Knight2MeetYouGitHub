@@ -74,11 +74,13 @@ Content-Type: application/json
 }
 
 ###
+# in the URL, the id is the matchId
 PUT http://localhost:8080/matches/1
 Content-Type: application/json
+# this is the player's id 
 
 {
-    "id": 1
+    "id": 1 
 }
 
 ###
@@ -110,7 +112,7 @@ Content-Type: application/json
     
 }
 
-//player player 1 into match 2
+// player 1 into match of id 2
 ###
 PUT http://localhost:8080/matches/2
 Content-Type: application/json
