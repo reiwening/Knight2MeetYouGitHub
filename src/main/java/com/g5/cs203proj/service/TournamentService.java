@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Admin;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
@@ -47,4 +48,7 @@ public interface TournamentService {
     Tournament setAdmin(Long tournamentId, Admin newAdmin);
     Tournament setName(Long tournamentId, String newTournamentName);
 
+
+    Tournament convertToEntity(TournamentDTO tournamentDTO);
+    TournamentDTO convertToDTO(Tournament tournament);
 }

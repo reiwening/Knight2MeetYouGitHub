@@ -1,5 +1,6 @@
 package com.g5.cs203proj.controller;
 
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.service.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,11 @@ public class TournamentController {
     // Create a new tournament
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/tournaments")
-    public Tournament createTournament(@RequestBody Tournament tournament) {
-        return tournamentService.createTournament(tournament);
+    public TournamentDTO createTournament(@RequestBody TournamentDTO tournamentDTO) {
+        Tournament tournament = tournamentService.convertToEntity(tournamentDTO);
+        Tournament savedTournament = tournamentService.createTournament(tournament);
+        TournamentDTO savedTournamentDTO = tournamentService.convertToDTO(savedTournament);
+        return savedTournamentDTO;
     }
 
     //test: ok

@@ -3,14 +3,18 @@ package com.g5.cs203proj.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
+// import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
+import com.g5.cs203proj.service.PlayerService;
+import com.g5.cs203proj.service.TournamentService;
 
 
 /**
@@ -21,6 +25,13 @@ import com.g5.cs203proj.repository.PlayerRepository;
 public class MatchServiceImpl implements MatchService {
 
     private MatchRepository matchRepository;
+
+    @Autowired
+    private PlayerService playerService;
+
+    @Autowired
+    private TournamentService tournamentService;
+
 
     // constructor 
     public MatchServiceImpl( MatchRepository matchRepository ) {
@@ -117,5 +128,45 @@ public class MatchServiceImpl implements MatchService {
         }
         return false;
     }
+
+    // convert Match entity to corresponding DTOs
+    public MatchDTO convertToDTO(Match match) {
+
+        MatchDTO matchDTO = new MatchDTO();
+        matchDTO.setId(match.getMatchId());
+        matchDTO.setPlayer1Id(match.getPlayer1().getId());
+        matchDTO.setPlayer2Id(match.getPlayer2().getId());
+        matchDTO.setTournamentId(match.getTournament().getId());  // Use ID instead of full object
+        matchDTO.setStatusP1(match.getStatusP1());
+        matchDTO.setStatusP2(match.getStatusP2());
+        matchDTO.setWinnerId(match.getWinner() != null ? match.getWinner().getId() : null);
+        matchDTO.setDraw(match.getDraw());
+        matchDTO.setComplete(match.getIsCompleteStatus());
+        matchDTO.setEloChange(match.getEloChange());
+
+        return matchDTO;
+    }
+
+    public Match convertToEntity(MatchDTO matchDTO) {
+        Match match = new Match();
+
+        Player player1 = playerService.getPlayerById(matchDTO.getPlayer1Id());
+        Player player2 = playerService.getPlayerById(matchDTO.getPlayer2Id());
+        Tournament tournament = tournamentService.getTournamentById(matchDTO.getTournamentId());
+    
+        match.setPlayer1(player1);
+        match.setPlayer2(player2);
+        match.setTournament(tournament);
+        match.setStatusP1(matchDTO.isStatusP1());
+        match.setStatusP2(matchDTO.isStatusP2());
+        match.setWinner(matchDTO.getWinnerId() != null ? playerService.getPlayerById(matchDTO.getWinnerId()) : null);
+        match.setDraw(matchDTO.isDraw());
+        match.setIsCompleteStatus(matchDTO.isComplete());
+        match.setEloChange(matchDTO.getEloChange());
+    
+        return match;
+    }
+
+
 }
 

@@ -54,8 +54,8 @@ public class Match {
     }
 
     // Other constructors, getters, setters, etc.
-    public Match(Long id, Player player1, Player player2) {
-        this.id = id;
+    public Match(Player player1, Player player2) {
+        // this.id = id;
         this.tournament = null;
         this.player1 = player1;
         this.player2 = player2;
@@ -69,8 +69,8 @@ public class Match {
         this.eloChange = null;
     }
 
-    public Match(Long id, Tournament tournament) {
-        this.id = id;
+    public Match(Tournament tournament) {
+        // this.id = id;
         this.tournament = tournament;
         this.player1 = null;
         this.player2 = null;
@@ -84,8 +84,8 @@ public class Match {
         this.eloChange = null;
     }
 
-    public Match(Long id, Tournament tournament, Player player1, Player player2) {
-        this.id = id;
+    public Match(Tournament tournament, Player player1, Player player2) {
+        // this.id = id;
         this.tournament = tournament;
         this.player1 = player1;
         this.player2 = player2;
@@ -158,6 +158,10 @@ public class Match {
         player2.setGlobalEloRating(newRatingP2);
     
         this.eloChange = Math.abs(newRatingP1 - ratingP1);
+    }
+
+    public void setEloChange(Double newEloChange) {
+        eloChange = newEloChange;
     }
     
 

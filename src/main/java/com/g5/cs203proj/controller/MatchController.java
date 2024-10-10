@@ -5,6 +5,9 @@ import java.util.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g5.cs203proj.entity.Match;
+import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.service.TournamentService;
+import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
@@ -29,15 +32,25 @@ public class MatchController {
     private PlayerService playerService;
 
     @Autowired
-    public MatchController(MatchService matchService) {
-        this.matchService = matchService;
-    }
+    private TournamentService tournamentService;
 
-    // create a new match
+    // @Autowired
+    // public MatchController(MatchService matchService) {
+    //     this.matchService = matchService;
+    // }
+
+// create a new match
     @PostMapping("/matches")
-    public Match createMatch(@RequestBody Match match) {
-        // Persist the new match using matchService
-        return matchService.saveMatch(match);
+    public MatchDTO createMatch(@RequestBody MatchDTO matchDTO) {
+        // so that json body only needs a matchDTO
+        Match match = matchService.convertToEntity(matchDTO);
+        // save match in DB
+        Match savedMatch = matchService.saveMatch(match);
+        
+        // Convert the saved Match entity back to MatchDTO to include any generated fields (like ID)
+        MatchDTO savedMatchDTO = matchService.convertToDTO(savedMatch);
+        return savedMatchDTO;
+
     }
     
 

@@ -1,6 +1,7 @@
 package com.g5.cs203proj.service;
 
 import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TournamentServiceImpl implements TournamentService {
@@ -199,4 +201,68 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setName(newTournamentName);
         return tournamentRepository.save(tournament);
     }
+
+
+    public TournamentDTO convertToDTO(Tournament tournament) {
+        TournamentDTO tournamentDTO = new TournamentDTO();
+        tournamentDTO.setTournamentId(tournament.getId());
+        tournamentDTO.setName(tournament.getName());
+        tournamentDTO.setTournamentStatus(tournament.getTournamentStatus());
+        tournamentDTO.setTournamentStyle(tournament.getTournamentStyle());
+        tournamentDTO.setMaxPlayers(tournament.getMaxPlayers());
+        tournamentDTO.setMinPlayers(tournament.getMinPlayers());
+        tournamentDTO.setMaxElo(tournament.getMaxElo());
+        tournamentDTO.setMinElo(tournament.getMinElo());
+        tournamentDTO.setRegistrationCutOff(tournament.getRegistrationCutOff());
+
+        // Collect the IDs of matches instead of including the full match objects
+        List<Long> matchIdsHistory = tournament.getTournamentMatchHistory()
+                                           .stream()
+                                           .map(Match::getMatchId)  
+                                           .collect(Collectors.toList());
+        tournamentDTO.setTournamentMatchHistoryId(matchIdsHistory);
+
+        // Convert registered players to their IDs
+        List<Long> registeredPlayersIds = tournament.getRegisteredPlayers()
+                                                    .stream()
+                                                    .map(Player::getId)  
+                                                    .collect(Collectors.toList());
+        tournamentDTO.setRegisteredPlayersId(registeredPlayersIds);
+        return tournamentDTO;
+    }
+
+
+    public Tournament convertToEntity(TournamentDTO tournamentDTO) {
+        Tournament tournament = new Tournament();
+
+        // Set the basic properties
+// tournament.setId(tournamentDTO.getTournamentId());
+        tournament.setName(tournamentDTO.getName());
+        tournament.setTournamentStatus(tournamentDTO.getTournamentStatus());
+        tournament.setTournamentStyle(tournamentDTO.getTournamentStyle());
+        tournament.setMaxPlayers(tournamentDTO.getMaxPlayers());
+        tournament.setMinPlayers(tournamentDTO.getMinPlayers());
+        tournament.setMinElo(tournamentDTO.getMinElo());
+        tournament.setMaxElo(tournamentDTO.getMaxElo());
+        tournament.setRegistrationCutOff(tournamentDTO.getRegistrationCutOff());
+
+        // Handle registeredPlayersIds (could be null or missing in the request)
+        if (tournamentDTO.getRegisteredPlayersId() != null) {
+            List<Player> registeredPlayers = tournamentDTO.getRegisteredPlayersId()
+                    .stream()
+                    .map(playerId -> playerRepository.findById(playerId).orElseThrow(() -> new PlayerNotFoundException(playerId)))
+                    .collect(Collectors.toList());
+            tournament.setRegisteredPlayers(registeredPlayers);
+        } else {
+            tournament.setRegisteredPlayers(new ArrayList<>());  // Initialize as empty list if not provided
+        }
+
+        // Set tournament match history to an empty list initially, since matches will be added later
+        tournament.setTournamentMatchHistory(new ArrayList<>());
+
+        return tournament;
+    }
+
+
+
 }

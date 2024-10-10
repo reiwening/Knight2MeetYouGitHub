@@ -3,6 +3,7 @@ package com.g5.cs203proj.service;
 import java.util.*;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 
 public interface MatchService {
@@ -25,5 +26,8 @@ public interface MatchService {
 
     // View check-in status for both players for a match
     boolean bothPlayersCheckedIn(Match match);
+
+    MatchDTO convertToDTO(Match match);
+    Match convertToEntity(MatchDTO matchDTO);
 
 }
