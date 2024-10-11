@@ -1,5 +1,6 @@
 package com.g5.cs203proj.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,11 +112,19 @@ public class MatchServiceImpl implements MatchService {
 
     // View check-in status for both players for a match
     @Override
-    public boolean bothPlayersCheckedIn(Match match) {
-        if (match.getStatusP1() && match.getStatusP2()) {
-            return true;
-        }
-        return false;
+    public HashMap<String, Boolean> viewCheckedInStatus(Match match) {
+        HashMap<String, Boolean> checkInStatuses = new HashMap<>();
+
+        String p1 = match.getPlayer1().getUsername();
+        String p2 = match.getPlayer2().getUsername();
+
+        Boolean p1Status = match.getStatusP1();
+        Boolean p2Status = match.getStatusP2();
+
+        checkInStatuses.put(p1, p1Status);
+        checkInStatuses.put(p2, p2Status);
+
+        return checkInStatuses;
     }
 }
 

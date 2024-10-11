@@ -5,6 +5,8 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.entity.Match;
 
+import java.util.HashMap;
+
 public interface MatchService {
     // createMatch returns (long) id of the newly created match
     // long createMatch();
@@ -24,6 +26,6 @@ public interface MatchService {
     boolean sendMatchStartNotification();
 
     // View check-in status for both players for a match
-    boolean bothPlayersCheckedIn(Match match);
+    HashMap<String, Boolean> viewCheckedInStatus(Match match);
 
 }
