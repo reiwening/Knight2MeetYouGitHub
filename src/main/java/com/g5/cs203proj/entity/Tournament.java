@@ -1,6 +1,7 @@
 package com.g5.cs203proj.entity;
 
 import java.util.*;
+
 import java.time.LocalDateTime;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -40,7 +41,7 @@ public class Tournament {
         name = "player_tournament",
         joinColumns = @JoinColumn(name = "tournament_id"),
         inverseJoinColumns = @JoinColumn(name = "player_id"))
-    private List<Player> registeredPlayers;
+    private Set<Player> registeredPlayers = new HashSet<>();
 
     
     @ElementCollection // Use @ElementCollection to store a Map in the database
@@ -97,8 +98,8 @@ public class Tournament {
         return tournamentMatchHistory;
     }
 
-    public void setTournamentMatchHistory(List<Match> tournamentMatchHistory) {
-        this.tournamentMatchHistory = tournamentMatchHistory;
+    public void setTournamentMatchHistory(List<Match> matchHistory) {
+        this.tournamentMatchHistory = matchHistory;
     }
 
     public String getTournamentStatus() {
@@ -117,11 +118,11 @@ public class Tournament {
         this.tournamentStyle = tournamentStyle;
     }
 
-    public List<Player> getRegisteredPlayers() {
+    public Set<Player> getRegisteredPlayers() {
         return registeredPlayers;
     }
 
-    public void setRegisteredPlayers(List<Player> registeredPlayers) {
+    public void setRegisteredPlayers(Set<Player> registeredPlayers) {
         this.registeredPlayers = registeredPlayers;
     }
 
@@ -180,22 +181,5 @@ public class Tournament {
     public void setAdmin(Admin admin) {
         this.admin = admin;
     }
-
-    // this will add tournament in player's tournamentRegistered 
-    // and will add player in tournament's playerRegistered
-    public void addPlayer(Player player) {
-        if (!this.registeredPlayers.contains(player)) {
-            this.registeredPlayers.add(player);
-            player.addTournament(this);  // Synchronize the relationship
-        }
-    }
-    
-    public void removePlayer(Player player) {
-        if (this.registeredPlayers.contains(player)) {
-            this.registeredPlayers.remove(player);
-            player.removeTournament(this);  // Synchronize the relationship
-        }
-    }
-
 
 }

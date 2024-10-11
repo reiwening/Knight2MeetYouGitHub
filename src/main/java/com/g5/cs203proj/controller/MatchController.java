@@ -12,6 +12,7 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.exception.*;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,25 +41,32 @@ public class MatchController {
 // test ok 
     // create a new match, given a tournament ID
     // havent assign my 2 players yet
-    @PostMapping("/matches/{tournamentId}")
-    public MatchDTO createMatchForTournament(@PathVariable Long tournamentId) {
+    @PostMapping("/matches/{id}")
+    public MatchDTO createMatchForTournament(@PathVariable Long id) {
         // Find the tournament by ID
-        Tournament tournament = tournamentService.getTournamentById(tournamentId);
+        Tournament tournament = tournamentService.getTournamentById(id);
         if (tournament == null) {
-            throw new TournamentNotFoundException(tournamentId);  // Custom exception
+            throw new TournamentNotFoundException(id);  // Custom exception
         }
         
         // Create a new Match with the specified tournament
         Match newMatch = new Match();
         newMatch.setTournament(tournament);
+
+        // Add the new match to the tournament's match history
+        tournament.getTournamentMatchHistory().add(newMatch);
         
         // Save the match in the database
         Match savedMatch = matchService.saveMatch(newMatch);
+
+        // Save the updated tournament to include the new match
+        tournamentService.updateTournament(id, tournament); // because we changed the match history 
         
         // Convert the saved Match entity back to DTO and return it
         MatchDTO savedMatchDTO = matchService.convertToDTO(savedMatch);
         return savedMatchDTO;
     }
+    
 // @PostMapping("/matches")
 // public MatchDTO createMatch(@RequestBody MatchDTO matchDTO) {
 //     // so that json body only needs a matchDTO
@@ -69,10 +77,10 @@ public class MatchController {
 //     // Convert the saved Match entity back to MatchDTO to include any generated fields (like ID)
 //     MatchDTO savedMatchDTO = matchService.convertToDTO(savedMatch);
 //     return savedMatchDTO;
-
 // }
     
 
+// test : ok (but not fixed)
     // assign 2 random players to a create match for a tournament 
     @PutMapping("matches/{matchId}/random-players")
     public MatchDTO assignRandomPlayersToMatch(@PathVariable Long matchId){
@@ -82,12 +90,12 @@ public class MatchController {
         return matchService.convertToDTO(match);
     }
 
-
+// test : ok
     // get the match
-    @GetMapping("/matches/{id}")
-    public MatchDTO getMatch(@PathVariable Long id) {
-        Match match = matchService.findMatchById(id);
-        if (match == null) throw new MatchNotFoundException(id);
+    @GetMapping("/matches/{matchId}")
+    public MatchDTO getMatch(@PathVariable Long matchId) {
+        Match match = matchService.findMatchById(matchId);
+        if (match == null) throw new MatchNotFoundException(matchId);
         return matchService.convertToDTO(match);  
     }
 
@@ -113,7 +121,22 @@ public class MatchController {
         return matchService.convertToDTO(match);  // Return MatchDTO instead of Match
     }
 
-    // get all matches 
+// test : ok 
+    // get all matches for a particular tournament 
+    @GetMapping("/matches/tournament/{tournamentId}")
+    public List<MatchDTO> getAllMatchesForATournament(@PathVariable Long tournamentId) {
+
+        Tournament tournament = tournamentService.getTournamentById(tournamentId);
+        if (tournament.getTournamentMatchHistory() == null) {
+            return new ArrayList<>();
+        }
+    
+        return tournament.getTournamentMatchHistory().stream()
+                         .map(matchService::convertToDTO)
+                         .collect(Collectors.toList());
+    }
+    
+
 
 }
 

@@ -26,7 +26,7 @@ public interface PlayerService {
     
     // Participation
     List<Match> getPlayerMatchHistory(Player player);
-    List<Tournament> getTournamentRegistered(Player player);
+    Set<Tournament> getTournamentRegistered(Player player);
     List<Tournament> getActiveTournamentRegistered(Player player);
 
     Optional<Player> findPlayerByUsername(String username);

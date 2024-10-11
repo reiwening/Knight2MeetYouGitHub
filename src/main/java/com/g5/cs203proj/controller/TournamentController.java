@@ -9,8 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -116,7 +115,7 @@ public class TournamentController {
     //test: ok
     // Get a list of registered players in a tournament
     @GetMapping("/tournaments/{id}/players")
-    public List<Player> getRegisteredPlayers(@PathVariable Long id) {
+    public Set<Player> getRegisteredPlayers(@PathVariable Long id) {
         return tournamentService.getRegisteredPlayers(id);
     }
 

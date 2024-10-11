@@ -51,12 +51,12 @@ public class Player implements UserDetails   {
     private double globalEloRating;
 
     @ManyToMany 
-    @JsonIgnore
+// @JsonIgnore
     @JoinTable(
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "tournament_id"))
-    private List<Tournament> tournamentRegistered;
+    private Set<Tournament> tournamentRegistered;
 // can make it Set<Tournament>
     
     @OneToMany(mappedBy = "player1")
@@ -70,10 +70,10 @@ public class Player implements UserDetails   {
 
     
     @Transient // This field is not persisted directly, but computed
-    @JsonIgnore
+// @JsonIgnore
     private List<Match> matchHistory;
 
-    public void setTournamentRegistered(List<Tournament> tournamentRegistered) {
+    public void setTournamentRegistered(Set<Tournament> tournamentRegistered) {
         this.tournamentRegistered = tournamentRegistered;
     }
 
@@ -177,7 +177,7 @@ public class Player implements UserDetails   {
         return true;
     }
     
-    public List<Tournament> getTournamentRegistered() {
+    public Set<Tournament> getTournamentRegistered() {
         return tournamentRegistered;
 
     }
@@ -201,22 +201,5 @@ public class Player implements UserDetails   {
         this.matchesAsPlayer2.add(match);
         return match;
     }
-
-// this will add tournament in player's tournamentRegistered 
-// and will add player in tournament's playerRegistered
-    public void addTournament(Tournament tournament) {
-        if (!this.tournamentRegistered.contains(tournament)) {
-            this.tournamentRegistered.add(tournament);
-            tournament.addPlayer(this);  // Synchronize the relationship
-        }
-    }
-
-    public void removeTournament(Tournament tournament) {
-        if (this.tournamentRegistered.contains(tournament)) {
-            this.tournamentRegistered.remove(tournament);
-            tournament.removePlayer(this);  // Synchronize the relationship
-        }
-    }
-
 }
 

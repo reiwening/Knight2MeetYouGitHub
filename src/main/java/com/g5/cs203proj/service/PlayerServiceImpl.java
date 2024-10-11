@@ -104,7 +104,7 @@ public class PlayerServiceImpl implements PlayerService {
     //////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public List<Tournament> getTournamentRegistered(Player player) {
+    public Set<Tournament> getTournamentRegistered(Player player) {
         return player.getTournamentRegistered();
     }
 

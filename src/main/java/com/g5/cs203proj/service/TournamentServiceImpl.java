@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
-    @Autowired
     private TournamentRepository tournamentRepository;
-    @Autowired
     private PlayerRepository playerRepository;
+    private MatchRepository matchRepository;
 
     //Contructors
     public TournamentServiceImpl(){};
+    @Autowired
     public TournamentServiceImpl(TournamentRepository tournamentRepository, PlayerRepository playerRepository){
         this.tournamentRepository = tournamentRepository;
         this.playerRepository = playerRepository;
@@ -45,6 +45,7 @@ public class TournamentServiceImpl implements TournamentService {
         existingTournament.setMinElo(updatedTournament.getMinElo());
         existingTournament.setMaxElo(updatedTournament.getMaxElo());
         existingTournament.setRegistrationCutOff(updatedTournament.getRegistrationCutOff());
+        existingTournament.setTournamentMatchHistory(updatedTournament.getTournamentMatchHistory());
         return tournamentRepository.save(existingTournament);
     }
 
@@ -108,22 +109,15 @@ public class TournamentServiceImpl implements TournamentService {
             throw new TournamentNotRegisterableException("" + tournament.getName());  
         }
 
-        // if player already signed up for the tournament 
-        if (player.getTournamentRegistered().contains(tournament)){
-            throw new TournamentAlreadyRegisteredException("You have already registered for " + tournament.getName());
+        // Check if the player is already registered for this tournament
+        if (tournament.getRegisteredPlayers().contains(player)) {
+            throw new TournamentAlreadyRegisteredException("Player is already registered for the tournament.");
         }
 
-// THIS IS WRONG BECAUSE IT CAUSES A DUPLICATE !
-// // Add the player to the tournament's list of participants (if needed)
-// tournament.getRegisteredPlayers().add(player);
+        // Add the player to the tournament's registered players, no need to handle both sides
+        tournament.getRegisteredPlayers().add(player);
 
-// // Add the tournament to the player's registered tournaments
-// player.getTournamentRegistered().add(tournament);
-
-        player.addTournament(tournament); // relationship is synchronised 
- 
-        // Save both player and tournament
-        playerRepository.save(player);
+        // Save only the tournament (or player) - cascading will manage the relationship
         return tournamentRepository.save(tournament);
 
     }
@@ -142,7 +136,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Player> getRegisteredPlayers(Long tournamentId) {
+    public Set<Player> getRegisteredPlayers(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
         return tournament.getRegisteredPlayers();
     }
@@ -152,7 +146,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void scheduleMatches(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
-        List<Player> players = tournament.getRegisteredPlayers();
+        Set<Player> players = tournament.getRegisteredPlayers();
         //not sure how to implement
     }
 
@@ -247,10 +241,10 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDTO.setTournamentMatchHistoryId(matchIdsHistory);
 
         // Convert registered players to their IDs
-        List<Long> registeredPlayersIds = tournament.getRegisteredPlayers()
-                                                    .stream()
-                                                    .map(Player::getId)  
-                                                    .collect(Collectors.toList());
+        List<Long> registeredPlayersIds =tournament.getRegisteredPlayers()
+                                                        .stream()
+                                                        .map(Player::getId)
+                                                        .collect(Collectors.toList());
         tournamentDTO.setRegisteredPlayersId(registeredPlayersIds);
         return tournamentDTO;
     }
@@ -272,20 +266,31 @@ public class TournamentServiceImpl implements TournamentService {
 
         // Handle registeredPlayersIds (could be null or missing in the request)
         if (tournamentDTO.getRegisteredPlayersId() != null) {
-            List<Player> registeredPlayers = tournamentDTO.getRegisteredPlayersId()
+            Set<Player> registeredPlayers = tournamentDTO.getRegisteredPlayersId()
                     .stream()
                     .map(playerId -> playerRepository.findById(playerId).orElseThrow(() -> new PlayerNotFoundException(playerId)))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
             tournament.setRegisteredPlayers(registeredPlayers);
         } else {
-            tournament.setRegisteredPlayers(new ArrayList<>());  // Initialize as empty list if not provided
+            tournament.setRegisteredPlayers(new HashSet<>());  // Initialize as empty list if not provided
         }
 
-        // Set tournament match history to an empty list initially, since matches will be added later
-        tournament.setTournamentMatchHistory(new ArrayList<>());
+         // Handle tournamentMatchHistoryIds
+        if (tournamentDTO.getTournamentMatchHistoryId() != null) {
+            // Fetch each Match by its ID and collect them into a list
+            List<Match> tournamentMatchHistory = tournamentDTO.getTournamentMatchHistoryId()
+                    .stream()
+                    .map(matchId -> matchRepository.findById(matchId)
+                    .orElseThrow(() -> new MatchNotFoundException(matchId)))
+                    .collect(Collectors.toList());
 
-        return tournament;
-    }
+            // Set the entire list of matches to the tournament's match history
+            tournament.setTournamentMatchHistory(tournamentMatchHistory);
+        } else {
+            tournament.setTournamentMatchHistory(new ArrayList<>()); // Set to an empty list if none provided
+        }
+            return tournament;
+        }
 
 
 

@@ -1,8 +1,8 @@
 package com.g5.cs203proj.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Admin;
@@ -28,7 +28,7 @@ public interface TournamentService {
 //player management
     Tournament registerPlayer(Long playerId, Long tournamentId);
     Tournament removePlayer(Long playerId, Long tournamentId);
-    List<Player> getRegisteredPlayers(Long tournamentId);
+    Set<Player> getRegisteredPlayers(Long tournamentId);
 
 
 //match management
