@@ -45,7 +45,8 @@ public class Match {
     
     private boolean isDraw;
 
-    private boolean isComplete;
+    private String matchStatus = "NOT_STARTED"; // "NOT_STARTED (default) | "ONGOING" | "COMPLETED"
+
     private Double eloChange;
 
     // Default constructor
@@ -59,13 +60,10 @@ public class Match {
         this.tournament = null;
         this.player1 = player1;
         this.player2 = player2;
-
         this.statusP1 = false;
         this.statusP2 = false;
-
         this.winner = null;
         this.isDraw = false;  // Initialize as not a draw
-        this.isComplete = false;
         this.eloChange = null;
     }
 
@@ -80,7 +78,6 @@ public class Match {
 
         this.winner = null;
         this.isDraw = false;  // Initialize as not a draw
-        this.isComplete = false;
         this.eloChange = null;
     }
 
@@ -95,7 +92,6 @@ public class Match {
 
         this.winner = null;
         this.isDraw = false;  // Initialize as not a draw
-        this.isComplete = false;
         this.eloChange = null;
     }
 
@@ -133,10 +129,6 @@ public class Match {
 
     public void setDraw(boolean isDraw) {
         this.isDraw = isDraw;
-    }
-
-    public void setIsCompleteStatus(boolean status) {
-        this.isComplete = status;
     }
 
     // 27/6/24: method invoked on player class for now, dk if using PlayerController
@@ -198,11 +190,15 @@ public class Match {
         return isDraw;
     }
 
-    public boolean getIsCompleteStatus() {
-        return isComplete;
-    }
-    
     public Double getEloChange() {
         return eloChange;
+    }
+
+    public String getMatchStatus() {
+        return matchStatus;
+    }
+
+    public void setMatchStatus(String matchStatus) {
+        this.matchStatus = matchStatus;
     }
 }

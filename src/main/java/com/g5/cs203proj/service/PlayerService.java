@@ -30,6 +30,7 @@ public interface PlayerService {
     List<Tournament> getActiveTournamentRegistered(Player player);
 
     Optional<Player> findPlayerByUsername(String username);
+    List<Player> getAvailablePlayersForTournament(Long tournamentIdOfMatch);
 
     // List<Match> getMatchesAsPlayer1(Player player);
     // List<Match> getMatchesAsPlayer2(Player player);

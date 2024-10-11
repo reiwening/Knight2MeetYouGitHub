@@ -181,6 +181,21 @@ public class Tournament {
         this.admin = admin;
     }
 
+    // this will add tournament in player's tournamentRegistered 
+    // and will add player in tournament's playerRegistered
+    public void addPlayer(Player player) {
+        if (!this.registeredPlayers.contains(player)) {
+            this.registeredPlayers.add(player);
+            player.addTournament(this);  // Synchronize the relationship
+        }
+    }
+    
+    public void removePlayer(Player player) {
+        if (this.registeredPlayers.contains(player)) {
+            this.registeredPlayers.remove(player);
+            player.removeTournament(this);  // Synchronize the relationship
+        }
+    }
 
 
 }

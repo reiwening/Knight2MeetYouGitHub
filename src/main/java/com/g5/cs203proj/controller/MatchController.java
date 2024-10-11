@@ -25,20 +25,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 public class MatchController {
-    @Autowired
+  
     private MatchService matchService;
-
-    @Autowired
     private PlayerService playerService;
-
-    @Autowired
     private TournamentService tournamentService;
 
-    // @Autowired
-    // public MatchController(MatchService matchService) {
-    //     this.matchService = matchService;
-    // }
+    @Autowired
+    public MatchController(MatchService matchService, PlayerService playerService, TournamentService tournamentService ) {
+        this.matchService = matchService;
+        this.tournamentService = tournamentService;
+        this.playerService = playerService;
+    }
 
+// test ok 
     // create a new match, given a tournament ID
     // havent assign my 2 players yet
     @PostMapping("/matches/{tournamentId}")
@@ -74,12 +73,12 @@ public class MatchController {
 // }
     
 
-
     // assign 2 random players to a create match for a tournament 
-    @PutMapping("matches/{id}/random-players")
-    public MatchDTO assignRandomPlayersToMatch(@PathVariable Long id){
+    @PutMapping("matches/{matchId}/random-players")
+    public MatchDTO assignRandomPlayersToMatch(@PathVariable Long matchId){
        
-        Match match = matchService.assignRandomPlayers(id);
+        Match match = matchService.assignRandomPlayers(matchId);
+// note match status is still NOT_STARTED
         return matchService.convertToDTO(match);
     }
 

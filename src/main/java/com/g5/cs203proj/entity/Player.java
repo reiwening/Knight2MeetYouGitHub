@@ -14,8 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.*;
-import java.util.List;
-import java.util.ArrayList;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -59,7 +57,7 @@ public class Player implements UserDetails   {
         joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "tournament_id"))
     private List<Tournament> tournamentRegistered;
-
+// can make it Set<Tournament>
     
     @OneToMany(mappedBy = "player1")
     @JsonIgnore
@@ -202,6 +200,22 @@ public class Player implements UserDetails   {
     public Match addMatchesAsPlayer2(Match match) {
         this.matchesAsPlayer2.add(match);
         return match;
+    }
+
+// this will add tournament in player's tournamentRegistered 
+// and will add player in tournament's playerRegistered
+    public void addTournament(Tournament tournament) {
+        if (!this.tournamentRegistered.contains(tournament)) {
+            this.tournamentRegistered.add(tournament);
+            tournament.addPlayer(this);  // Synchronize the relationship
+        }
+    }
+
+    public void removeTournament(Tournament tournament) {
+        if (this.tournamentRegistered.contains(tournament)) {
+            this.tournamentRegistered.remove(tournament);
+            tournament.removePlayer(this);  // Synchronize the relationship
+        }
     }
 
 }

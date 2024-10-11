@@ -113,12 +113,15 @@ public class TournamentServiceImpl implements TournamentService {
             throw new TournamentAlreadyRegisteredException("You have already registered for " + tournament.getName());
         }
 
-        // Add the tournament to the player's registered tournaments
-        player.getTournamentRegistered().add(tournament);
+// THIS IS WRONG BECAUSE IT CAUSES A DUPLICATE !
+// // Add the player to the tournament's list of participants (if needed)
+// tournament.getRegisteredPlayers().add(player);
 
-        // Add the player to the tournament's list of participants (if needed)
-        tournament.getRegisteredPlayers().add(player);
+// // Add the tournament to the player's registered tournaments
+// player.getTournamentRegistered().add(tournament);
 
+        player.addTournament(tournament); // relationship is synchronised 
+ 
         // Save both player and tournament
         playerRepository.save(player);
         return tournamentRepository.save(tournament);

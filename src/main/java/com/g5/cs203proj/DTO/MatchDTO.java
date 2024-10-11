@@ -12,7 +12,7 @@ public class MatchDTO {
     private boolean statusP2;
     private Long winnerId;
     private boolean isDraw;
-    private boolean isComplete;
+    private String matchStatus = "NOT_STARTED";
     private Double eloChange;
     
     public MatchDTO(){
@@ -83,20 +83,20 @@ public class MatchDTO {
         this.isDraw = isDraw;
     }
 
-    public boolean isComplete() {
-        return isComplete;
-    }
-
-    public void setComplete(boolean isComplete) {
-        this.isComplete = isComplete;
-    }
-
     public Double getEloChange() {
         return eloChange;
     }
 
     public void setEloChange(Double eloChange) {
         this.eloChange = eloChange;
+    }
+
+    public String getMatchStatus() {
+        return matchStatus;
+    }
+
+    public void setMatchStatus(String matchStatus) {
+        this.matchStatus = matchStatus;
     }    
     
     

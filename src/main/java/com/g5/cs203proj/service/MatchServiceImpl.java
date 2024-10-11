@@ -76,10 +76,14 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public Match assignRandomPlayers( Long matchId ){
-        Match match = matchRepository.findById(matchId).orElseThrow(() -> new MatchNotFoundException(matchId)); // so the match needs to be created first 
+
+        // retrieve the match
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new MatchNotFoundException(matchId)); // so the match needs to be created first in Postman
+
+        Long tournamentIdOfMatch = match.getTournament().getId();
 
         // get the list of all available players 
-        List<Player> availablePlayers = playerService.getAllPlayerUsers(); // THE PLAYERS CANNOT BE IN AN ONGOING MATCH TOO
+        List<Player> availablePlayers = playerService.getAvailablePlayersForTournament(tournamentIdOfMatch);
         int playerCount = availablePlayers.size();
         if ( playerCount < 2 ) {
             throw new NotEnoughPlayersException(playerCount);
@@ -111,7 +115,7 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public void processMatchResult(Match match, Player winner, boolean isDraw) {
-        match.setIsCompleteStatus(true);
+        match.setMatchStatus("COMPLETED");
         match.setDraw(isDraw);
 
         if (isDraw) {
@@ -164,14 +168,14 @@ public class MatchServiceImpl implements MatchService {
         MatchDTO matchDTO = new MatchDTO();
 
         matchDTO.setId(match.getMatchId());
-        matchDTO.setPlayer1Id(match.getPlayer1().getId());
-        matchDTO.setPlayer2Id(match.getPlayer2().getId());
+        matchDTO.setPlayer1Id(match.getPlayer1() != null ? match.getPlayer1().getId() : null );
+        matchDTO.setPlayer2Id(match.getPlayer2() != null ? match.getPlayer2().getId() : null );
         matchDTO.setTournamentId(match.getTournament().getId());  // Use ID instead of full object
         matchDTO.setStatusP1(match.getStatusP1());
         matchDTO.setStatusP2(match.getStatusP2());
         matchDTO.setWinnerId(match.getWinner() != null ? match.getWinner().getId() : null);
         matchDTO.setDraw(match.getDraw());
-        matchDTO.setComplete(match.getIsCompleteStatus());
+        matchDTO.setMatchStatus(match.getMatchStatus());
         matchDTO.setEloChange(match.getEloChange());
 
         return matchDTO;
@@ -192,7 +196,7 @@ public class MatchServiceImpl implements MatchService {
         match.setStatusP2(matchDTO.isStatusP2());
         match.setWinner(matchDTO.getWinnerId() != null ? playerService.getPlayerById(matchDTO.getWinnerId()) : null);
         match.setDraw(matchDTO.isDraw());
-        match.setIsCompleteStatus(matchDTO.isComplete());
+        match.setMatchStatus(matchDTO.getMatchStatus());    
         match.setEloChange(matchDTO.getEloChange());
     
         return match;

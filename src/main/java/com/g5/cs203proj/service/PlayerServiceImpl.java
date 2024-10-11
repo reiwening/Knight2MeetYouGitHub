@@ -97,6 +97,10 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getMatchHistory();
     }
 
+    public List<Player> getAvailablePlayersForTournament(Long tournamentIdOfMatch){
+        return playerRepository.findAllByTournamentIdAndNotInOngoingMatch(tournamentIdOfMatch);
+    }
+
     //////////////////////////////////////////////////////////////////////////////////
 
     @Override
