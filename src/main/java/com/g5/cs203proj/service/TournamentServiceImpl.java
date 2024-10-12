@@ -1,5 +1,7 @@
 package com.g5.cs203proj.service;
 
+import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,17 +9,25 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
 
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
     @Autowired
     private TournamentRepository tournamentRepository;
+    @Autowired
+    private PlayerRepository playerRepository;
+    @Autowired
+    private MatchRepository matchRepository;
 
     //Contructors
     public TournamentServiceImpl(){};
-    public TournamentServiceImpl(TournamentRepository tournamentRepository){
+    public TournamentServiceImpl(TournamentRepository tournamentRepository, PlayerRepository playerRepository, MatchRepository matchRepository){
         this.tournamentRepository = tournamentRepository;
+        this.playerRepository = playerRepository;
+        this.matchRepository = matchRepository;
     }
 
 
@@ -27,8 +37,12 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentRepository.save(tournament);
     }
 
+    // Update a tournament
     @Override
-    public Tournament updateTournament(Tournament existingTournament, Tournament updatedTournament) {
+    public Tournament updateTournament(Long tournamentId, Tournament updatedTournament) {
+        Tournament existingTournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+
         existingTournament.setName(updatedTournament.getName());
         existingTournament.setTournamentStatus(updatedTournament.getTournamentStatus());
         existingTournament.setTournamentStyle(updatedTournament.getTournamentStyle());
@@ -37,18 +51,33 @@ public class TournamentServiceImpl implements TournamentService {
         existingTournament.setMinElo(updatedTournament.getMinElo());
         existingTournament.setMaxElo(updatedTournament.getMaxElo());
         existingTournament.setRegistrationCutOff(updatedTournament.getRegistrationCutOff());
+
+        // Update registered players if needed
+        if (updatedTournament.getRegisteredPlayers() != null) {
+            existingTournament.setRegisteredPlayers(updatedTournament.getRegisteredPlayers());
+        }
+
+        // Update match history if needed
+        if (updatedTournament.getTournamentMatchHistory() != null) {
+            existingTournament.setTournamentMatchHistory(updatedTournament.getTournamentMatchHistory());
+        }
+
         return tournamentRepository.save(existingTournament);
     }
 
+    // Delete a tournament
     @Override
-    public Tournament deleteTournament(Tournament tournament) {
+    public void deleteTournament(Long tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
         tournamentRepository.delete(tournament);
-        return tournament;
     }
 
+    // Get a tournament by ID
     @Override
     public Tournament getTournamentById(Long tournamentId) {
-        return tournamentRepository.findById(tournamentId).orElse(null);
+        return tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
     }
 
     @Override
@@ -71,38 +100,60 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentRepository.save(tournament);
     }
 
+    // Get tournament rankings
     @Override
     public Map<Long, Integer> getTournamentRankings(Tournament tournament) {
         return tournament.getRankings();
     }
 
     // Player management
+    // Register a player to a tournament
     @Override
-    public Tournament registerPlayer(Player player, Tournament tournament) {
+    public Tournament registerPlayer(Long playerId, Long tournamentId) {
+        Tournament tournament = getTournamentById(tournamentId);
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(playerId));
+
+        if (tournament.getRegisteredPlayers().contains(player)) {
+            throw new PlayerAlreadyInTournamentException(playerId, tournamentId);
+        }
+
+        if (tournament.getRegisteredPlayers().size() >= tournament.getMaxPlayers()) {
+            throw new TournamentFullException(tournamentId);
+        }
+
         tournament.getRegisteredPlayers().add(player);
         return tournamentRepository.save(tournament);
     }
 
+    // Remove a player from a tournament
     @Override
-    public Tournament removePlayer(Player player, Tournament tournament) {
+    public Tournament removePlayer(Long playerId, Long tournamentId) {
+        Tournament tournament = getTournamentById(tournamentId);
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException(playerId));
+
+        if (!tournament.getRegisteredPlayers().contains(player)) {
+            throw new PlayerNotInTournamentException(playerId, tournamentId);
+        }
+
         tournament.getRegisteredPlayers().remove(player);
         return tournamentRepository.save(tournament);
     }
 
     @Override
-    public List<Player> getRegisteredPlayers(Tournament tournament) {
+    public Set<Player> getRegisteredPlayers(Long tournamentId) {
+        Tournament tournament = getTournamentById(tournamentId);
         return tournament.getRegisteredPlayers();
     }
 
     // Match management
 
     @Override
-    public void scheduleMatches(Tournament tournament) {
+    public void scheduleMatches(Long tournamentId) {
+        //not sure how to implement
+    }
 /*
-        //only 1st round needs to be random, 
-        //the remaining rounds will be predetermined cos winner of match1 vs winner of match2,
-        //winner of match3 vs winner of match4
-
         //just a placeholder, might wannna come up with something better
         boolean isFirstRound = true;
         List<Player> players;
@@ -137,64 +188,184 @@ public class TournamentServiceImpl implements TournamentService {
             tournament.setTournamentMatchHistory(tournament.getTournamentMatchHistory().add(match));
         }
 */
-    }
     @Override
     public List<Match> getTournamentMatchHistory(Tournament tournament) {
         return tournament.getTournamentMatchHistory();
     }
 
-    @Override
-    public void sendMatchNotification(Tournament tournament, List<Match> matches) {
+    //if we store the matches in the most recent round, we can just iterate through that instead of having to pass in matches
+    public void sendMatchNotification(Long tournamentId) {
+        Tournament tournament = getTournamentById(tournamentId);
         /*
         for (Match match : matches){
             match.matchService.sendNotification();
         }
         */
+        
     }
 
     // Tournament settings methods
-
+    // Set Elo Range
     @Override
-    public Tournament setTournamentEloRange(Tournament tournament, int minElo, int maxElo) {
+    public Tournament setTournamentEloRange(Long tournamentId, int minElo, int maxElo) {
+        Tournament tournament = getTournamentById(tournamentId);
+
+        if (minElo < 0 || maxElo < 0) {
+            throw new InvalidEloValueException("Elo values cannot be negative");
+        }
+
+        if (minElo > maxElo) {
+            throw new InvalidEloValueException("minElo cannot be greater than maxElo");
+        }
+
+        // Optionally, check if existing players adhere to the new Elo range
+        boolean playersWithinRange = tournament.getRegisteredPlayers().stream()
+                .allMatch(player -> player.getGlobalEloRating() >= minElo && player.getGlobalEloRating() <= maxElo);
+
+        if (!playersWithinRange) {
+            throw new InvalidEloValueException("Not all players meet the new Elo range criteria");
+        }
+
         tournament.setMinElo(minElo);
         tournament.setMaxElo(maxElo);
         return tournamentRepository.save(tournament);
     }
 
+    // Set Tournament Status
     @Override
-    public Tournament setTournamentStatus(Tournament tournament, String status) {
+    public Tournament setTournamentStatus(Long tournamentId, String status) {
+        Tournament tournament = getTournamentById(tournamentId);
+        // Validate status if necessary
+        List<String> validStatuses = Arrays.asList("Registration", "In Progress", "Cancelled", "Completed");
+        if (!validStatuses.contains(status)) {
+            throw new InvalidStatusException("Invalid tournament status: " + status);
+        }
         tournament.setTournamentStatus(status);
         return tournamentRepository.save(tournament);
     }
 
+    // Set Tournament Style
     @Override
-    public Tournament setTournamentStyle(Tournament tournament, String style) {
+    public Tournament setTournamentStyle(Long tournamentId, String style) {
+        Tournament tournament = getTournamentById(tournamentId);
+        // Validate style if necessary
+        List<String> validStyles = Arrays.asList("Single Elimination", "Double Elimination", "Round Robin", "Random");
+        if (!validStyles.contains(style)) {
+            throw new InvalidStyleException("Invalid tournament style: " + style);
+        }
         tournament.setTournamentStyle(style);
         return tournamentRepository.save(tournament);
     }
 
+    // Set Player Range
     @Override
-    public Tournament setTournamentPlayerRange(Tournament tournament, int minPlayers, int maxPlayers) {
+    public Tournament setTournamentPlayerRange(Long tournamentId, int minPlayers, int maxPlayers) {
+        Tournament tournament = getTournamentById(tournamentId);
+
+        if (minPlayers < 0 || maxPlayers < 0) {
+            throw new InvalidPlayerRangeException("Player count cannot be negative");
+        }
+
+        if (minPlayers > maxPlayers) {
+            throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
+        }
+
+        int playerCount = tournament.getRegisteredPlayers().size();
+        if (playerCount > maxPlayers) {
+            throw new InvalidPlayerRangeException(String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers));
+        }
+
         tournament.setMinPlayers(minPlayers);
         tournament.setMaxPlayers(maxPlayers);
         return tournamentRepository.save(tournament);
     }
 
+    // Set Registration Cutoff
     @Override
     public Tournament setTournamentRegistrationCutOff(Tournament tournament, LocalDateTime registrationCutOff) {
         tournament.setRegistrationCutOff(registrationCutOff);
         return tournamentRepository.save(tournament);
     }
 
+    // Set Admin
     @Override
     public Tournament setAdmin(Tournament tournament, Admin newAdmin) {
         tournament.setAdmin(newAdmin);
         return tournamentRepository.save(tournament);
     }
 
+    // Set Name
     @Override
-    public Tournament setName(Tournament tournament, String newTournamentName) {
-        tournament.setName(newTournamentName);
+    public Tournament setName(Long tournamentId, String newName) {
+        Tournament tournament = getTournamentById(tournamentId);
+        tournament.setName(newName);
         return tournamentRepository.save(tournament);
+    }
+
+// Convert Entity to DTO
+    @Override
+    public TournamentDTO convertToDTO(Tournament tournament) {
+        TournamentDTO tournamentDTO = new TournamentDTO();
+        tournamentDTO.setTournamentId(tournament.getId());
+        tournamentDTO.setName(tournament.getName());
+        tournamentDTO.setTournamentStatus(tournament.getTournamentStatus());
+        tournamentDTO.setTournamentStyle(tournament.getTournamentStyle());
+        tournamentDTO.setMaxPlayers(tournament.getMaxPlayers());
+        tournamentDTO.setMinPlayers(tournament.getMinPlayers());
+        tournamentDTO.setMinElo(tournament.getMinElo());
+        tournamentDTO.setMaxElo(tournament.getMaxElo());
+        tournamentDTO.setRegistrationCutOff(tournament.getRegistrationCutOff());
+
+        // Collect match IDs
+        List<Long> matchIdsHistory = tournament.getTournamentMatchHistory().stream()
+                .map(Match::getMatchId)
+                .collect(Collectors.toList());
+        tournamentDTO.setTournamentMatchHistoryId(matchIdsHistory);
+
+        // Collect registered player IDs
+        List<Long> registeredPlayersIds = tournament.getRegisteredPlayers().stream()
+                .map(Player::getId)
+                .collect(Collectors.toList());
+        tournamentDTO.setRegisteredPlayersId(registeredPlayersIds);
+
+        return tournamentDTO;
+    }
+
+    // Convert DTO to Entity
+    @Override
+    public Tournament convertToEntity(TournamentDTO tournamentDTO) {
+        Tournament tournament = new Tournament();
+        tournament.setName(tournamentDTO.getName());
+        tournament.setTournamentStatus(tournamentDTO.getTournamentStatus());
+        tournament.setTournamentStyle(tournamentDTO.getTournamentStyle());
+        tournament.setMaxPlayers(tournamentDTO.getMaxPlayers());
+        tournament.setMinPlayers(tournamentDTO.getMinPlayers());
+        tournament.setMinElo(tournamentDTO.getMinElo());
+        tournament.setMaxElo(tournamentDTO.getMaxElo());
+        tournament.setRegistrationCutOff(tournamentDTO.getRegistrationCutOff());
+
+        // Handle registeredPlayersIds
+        if (tournamentDTO.getRegisteredPlayersId() != null) {
+            Set<Player> registeredPlayers = tournamentDTO.getRegisteredPlayersId().stream()
+                    .map(playerId -> playerRepository.findById(playerId)
+                            .orElseThrow(() -> new PlayerNotFoundException(playerId)))
+                    .collect(Collectors.toSet());
+            tournament.setRegisteredPlayers(registeredPlayers);
+        } else {
+            tournament.setRegisteredPlayers(new HashSet<>());
+        }
+
+        // Handle tournamentMatchHistoryIds
+        if (tournamentDTO.getTournamentMatchHistoryId() != null) {
+            List<Match> tournamentMatchHistory = tournamentDTO.getTournamentMatchHistoryId().stream()
+                    .map(matchId -> matchRepository.findById(matchId)
+                            .orElseThrow(() -> new MatchNotFoundException(matchId)))
+                    .collect(Collectors.toList());
+            tournament.setTournamentMatchHistory(tournamentMatchHistory);
+        } else {
+            tournament.setTournamentMatchHistory(new ArrayList<>());
+        }
+
+        return tournament;
     }
 }

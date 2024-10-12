@@ -45,7 +45,8 @@ public class Match {
     
     private boolean isDraw;
 
-    private boolean isComplete;
+    private String matchStatus = "NOT_STARTED"; // "NOT_STARTED (default) | "ONGOING" | "COMPLETED"
+
     private Double eloChange;
 
     // Default constructor
@@ -54,23 +55,20 @@ public class Match {
     }
 
     // Other constructors, getters, setters, etc.
-    public Match(Long id, Player player1, Player player2) {
-        this.id = id;
+    public Match(Player player1, Player player2) {
+        // this.id = id;
         this.tournament = null;
         this.player1 = player1;
         this.player2 = player2;
-
         this.statusP1 = false;
         this.statusP2 = false;
-
         this.winner = null;
         this.isDraw = false;  // Initialize as not a draw
-        this.isComplete = false;
         this.eloChange = null;
     }
 
-    public Match(Long id, Tournament tournament) {
-        this.id = id;
+    public Match(Tournament tournament) {
+        // this.id = id;
         this.tournament = tournament;
         this.player1 = null;
         this.player2 = null;
@@ -80,12 +78,11 @@ public class Match {
 
         this.winner = null;
         this.isDraw = false;  // Initialize as not a draw
-        this.isComplete = false;
         this.eloChange = null;
     }
 
-    public Match(Long id, Tournament tournament, Player player1, Player player2) {
-        this.id = id;
+    public Match(Tournament tournament, Player player1, Player player2) {
+        // this.id = id;
         this.tournament = tournament;
         this.player1 = player1;
         this.player2 = player2;
@@ -95,7 +92,6 @@ public class Match {
 
         this.winner = null;
         this.isDraw = false;  // Initialize as not a draw
-        this.isComplete = false;
         this.eloChange = null;
     }
 
@@ -135,10 +131,6 @@ public class Match {
         this.isDraw = isDraw;
     }
 
-    public void setIsCompleteStatus(boolean status) {
-        this.isComplete = status;
-    }
-
     // 27/6/24: method invoked on player class for now, dk if using PlayerController
     public void setEloChange(Player winner) {
         double kFactor = 32.0;
@@ -158,6 +150,10 @@ public class Match {
         player2.setGlobalEloRating(newRatingP2);
     
         this.eloChange = Math.abs(newRatingP1 - ratingP1);
+    }
+
+    public void setOnlyEloChange(Double newEloChange) {
+        eloChange = newEloChange;
     }
     
 
@@ -194,11 +190,15 @@ public class Match {
         return isDraw;
     }
 
-    public boolean getIsCompleteStatus() {
-        return isComplete;
-    }
-    
     public Double getEloChange() {
         return eloChange;
+    }
+
+    public String getMatchStatus() {
+        return matchStatus;
+    }
+
+    public void setMatchStatus(String matchStatus) {
+        this.matchStatus = matchStatus;
     }
 }

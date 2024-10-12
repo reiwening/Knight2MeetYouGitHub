@@ -11,4 +11,3 @@ public class InvalidEloValueException extends RuntimeException{
         super(msg);
     }
 }
-

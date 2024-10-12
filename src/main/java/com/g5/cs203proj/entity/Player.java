@@ -14,8 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.*;
-import java.util.List;
-import java.util.ArrayList;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -53,13 +51,13 @@ public class Player implements UserDetails   {
     private double globalEloRating;
 
     @ManyToMany 
-    @JsonIgnore
+// @JsonIgnore
     @JoinTable(
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "tournament_id"))
-    private List<Tournament> tournamentRegistered;
-
+    private Set<Tournament> tournamentRegistered;
+// can make it Set<Tournament>
     
     @OneToMany(mappedBy = "player1")
     @JsonIgnore
@@ -72,10 +70,10 @@ public class Player implements UserDetails   {
 
     
     @Transient // This field is not persisted directly, but computed
-    @JsonIgnore
+// @JsonIgnore
     private List<Match> matchHistory;
 
-    public void setTournamentRegistered(List<Tournament> tournamentRegistered) {
+    public void setTournamentRegistered(Set<Tournament> tournamentRegistered) {
         this.tournamentRegistered = tournamentRegistered;
     }
 
@@ -179,7 +177,7 @@ public class Player implements UserDetails   {
         return true;
     }
     
-    public List<Tournament> getTournamentRegistered() {
+    public Set<Tournament> getTournamentRegistered() {
         return tournamentRegistered;
 
     }
@@ -203,6 +201,5 @@ public class Player implements UserDetails   {
         this.matchesAsPlayer2.add(match);
         return match;
     }
-
 }
 

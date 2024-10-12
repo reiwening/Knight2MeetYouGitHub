@@ -1,16 +1,19 @@
 package com.g5.cs203proj.controller;
 
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
+import com.g5.cs203proj.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 public class TournamentController {
@@ -25,206 +28,159 @@ public class TournamentController {
         this.tournamentService = tournamentService;
         this.playerService = playerService;
     }
-
-    //test: ok (9/10/24)
+    //test: ok (matt 13/10/24)
     // Create a new tournament
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/tournaments")
-    public Tournament createTournament(@RequestBody Tournament tournament) {
-        return tournamentService.createTournament(tournament);
+    public ResponseEntity<TournamentDTO> createTournament(@RequestBody TournamentDTO tournamentDTO) {
+        Tournament savedTournament = tournamentService.createTournament(tournamentService.convertToEntity(tournamentDTO));
+        return new ResponseEntity<>(tournamentService.convertToDTO(savedTournament), HttpStatus.CREATED);
     }
 
-    //test: ok (9/10/24)
-    // Get a specific tournament by ID
-    @GetMapping("/tournaments/{id}")
-    public Tournament getTournamentById(@PathVariable Long id) {
-        Tournament tournament = tournamentService.getTournamentById(id);
-        if (tournament == null){
-            throw new TournamentNotFoundException(id);
-        }
-        return tournament;
-    }
-
-    //test: ok (9/10/24)
+    //test: ok but no field validation (matt 13/10/24)
     // Update a tournament by ID
     @PutMapping("/tournaments/{id}")
-    public Tournament updateTournament(@PathVariable Long id, @RequestBody Tournament updatedTournament) {
-        Tournament tournament = getTournamentById(id);
-        return tournamentService.updateTournament(tournament, updatedTournament);
+    public ResponseEntity<TournamentDTO> updateTournament(@PathVariable Long id, @RequestBody TournamentDTO updatedTournamentDTO) {
+        Tournament updatedTournament = tournamentService.updateTournament(id, tournamentService.convertToEntity(updatedTournamentDTO));
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
+    //test: ok (matt 13/10/24)
     // Delete a tournament by ID
     @DeleteMapping("/tournaments/{id}")
-    public void deleteTournament(@PathVariable Long id) {
-        Tournament tournament = getTournamentById(id);
-        tournamentService.deleteTournament(tournament);
+    public ResponseEntity<String> deleteTournament(@PathVariable Long id) {
+        tournamentService.deleteTournament(id);
+        return new ResponseEntity<>("Successfully deleted tournament " + id, HttpStatus.NO_CONTENT);
     }
 
-    //test: ok (9/10/24)
+    //test: ok (matt 13/10/24)
+    // Get a specific tournament by ID
+    @GetMapping("/tournaments/{id}")
+    public ResponseEntity<TournamentDTO> getTournamentById(@PathVariable Long id) {
+        Tournament tournament = tournamentService.getTournamentById(id);
+        return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
+    }
+
+
+    //test: ok (matt 13/10/24)
     // Get all tournaments
     @GetMapping("/tournaments")
-    public List<Tournament> getAllTournaments() {
-        return tournamentService.getAllTournaments();
+    public ResponseEntity<List<TournamentDTO>> getAllTournaments() {
+        List<TournamentDTO> tournamentDTOs = tournamentService.getAllTournaments()
+                .stream()
+                .map(tournamentService::convertToDTO)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(tournamentDTOs, HttpStatus.OK);
     }
-
-    //test: ok (9/10/24)
+    //test: ok (matt 13/10/24)
     // Get all registerable tournaments
-    @GetMapping("/tournaments/Registration")
-    public List<Tournament> getAllRegisterableTournaments() {
-        return tournamentService.getAllRegisterableTournaments();
+    @GetMapping("/tournaments/reg")
+    public ResponseEntity<List<TournamentDTO>> getAllRegisterableTournaments() {
+        List<TournamentDTO> tournamentDTOs = tournamentService.getAllRegisterableTournaments()
+                .stream()
+                .map(tournamentService::convertToDTO)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(tournamentDTOs, HttpStatus.OK);
     }
 
     //havent test yet
     // Start or cancel a tournament based on registration cutoff
-    @PostMapping("/tournaments/{id}")
-    public Tournament startOrCancelTournament(@PathVariable Long id) {
-        Tournament tournament = getTournamentById(id);
-        //check if tournament is in Registration status
-        if (tournament.getTournamentStatus() != "Registration"){
-            throw new TournamentNotInRegistrationException("Tournament not in \"Registration\" status");
-        }
-        return tournamentService.startOrCancelTournament(tournament);
+    @PostMapping("/tournaments/{id}/start-or-cancel")
+    public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
+        Tournament tournament = tournamentService.startOrCancelTournament(id);
+        return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
     }
 
     //havent tested
     // Get tournament rankings by ID
     @GetMapping("/tournaments/{id}/rankings")
-    public Map<Long, Integer> getTournamentRankings(@PathVariable Long id) {
-        Tournament tournament = getTournamentById(id);
-        return tournamentService.getTournamentRankings(tournament);
+    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
+        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
+        return new ResponseEntity<>(rankings, HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
-    //do i need to check for adding player after registration close?
+    // test: ok (matt 13/10/24)
     // Register a player to a tournament
     @PostMapping("/tournaments/{tournamentId}/players")
-    public Tournament registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
-        Tournament tournament = getTournamentById(tournamentId);
-        Player player = playerService.getPlayerById(playerId);
-        //check if player is alr in tourn
-        List<Player> registeredPlayers = tournament.getRegisteredPlayers();
-        if (registeredPlayers.contains(player)){
-            throw new PlayerAlreadyInTournamentException(playerId, tournamentId);
-        }
-        //check if adding will exceed player limit
-        if (registeredPlayers.size() >= tournament.getMaxPlayers()){
-            throw new TournamentFullException(tournamentId);
-        }
-        //pass both checks, can add player
-        return tournamentService.registerPlayer(player, tournament);
+    public ResponseEntity<TournamentDTO> registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
+        Tournament updatedTournament = tournamentService.registerPlayer(playerId, tournamentId);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
-    // Remove a player from a tournament
+    //test: ok (matt 13/10/24)
+    //remove player from a tournament
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
-    public Tournament removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
-        Tournament tournament = getTournamentById(tournamentId);
-        Player player = playerService.getPlayerById(playerId);
-        //check if player is not in tournament
-        List<Player> registeredPlayers = tournament.getRegisteredPlayers();
-        if (!registeredPlayers.contains(player)){
-            throw new PlayerNotInTournamentException(playerId, tournamentId);
-        }
-        //save to add to tourn
-        return tournamentService.removePlayer(player, tournament);
+    public ResponseEntity<TournamentDTO> removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
+        Tournament updatedTournament = tournamentService.removePlayer(playerId, tournamentId);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
+    //test: ok but need matchDTO to not keep recurring (matt 13/10/24)
     // Get a list of registered players in a tournament
     @GetMapping("/tournaments/{id}/players")
-    public List<Player> getRegisteredPlayers(@PathVariable Long id) {
-        Tournament tournament = getTournamentById(id);
-        return tournamentService.getRegisteredPlayers(tournament);
+    public ResponseEntity<Set<Player>> getRegisteredPlayers(@PathVariable Long id) {
+        Set<Player> players = tournamentService.getRegisteredPlayers(id);
+        return new ResponseEntity<>(players, HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
-//TODO: check if the players already in the tourn adhere to the new elo range if not dont allow change
+    //test: ok (matt 13/10/24)
     // Update the Elo range for the tournament
-    @PutMapping("/tournaments/{id}/elo-range") //not sure about mapping
-    public Tournament setTournamentEloRange(@PathVariable Long id, @RequestParam int minElo, @RequestParam int maxElo) {
-        Tournament tournament = getTournamentById(id);
-        //check for negative elo values
-        if (minElo < 0 || maxElo < 0){
-            throw new InvalidEloValueException("Elo values cannot be negative");
-        }
-        //check for min elo > max elo
-        if (minElo > maxElo){
-            throw new InvalidEloValueException("minElo cannot be greater than maxElo");
-        }
-        //safe to change elo value
-        return tournamentService.setTournamentEloRange(tournament, minElo, maxElo);
+    @PutMapping("/tournaments/{id}/elo-range")
+    public ResponseEntity<TournamentDTO> setTournamentEloRange(@PathVariable Long id, @RequestParam int minElo, @RequestParam int maxElo) {
+        Tournament updatedTournament = tournamentService.setTournamentEloRange(id, minElo, maxElo);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
-
-    //test: ok (9/10/24)
-//TODO: validate that status input is valid
+    
+    //test: ok (matt 13/10/24)
     // Update the tournament status
     @PutMapping("/tournaments/{id}/status")
-    public Tournament setTournamentStatus(@PathVariable Long id, @RequestParam String status) {
-        Tournament tournament = getTournamentById(id);
-        //need to check for invalid status?
-        return tournamentService.setTournamentStatus(tournament, status);
+    public ResponseEntity<TournamentDTO> setTournamentStatus(@PathVariable Long id, @RequestParam String status) {
+        Tournament updatedTournament = tournamentService.setTournamentStatus(id, status);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
-
-    //test: ok (9/10/24)
-//TODO: validate that style input is valid
+    
+    //test: ok (matt 13/10/24)
     // Update the tournament style
     @PutMapping("/tournaments/{id}/style")
-    public Tournament setTournamentStyle(@PathVariable Long id, @RequestParam String style) {
-        Tournament tournament = getTournamentById(id);
-        return tournamentService.setTournamentStyle(tournament, style);
+    public ResponseEntity<TournamentDTO> setTournamentStyle(@PathVariable Long id, @RequestParam String style) {
+        Tournament updatedTournament = tournamentService.setTournamentStyle(id, style);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
+    //Test: ok (matt 13/10/24)
     // Update the player range (min/max players)
     @PutMapping("/tournaments/{id}/player-range")
-    public Tournament setTournamentPlayerRange(
+    public ResponseEntity<TournamentDTO> setTournamentPlayerRange(
         @PathVariable Long id, @RequestParam int minPlayers, @RequestParam int maxPlayers) {
-        Tournament tournament = getTournamentById(id);
-        //check for invalid player range
-        if (minPlayers < 0 || maxPlayers < 0){
-            throw new InvalidPlayerRangeException("Player count cannot be negative");
-        }
-        //check for min players > max players
-        if (minPlayers > maxPlayers){
-            throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
-        }
-        //check if updated range can hold current player count
-        int playerCount = tournament.getRegisteredPlayers().size();
-        if (playerCount > maxPlayers){
-            throw new InvalidPlayerRangeException("Tournament has more players than maxPlayers");
-        }
-
-        //safe to update player count
-        return tournamentService.setTournamentPlayerRange(tournament, minPlayers, maxPlayers);
+        Tournament updatedTournament = tournamentService.setTournamentPlayerRange(id, minPlayers, maxPlayers);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
+    //test: ok (matt 13/10/24)
     // Update the registration cutoff time
     @PutMapping("/tournaments/{id}/registration-cutoff")
-    public Tournament setTournamentRegistrationCutOff(
-        @PathVariable Long id, @RequestParam int year, @RequestParam int monthOfYear, @RequestParam int dayOfMonth, @RequestParam int hour, @RequestParam int minute) {
-        Tournament tournament = getTournamentById(id);
+    public ResponseEntity<TournamentDTO> setTournamentRegistrationCutOff(
+        @PathVariable Long id, @RequestParam int year,  @RequestParam int monthOfYear, 
+        @RequestParam int dayOfMonth, @RequestParam int minute, @RequestParam int hour) {
         LocalDateTime registrationCutOff = LocalDateTime.of(year, monthOfYear, dayOfMonth, hour, minute);
-        return tournamentService.setTournamentRegistrationCutOff(tournament, registrationCutOff);
+        Tournament updatedTournament = tournamentService.setTournamentRegistrationCutOff(id, registrationCutOff);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: not done (might need to change this to use new security config)
+    //test later, NOT SURE ABT ADMIN 
     // Update the tournament admin
     @PutMapping("/tournaments/{id}/admin")
-    public Tournament setAdmin(
-        @PathVariable Long id, @RequestBody Admin newAdmin) {
-        Tournament tournament = getTournamentById(id);
-        return tournamentService.setAdmin(tournament, newAdmin);
+    public ResponseEntity<TournamentDTO> setAdmin(@PathVariable Long id, @RequestBody Admin newAdmin) {
+        Tournament updatedTournament = tournamentService.setAdmin(id, newAdmin);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (9/10/24)
+    //test: ok (matt 13/10/24)
     // Update the tournament name
     @PutMapping("/tournaments/{id}/name")
-    public Tournament setName(
-        @PathVariable Long id, @RequestParam String newName) {
-        Tournament tournament = getTournamentById(id);
-        return tournamentService.setName(tournament, newName);
+    public ResponseEntity<TournamentDTO> setName(@PathVariable Long id, @RequestParam String newName) {
+        Tournament updatedTournament = tournamentService.setName(id, newName);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 }
 

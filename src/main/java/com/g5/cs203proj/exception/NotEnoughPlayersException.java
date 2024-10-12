@@ -4,10 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
-public class PlayerNotInTournamentException extends RuntimeException {
+public class NotEnoughPlayersException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public PlayerNotInTournamentException(Long playerId, Long tournamentId) {
-        super("Player " + playerId + " is not registered for Tournament " + tournamentId);
+    public NotEnoughPlayersException(int numPlayers){
+        super("You currently have " + numPlayers + "players.");
     }
 }

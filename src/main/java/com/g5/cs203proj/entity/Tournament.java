@@ -1,6 +1,7 @@
 package com.g5.cs203proj.entity;
 
 import java.util.*;
+
 import java.time.LocalDateTime;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -40,8 +41,7 @@ public class Tournament {
         name = "player_tournament",
         joinColumns = @JoinColumn(name = "tournament_id"),
         inverseJoinColumns = @JoinColumn(name = "player_id"))
-    private List<Player> registeredPlayers;
-    //private List<Long> registeredPlayers;
+    private Set<Player> registeredPlayers = new HashSet<>();
 
     
     @ElementCollection // Use @ElementCollection to store a Map in the database
@@ -98,8 +98,8 @@ public class Tournament {
         return tournamentMatchHistory;
     }
 
-    public void setTournamentMatchHistory(List<Match> tournamentMatchHistory) {
-        this.tournamentMatchHistory = tournamentMatchHistory;
+    public void setTournamentMatchHistory(List<Match> matchHistory) {
+        this.tournamentMatchHistory = matchHistory;
     }
 
     public String getTournamentStatus() {
@@ -118,16 +118,11 @@ public class Tournament {
         this.tournamentStyle = tournamentStyle;
     }
 
-    public List<Player> getRegisteredPlayers() {
+    public Set<Player> getRegisteredPlayers() {
         return registeredPlayers;
     }
 
-    //why when i put this in, creating a tournament gives this error (Could not write JSON: Cannot invoke "java.util.List.size()" because "this.registeredPlayers" is null)
-    // public int getRegisteredPlayerCount(){
-    //     return registeredPlayers.size();
-    // }
-
-    public void setRegisteredPlayers(List<Player> registeredPlayers) {
+    public void setRegisteredPlayers(Set<Player> registeredPlayers) {
         this.registeredPlayers = registeredPlayers;
     }
 
@@ -186,7 +181,5 @@ public class Tournament {
     public void setAdmin(Admin admin) {
         this.admin = admin;
     }
-
-
 
 }

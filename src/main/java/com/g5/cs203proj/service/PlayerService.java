@@ -26,14 +26,15 @@ public interface PlayerService {
     
     // Participation
     List<Match> getPlayerMatchHistory(Player player);
-    List<Tournament> getTournamentRegistered(Player player);
+    Set<Tournament> getTournamentRegistered(Player player);
     List<Tournament> getActiveTournamentRegistered(Player player);
 
     Optional<Player> findPlayerByUsername(String username);
+    List<Player> getAvailablePlayersForTournament(Long tournamentIdOfMatch);
 
-    List<Match> getMatchesAsPlayer1(Player player);
-    List<Match> getMatchesAsPlayer2(Player player);
-    Match addMatchToPlayerHistory(Player player, Match match);
-    
+    // List<Match> getMatchesAsPlayer1(Player player);
+    // List<Match> getMatchesAsPlayer2(Player player);
+    // Match addMatchToPlayerHistory(Player player, Match match);
+    // boolean registerPlayerForTournament(String username, Long tournamentId) ;
     
 }

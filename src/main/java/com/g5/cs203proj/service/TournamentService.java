@@ -1,9 +1,10 @@
 package com.g5.cs203proj.service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Admin;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
@@ -12,39 +13,35 @@ import com.g5.cs203proj.entity.Tournament;
 public interface TournamentService {
 //Tournament cycle
     Tournament createTournament(Tournament tournament);
-    Tournament updateTournament(Tournament tournament, Tournament updatedTournament);
-    Tournament deleteTournament(Tournament tournament);
-    Tournament getTournamentById(Long  tournamentId);
+    Tournament updateTournament(Long tournamentId, Tournament updatedTournament);
+    void deleteTournament(Long tournamentId);
+    Tournament getTournamentById(Long tournamentId);
     List<Tournament> getAllTournaments();
     List<Tournament> getAllRegisterableTournaments();
-        //allow filtering by other parameters?
-    Tournament startOrCancelTournament(Tournament tournament); 
-        //decides to start or cancel tournament at registration cut off, comparing player count and minPlayers
-    Map<Long, Integer> getTournamentRankings(Tournament tournament); 
-        //consider changing to Map<Integer, Set<Player>>
-    
+    Tournament startOrCancelTournament(Long tournamentId);
+    Map<Long, Integer> getTournamentRankings(Long tournamentId);
 
-//player management
-    Tournament registerPlayer(Player player, Tournament tournament);
-    Tournament removePlayer(Player player, Tournament tournament);
-    List<Player> getRegisteredPlayers(Tournament tournament);
-
+    // Player Management
+    Tournament registerPlayer(Long playerId, Long tournamentId);
+    Tournament removePlayer(Long playerId, Long tournamentId);
+    Set<Player> getRegisteredPlayers(Long tournamentId);
 
 //match management
-    void scheduleMatches(Tournament tournament);
-    List<Match> getTournamentMatchHistory(Tournament tournament);
-    void sendMatchNotification(Tournament tournament, List<Match> matches);
+    void scheduleMatches(Long tournamentId);
+    List<Match> getTournamentMatchHistory(Long tournamentId);
+    void sendMatchNotification(Long tournamentId);
         //uses sendNotification inside MatchService
 
+    // Tournament Settings
+    Tournament setTournamentEloRange(Long tournamentId, int minElo, int maxElo);
+    Tournament setTournamentStatus(Long tournamentId, String status);
+    Tournament setTournamentStyle(Long tournamentId, String style);
+    Tournament setTournamentPlayerRange(Long tournamentId, int minPlayers, int maxPlayers);
+    Tournament setTournamentRegistrationCutOff(Long tournamentId, LocalDateTime registrationCutOff);
+    Tournament setAdmin(Long tournamentId, Admin newAdmin);
+    Tournament setName(Long tournamentId, String newName);
 
-//tournament settings
-    Tournament setTournamentEloRange(Tournament tournament, int minElo, int maxElo);
-    Tournament setTournamentStatus(Tournament tournament, String status);
-    Tournament setTournamentStyle(Tournament tournament, String style);
-    Tournament setTournamentPlayerRange(Tournament tournament, int minPlayers, int maxPlayers); 
-        //restrict max players to a number that supports tournament style   
-    Tournament setTournamentRegistrationCutOff(Tournament tournament, LocalDateTime registrationCutOff);
-    Tournament setAdmin(Tournament tournament, Admin newAdmin);
-    Tournament setName(Tournament tournament, String newTournamentName);
-
+    // Conversion Methods
+    TournamentDTO convertToDTO(Tournament tournament);
+    Tournament convertToEntity(TournamentDTO tournamentDTO);
 }

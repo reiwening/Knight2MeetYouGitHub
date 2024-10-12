@@ -1,16 +1,23 @@
 package com.g5.cs203proj.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
+// import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.exception.MatchNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
+import com.g5.cs203proj.service.PlayerService;
+import com.g5.cs203proj.service.TournamentService;
+import com.g5.cs203proj.exception.NotEnoughPlayersException;
 
 
 /**
@@ -21,6 +28,13 @@ import com.g5.cs203proj.repository.PlayerRepository;
 public class MatchServiceImpl implements MatchService {
 
     private MatchRepository matchRepository;
+
+    @Autowired
+    private PlayerService playerService;
+
+    @Autowired
+    private TournamentService tournamentService;
+
 
     // constructor 
     public MatchServiceImpl( MatchRepository matchRepository ) {
@@ -61,17 +75,47 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public void assignPlayerToMatch(Match match, Player player) {
-        if (match.getPlayer1() == null) {
-            match.setPlayer1(player);
-        } else if (match.getPlayer2() == null) {
-            match.setPlayer2(player);
+    public Match assignRandomPlayers( Long matchId ){
+
+        // retrieve the match
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new MatchNotFoundException(matchId)); // so the match needs to be created first in Postman
+
+        Long tournamentIdOfMatch = match.getTournament().getId();
+
+        // get the list of all available players 
+        List<Player> availablePlayers = playerService.getAvailablePlayersForTournament(tournamentIdOfMatch);
+        int playerCount = availablePlayers.size();
+        if ( playerCount < 2 ) {
+            throw new NotEnoughPlayersException(playerCount);
         }
+        Collections.shuffle(availablePlayers);
+        Player p1 = availablePlayers.get(0);
+        Player p2 = availablePlayers.get(1);
+        match.setPlayer1(p1);
+        match.setPlayer2(p2);
+        matchRepository.save(match);
+
+        // then we need to add the players to match histories
+        p1.addMatchesAsPlayer1(match);
+        p2.addMatchesAsPlayer2(match);
+        playerService.savePlayer(p1);
+        playerService.savePlayer(p2);
+        return match;
+
     }
+
+// @Override
+// public void assignPlayerToMatch(Match match, Player player) {
+//     if (match.getPlayer1() == null) {
+//         match.setPlayer1(player);
+//     } else if (match.getPlayer2() == null) {
+//         match.setPlayer2(player);
+//     }
+// }
 
     @Override
     public void processMatchResult(Match match, Player winner, boolean isDraw) {
-        match.setIsCompleteStatus(true);
+        match.setMatchStatus("COMPLETED");
         match.setDraw(isDraw);
 
         if (isDraw) {
@@ -117,5 +161,47 @@ public class MatchServiceImpl implements MatchService {
         }
         return false;
     }
+
+    // convert Match entity to corresponding DTOs
+    public MatchDTO convertToDTO(Match match) {
+
+        MatchDTO matchDTO = new MatchDTO();
+
+        matchDTO.setId(match.getMatchId());
+        matchDTO.setPlayer1Id(match.getPlayer1() != null ? match.getPlayer1().getId() : null );
+        matchDTO.setPlayer2Id(match.getPlayer2() != null ? match.getPlayer2().getId() : null );
+        matchDTO.setTournamentId(match.getTournament().getId());  // Use ID instead of full object
+        matchDTO.setStatusP1(match.getStatusP1());
+        matchDTO.setStatusP2(match.getStatusP2());
+        matchDTO.setWinnerId(match.getWinner() != null ? match.getWinner().getId() : null);
+        matchDTO.setDraw(match.getDraw());
+        matchDTO.setMatchStatus(match.getMatchStatus());
+        matchDTO.setEloChange(match.getEloChange());
+
+        return matchDTO;
+    }
+
+    public Match convertToEntity(MatchDTO matchDTO) {
+
+        Match match = new Match();
+
+        Player player1 = playerService.getPlayerById(matchDTO.getPlayer1Id());
+        Player player2 = playerService.getPlayerById(matchDTO.getPlayer2Id());
+        Tournament tournament = tournamentService.getTournamentById(matchDTO.getTournamentId());
+    
+        match.setPlayer1(player1);
+        match.setPlayer2(player2);
+        match.setTournament(tournament);
+        match.setStatusP1(matchDTO.isStatusP1());
+        match.setStatusP2(matchDTO.isStatusP2());
+        match.setWinner(matchDTO.getWinnerId() != null ? playerService.getPlayerById(matchDTO.getWinnerId()) : null);
+        match.setDraw(matchDTO.isDraw());
+        match.setMatchStatus(matchDTO.getMatchStatus());    
+        match.setOnlyEloChange(matchDTO.getEloChange());
+    
+        return match;
+    }
+
+
 }
 
