@@ -98,10 +98,46 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void scheduleMatches(Tournament tournament) {
-        List<Player> players = tournament.getRegisteredPlayers();
-        //not sure how to implement
-    }
+/*
+        //only 1st round needs to be random, 
+        //the remaining rounds will be predetermined cos winner of match1 vs winner of match2,
+        //winner of match3 vs winner of match4
 
+        //just a placeholder, might wannna come up with something better
+        boolean isFirstRound = true;
+        List<Player> players;
+        if (isFirstRound){
+            players = tournament.getRegisteredPlayers();
+            Collections.shuffle(players);
+            isFirstRound = false;
+        }
+        else{ //not first round
+            //loop through all the matches in the last round and add the winners (not sure how to do this)
+            //retain order because winner of match 1 vs winner of match 2, match3 vs match4
+        }
+    //creating matches (inefficient implementation of shifting everytime. use a queue instead   )
+        //keep making pairs while at least have 2 players
+        while (players.size() >= 2) {
+            Player player1 = players.removeFirst();
+            Player player2 = players.removeFirst();
+            Match match = new Match(); //maybe create a constructor which takes in both players
+            //do we want set all other match values like match timing, elochange now?
+            match.setPlayer1(player1);
+            match.setPlayer2(player2);
+            //put match into match history
+            tournament.setTournamentMatchHistory(tournament.getTournamentMatchHistory().add(match));
+        }
+        //incase got 1 player left
+        if (!players.isEmpty()){
+            Match match = new Match();
+            match.setPlayer1(players.removeFirst());
+            match.setPlayer2(null);
+            //might want to set the winner at this point immediately
+            //put match into match history
+            tournament.setTournamentMatchHistory(tournament.getTournamentMatchHistory().add(match));
+        }
+*/
+    }
     @Override
     public List<Match> getTournamentMatchHistory(Tournament tournament) {
         return tournament.getTournamentMatchHistory();

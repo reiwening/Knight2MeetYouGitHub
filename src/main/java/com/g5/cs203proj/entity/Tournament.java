@@ -41,6 +41,7 @@ public class Tournament {
         joinColumns = @JoinColumn(name = "tournament_id"),
         inverseJoinColumns = @JoinColumn(name = "player_id"))
     private List<Player> registeredPlayers;
+    //private List<Long> registeredPlayers;
 
     
     @ElementCollection // Use @ElementCollection to store a Map in the database
