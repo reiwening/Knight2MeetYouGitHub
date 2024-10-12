@@ -14,9 +14,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.*;
 
 @Entity
+@Table(name = "matches") //have to rename cuz 'match' is an sql syntax
 public class Match {
     
 
