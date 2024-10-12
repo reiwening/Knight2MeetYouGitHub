@@ -1,18 +1,16 @@
 package com.g5.cs203proj.security;
 
-import org.springframework.security.config.Customizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.g5.cs203proj.service.PlayerDetailsService;
@@ -54,6 +52,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/players/users").hasRole("ADMIN") 
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/players").authenticated()
+                .requestMatchers(HttpMethod.POST, "/tournaments/{tournamentId}/players").hasRole("USER")
                 // .requestMatchers(HttpMethod.POST, "/players").permitAll()
                 // .requestMatchers(HttpMethod.GET, "/players").permitAll()
                 // .requestMatchers(HttpMethod.PUT, "/matches").permitAll()

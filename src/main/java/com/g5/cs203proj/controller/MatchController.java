@@ -122,6 +122,7 @@ public class MatchController {
     }
 
 // test : ok 
+// CHANGE URL HERE AND POSTMAN 
     // get all matches for a particular tournament 
     @GetMapping("/matches/tournament/{tournamentId}")
     public List<MatchDTO> getAllMatchesForATournament(@PathVariable Long tournamentId) {

@@ -90,6 +90,7 @@ public class MatchServiceImpl implements MatchService {
         if ( playerCount < 2 ) {
             throw new NotEnoughPlayersException(playerCount);
         }
+//NEED TO CHANGE LOGIC 
         Collections.shuffle(availablePlayers);
         Player p1 = availablePlayers.get(0);
         Player p2 = availablePlayers.get(1);
