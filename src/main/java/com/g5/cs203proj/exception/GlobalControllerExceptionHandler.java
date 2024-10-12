@@ -1,6 +1,7 @@
 package com.g5.cs203proj.exception;
 
 import java.util.Map;
+import java.time.DateTimeException;
 import java.util.HashMap;
 
 import org.springframework.http.HttpStatus;
@@ -70,5 +71,70 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+//Exceptions for Tournament    
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(PlayerNotInTournamentException.class)
+    public ResponseEntity<Map<String, Object>> handlePlayerNotInTournamentException(PlayerNotInTournamentException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PlayerAlreadyInTournamentException.class)
+    public ResponseEntity<Map<String, Object>> handlePlayerAlreadyInTournamentException(PlayerAlreadyInTournamentException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(TournamentNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleTournmentNotFoundException(TournamentNotFoundException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TournamentFullException.class)
+    public ResponseEntity<Map<String, Object>> handleTournamentFullException(TournamentFullException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidEloValueException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidEloValueException(InvalidEloValueException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InvalidPlayerRangeException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidPlayerRangeException(InvalidPlayerRangeException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DateTimeException.class)
+    public ResponseEntity<Map<String, Object>> handleDateTimeException(DateTimeException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TournamentNotInRegistrationException.class)
+    public ResponseEntity<Map<String, Object>> handleTournamentNotInRegistrationException(TournamentNotInRegistrationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    
 }
