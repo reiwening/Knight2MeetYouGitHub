@@ -152,7 +152,7 @@ public class Match {
         this.eloChange = Math.abs(newRatingP1 - ratingP1);
     }
 
-    public void setEloChange(Double newEloChange) {
+    public void setOnlyEloChange(Double newEloChange) {
         eloChange = newEloChange;
     }
     

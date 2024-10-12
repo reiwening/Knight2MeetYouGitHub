@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -45,7 +46,7 @@ public class PlayerController {
 
 
     // create a new player
-    @PostMapping("/players")
+    @PostMapping(value = "/players", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createPlayer(@Valid @RequestBody Player player) {
             // Check if the player already exists
             Player existingPlayer = playerService.registerPlayer(player); 
