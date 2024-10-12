@@ -197,7 +197,7 @@ public class MatchServiceImpl implements MatchService {
         match.setWinner(matchDTO.getWinnerId() != null ? playerService.getPlayerById(matchDTO.getWinnerId()) : null);
         match.setDraw(matchDTO.isDraw());
         match.setMatchStatus(matchDTO.getMatchStatus());    
-        match.setEloChange(matchDTO.getEloChange());
+        match.setOnlyEloChange(matchDTO.getEloChange());
     
         return match;
     }

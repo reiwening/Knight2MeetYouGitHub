@@ -14,41 +14,34 @@ public interface TournamentService {
 //Tournament cycle
     Tournament createTournament(Tournament tournament);
     Tournament updateTournament(Long tournamentId, Tournament updatedTournament);
-    Tournament deleteTournament(Long tournamentId);
+    void deleteTournament(Long tournamentId);
     Tournament getTournamentById(Long tournamentId);
     List<Tournament> getAllTournaments();
     List<Tournament> getAllRegisterableTournaments();
-        //allow filtering by other parameters?
-    Tournament startOrCancelTournament(Long tournamentId); 
-        //decides to start or cancel tournament at registration cut off, comparing player count and minPlayers
-    Map<Long, Integer> getTournamentRankings(Long tournamentId); 
-        //consider changing to Map<Integer, Set<Player>>
-    
+    Tournament startOrCancelTournament(Long tournamentId);
+    Map<Long, Integer> getTournamentRankings(Long tournamentId);
 
-//player management
+    // Player Management
     Tournament registerPlayer(Long playerId, Long tournamentId);
     Tournament removePlayer(Long playerId, Long tournamentId);
     Set<Player> getRegisteredPlayers(Long tournamentId);
 
-
 //match management
     void scheduleMatches(Long tournamentId);
     List<Match> getTournamentMatchHistory(Long tournamentId);
-    void sendMatchNotification(Long tournamentId, List<Match> matches);
+    void sendMatchNotification(Long tournamentId);
         //uses sendNotification inside MatchService
 
-
-//tournament settings
+    // Tournament Settings
     Tournament setTournamentEloRange(Long tournamentId, int minElo, int maxElo);
     Tournament setTournamentStatus(Long tournamentId, String status);
     Tournament setTournamentStyle(Long tournamentId, String style);
-    Tournament setTournamentPlayerRange(Long tournamentId, int minPlayers, int maxPlayers); 
-        //restrict max players to a number that supports tournament style   
+    Tournament setTournamentPlayerRange(Long tournamentId, int minPlayers, int maxPlayers);
     Tournament setTournamentRegistrationCutOff(Long tournamentId, LocalDateTime registrationCutOff);
     Tournament setAdmin(Long tournamentId, Admin newAdmin);
-    Tournament setName(Long tournamentId, String newTournamentName);
+    Tournament setName(Long tournamentId, String newName);
 
-
-    Tournament convertToEntity(TournamentDTO tournamentDTO);
+    // Conversion Methods
     TournamentDTO convertToDTO(Tournament tournament);
+    Tournament convertToEntity(TournamentDTO tournamentDTO);
 }
