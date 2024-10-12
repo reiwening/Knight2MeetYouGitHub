@@ -3,6 +3,7 @@ package com.g5.cs203proj.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 // import org.hibernate.annotations.DialectOverride.OverridesAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import com.g5.cs203proj.exception.MatchNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.PlayerService;
+import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.TournamentService;
 import com.g5.cs203proj.exception.NotEnoughPlayersException;
 
@@ -201,6 +203,14 @@ public class MatchServiceImpl implements MatchService {
     
         return match;
     }
+
+    // to convert a List<Match> to a List<MatchDTO>
+    public List<MatchDTO> toDTOList(List<Match> matches) {
+        return matches.stream()
+                      .map(this::convertToDTO)
+                      .collect(Collectors.toList());
+    }
+
 
 
 }

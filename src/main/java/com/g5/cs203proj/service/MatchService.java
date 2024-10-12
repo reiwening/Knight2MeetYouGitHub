@@ -29,5 +29,7 @@ public interface MatchService {
 
     MatchDTO convertToDTO(Match match);
     Match convertToEntity(MatchDTO matchDTO);
+    List<MatchDTO> toDTOList(List<Match> matches);
+
 
 }

@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.DTO.MatchDTO;
+import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.PlayerNotFoundException;
 import com.g5.cs203proj.repository.PlayerRepository;
+import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerDetailsService;
 import com.g5.cs203proj.service.PlayerService;
 
@@ -37,11 +40,13 @@ import org.springframework.security.core.Authentication;
 @RestController
 public class PlayerController {
     private PlayerService playerService;
+    private MatchService matchService;
     
 
     @Autowired
-    public PlayerController(PlayerService playerService) {
+    public PlayerController(PlayerService playerService, MatchService matchService) {
         this.playerService = playerService;
+        this.matchService = matchService;
         
     }
 
@@ -145,9 +150,7 @@ public class PlayerController {
         return player;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    
-    // get all the players who registered for that tournament 
+    // get all the tournaments' name registered for a player
     @GetMapping("/players/tournamentsReg/{username}")
     public Set<String> getNameOfTournamentRegByPlayer(@PathVariable String username) {
         // Get the currently authenticated user's username
@@ -172,6 +175,33 @@ public class PlayerController {
                             .collect(Collectors.toSet());
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    // for player to get matchHistories
+    @GetMapping("/players/matchHistories/{username}")
+    public List<MatchDTO> getPlayerMatchHistory(@PathVariable String username) {
+        // Get the currently authenticated user's username
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName();  // The logged-in username
+
+        // Check if the authenticated user is requesting their own data
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("You are trying to access data for Player: " + username);
+        }
+
+        Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
+        if(!existingPlayer.isPresent()) {
+            throw new UsernameNotFoundException(username); // can do testing to see if this exception is thrown 
+        }
+
+        // If they are allowed and username in found in DB 
+        Player player = existingPlayer.get();
+        
+        return matchService.toDTOList(player.getMatchHistory());
+    }
+        
+        
 
 }
 
