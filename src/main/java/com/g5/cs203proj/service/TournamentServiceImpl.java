@@ -20,6 +20,8 @@ public class TournamentServiceImpl implements TournamentService {
     private TournamentRepository tournamentRepository;
     @Autowired
     private PlayerRepository playerRepository;
+    @Autowired
+    private MatchRepository matchRepository;
 
     //Contructors
     public TournamentServiceImpl(){};
@@ -146,16 +148,34 @@ public class TournamentServiceImpl implements TournamentService {
         for (Match m : matches) {
             // Combine each match's info into 1 ArrayList
             String matchId = "" + m.getMatchId();
-            String p1 = m.getPlayer1().getUsername();
-            String p2 = m.getPlayer2().getUsername();
-            String winner = m.getWinner().getUsername();
+
+            Player p1 = m.getPlayer1();
+            String p1Name = null;
+            if (p1 != null) {
+                p1Name = p1.getUsername();
+            }
+
+            Player p2 = m.getPlayer2();
+            String p2Name = null;
+            if (p2 != null) {
+                p2Name = p2.getUsername();
+            }
+
+            Player winner = m.getWinner();
+            String winnerName = null;
+            if (winner != null) {
+                winnerName = winner.getUsername();
+            }
+
             String eloChange = "" + m.getEloChange();
+            String isDraw = "" + m.getDraw();
 
             matchInfo.add(matchId);
-            matchInfo.add(p1);
-            matchInfo.add(p2);
-            matchInfo.add(winner);
+            matchInfo.add(p1Name);
+            matchInfo.add(p2Name);
+            matchInfo.add(winnerName);
             matchInfo.add(eloChange);
+            matchInfo.add(isDraw);
             detailedMatchInfo.add(matchInfo);
         }
 
@@ -165,7 +185,14 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public boolean addTestMatchToTournament(Long tournamentId, Match match) {
         Tournament t = getTournamentById(tournamentId);
+        
+        // attach this tournament to the match added
+        match.setTournament(t);
+        matchRepository.save(match);
+
+        // add match to tournament matches
         t.addTestMatch(match);
+        tournamentRepository.save(t);
         return true;
     }
 
