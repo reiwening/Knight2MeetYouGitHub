@@ -1,6 +1,7 @@
 package com.g5.cs203proj.controller;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -144,6 +145,32 @@ public class PlayerController {
         return player;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    // get all the players who registered for that tournament 
+    @GetMapping("/players/tournamentsReg/{username}")
+    public Set<String> getNameOfTournamentRegByPlayer(@PathVariable String username) {
+        // Get the currently authenticated user's username
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName();  // The logged-in username
+
+        // Check if the authenticated user is requesting their own data
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("You are trying to access data for Player: " + username);
+        }
+
+        Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
+        if(!existingPlayer.isPresent()) {
+            throw new UsernameNotFoundException(username); // can do testing to see if this exception is thrown 
+        }
+
+        // If they are allowed and username in found in DB 
+        Player player = existingPlayer.get();
+        Set<Tournament> tournamentReg = player.getTournamentRegistered();
+        return tournamentReg.stream()
+                            .map(Tournament :: getName)
+                            .collect(Collectors.toSet());
+    }
 
 
 }
@@ -151,7 +178,6 @@ public class PlayerController {
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
 
     // // get the player
     // @GetMapping("/players/{id}")

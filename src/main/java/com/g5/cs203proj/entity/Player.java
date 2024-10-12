@@ -51,7 +51,7 @@ public class Player implements UserDetails   {
     private double globalEloRating;
 
     @ManyToMany 
-// @JsonIgnore
+    @JsonIgnore
     @JoinTable(
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 
@@ -70,7 +70,7 @@ public class Player implements UserDetails   {
 
     
     @Transient // This field is not persisted directly, but computed
-// @JsonIgnore
+    @JsonIgnore 
     private List<Match> matchHistory;
 
     public void setTournamentRegistered(Set<Tournament> tournamentRegistered) {
