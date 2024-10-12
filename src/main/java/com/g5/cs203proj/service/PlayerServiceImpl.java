@@ -114,8 +114,12 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Player deletePlayer(Long id) {
-        return null;
+    public void deletePlayer(String username) {
+        Optional<Player> p = findPlayerByUsername(username);
+        if (!p.isPresent()) {
+            throw new PlayerNotFoundException(username);
+        }
+        playerRepository.delete(p.get());
     }
 
     @Override

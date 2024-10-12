@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.PlayerNotFoundException;
@@ -13,6 +14,8 @@ import com.g5.cs203proj.service.PlayerDetailsService;
 import com.g5.cs203proj.service.PlayerService;
 
 import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -79,6 +82,14 @@ public class PlayerController {
         // If they are allowed and username in found in DB 
         Player player = existingPlayer.get();
         return ResponseEntity.ok(player);
+    }
+
+    //test: to do
+    // delete a player 
+    @DeleteMapping("/players/{username}")
+    public String deletePlayer(@PathVariable String username) {
+        playerService.deletePlayer(username);
+        return "Player " + username + " deleted successfully";
     }
 
     @GetMapping("/players")

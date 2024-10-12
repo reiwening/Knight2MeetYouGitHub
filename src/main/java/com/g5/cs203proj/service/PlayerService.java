@@ -14,7 +14,7 @@ public interface PlayerService {
 
     Player savePlayer( Player player );
     Player updatePlayer(Long id, Player updatedPlayer);
-    Player deletePlayer(Long id);
+    void deletePlayer(String username);
     Player registerPlayer(Player playerToRegister );
     List<Player> getAllAdmins() ;
     List<Player> getAllPlayerUsers();
