@@ -91,7 +91,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Tournament startOrCancelTournament(Tournament tournament) {
+    public Tournament startOrCancelTournament(Long tournamentId) {
+        Tournament tournament = getTournamentById(tournamentId);
         if (tournament.getRegisteredPlayers().size() >= tournament.getMinPlayers()) {
             tournament.setTournamentStatus("In Progress");
         } else {
@@ -102,7 +103,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     // Get tournament rankings
     @Override
-    public Map<Long, Integer> getTournamentRankings(Tournament tournament) {
+    public Map<Long, Integer> getTournamentRankings(Long tournamentId) {
+        Tournament tournament = getTournamentById(tournamentId);
         return tournament.getRankings();
     }
 
@@ -153,43 +155,10 @@ public class TournamentServiceImpl implements TournamentService {
     public void scheduleMatches(Long tournamentId) {
         //not sure how to implement
     }
-/*
-        //just a placeholder, might wannna come up with something better
-        boolean isFirstRound = true;
-        List<Player> players;
-        if (isFirstRound){
-            players = tournament.getRegisteredPlayers();
-            Collections.shuffle(players);
-            isFirstRound = false;
-        }
-        else{ //not first round
-            //loop through all the matches in the last round and add the winners (not sure how to do this)
-            //retain order because winner of match 1 vs winner of match 2, match3 vs match4
-        }
-    //creating matches (inefficient implementation of shifting everytime. use a queue instead   )
-        //keep making pairs while at least have 2 players
-        while (players.size() >= 2) {
-            Player player1 = players.removeFirst();
-            Player player2 = players.removeFirst();
-            Match match = new Match(); //maybe create a constructor which takes in both players
-            //do we want set all other match values like match timing, elochange now?
-            match.setPlayer1(player1);
-            match.setPlayer2(player2);
-            //put match into match history
-            tournament.setTournamentMatchHistory(tournament.getTournamentMatchHistory().add(match));
-        }
-        //incase got 1 player left
-        if (!players.isEmpty()){
-            Match match = new Match();
-            match.setPlayer1(players.removeFirst());
-            match.setPlayer2(null);
-            //might want to set the winner at this point immediately
-            //put match into match history
-            tournament.setTournamentMatchHistory(tournament.getTournamentMatchHistory().add(match));
-        }
-*/
+
     @Override
-    public List<Match> getTournamentMatchHistory(Tournament tournament) {
+    public List<Match> getTournamentMatchHistory(Long tournamentId) {
+        Tournament tournament = getTournamentById(tournamentId);
         return tournament.getTournamentMatchHistory();
     }
 
@@ -205,6 +174,13 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     // Tournament settings methods
+
+    // @Override
+    // public Tournament setTournamentEloRange(Tournament tournament, int minElo, int maxElo) {
+    //     tournament.setMinElo(minElo);
+    //     tournament.setMaxElo(maxElo);
+    //     return tournamentRepository.save(tournament);
+    // }
     // Set Elo Range
     @Override
     public Tournament setTournamentEloRange(Long tournamentId, int minElo, int maxElo) {
@@ -282,14 +258,16 @@ public class TournamentServiceImpl implements TournamentService {
 
     // Set Registration Cutoff
     @Override
-    public Tournament setTournamentRegistrationCutOff(Tournament tournament, LocalDateTime registrationCutOff) {
+    public Tournament setTournamentRegistrationCutOff(Long tournamentId, LocalDateTime registrationCutOff) {
+        Tournament tournament = getTournamentById(tournamentId);
         tournament.setRegistrationCutOff(registrationCutOff);
         return tournamentRepository.save(tournament);
     }
 
     // Set Admin
     @Override
-    public Tournament setAdmin(Tournament tournament, Admin newAdmin) {
+    public Tournament setAdmin(Long tournamentId, Admin newAdmin) {
+        Tournament tournament = getTournamentById(tournamentId);
         tournament.setAdmin(newAdmin);
         return tournamentRepository.save(tournament);
     }

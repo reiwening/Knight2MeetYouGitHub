@@ -48,9 +48,11 @@ public class TournamentController {
     //test: ok (matt 13/10/24)
     // Delete a tournament by ID
     @DeleteMapping("/tournaments/{id}")
-    public ResponseEntity<String> deleteTournament(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteTournament(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
-        return new ResponseEntity<>("Successfully deleted tournament " + id, HttpStatus.NO_CONTENT);
+        Map<String, String> body = new HashMap<>();
+        body.put("Success", "Successfully deleted tournament " + id);
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     //test: ok (matt 13/10/24)
