@@ -64,10 +64,10 @@ public class MatchServiceImpl implements MatchService {
         return matchRepository.save(match);
     }
 
-    // @Override
-    // public void deleteMatch(Long id) {
-    //     matchRepository.delete(findMatchById(id));
-    // }
+    @Override
+    public void deleteMatch(Long id) {
+        matchRepository.delete(findMatchById(id));
+    }
 
     @Override
     public Match findMatchById(Long id) {

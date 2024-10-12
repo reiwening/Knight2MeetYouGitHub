@@ -84,7 +84,7 @@ public class PlayerController {
         return ResponseEntity.ok(player);
     }
 
-    //test: to do
+    //test: working
     // delete a player 
     @DeleteMapping("/players/{username}")
     public String deletePlayer(@PathVariable String username) {

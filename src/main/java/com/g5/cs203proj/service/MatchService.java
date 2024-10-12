@@ -11,7 +11,7 @@ public interface MatchService {
     // long createMatch();
 
     Match saveMatch(Match match);
-    // Match deleteMatch(Long id);
+    void deleteMatch(Long id);
     Match findMatchById(Long id);
     
     Match assignRandomPlayers(Long MatchId);
