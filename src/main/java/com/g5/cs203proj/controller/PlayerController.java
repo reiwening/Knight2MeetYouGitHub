@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.PlayerNotFoundException;
 import com.g5.cs203proj.repository.PlayerRepository;
@@ -41,30 +42,38 @@ import org.springframework.security.core.Authentication;
 public class PlayerController {
     private PlayerService playerService;
     
-
+    
     @Autowired
     public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
         
     }
-
-
+    
+    
     // create a new player
-    @PostMapping(value = "/players", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createPlayer(@Valid @RequestBody Player player) {
-            // Check if the player already exists
-            Player existingPlayer = playerService.registerPlayer(player); 
-            
-            if (existingPlayer == null) {
+    @PostMapping("/players")
+    public ResponseEntity<?> createPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
+
+        // convert the DTO into a player 
+        Player player = playerService.convertToEntity(playerDTO); // still has the raw password here
+
+        // Check if the player already exists
+        Player existingPlayer = playerService.registerPlayer(player); // registerPlayer() will hash the password 
+
+        if (existingPlayer == null) {
             // Return a bad request or conflict status with a meaningful message
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists.");
         } /* else means that it is save to register this player */
-        return ResponseEntity.ok(existingPlayer);  // Return the saved player with a 200 OK status
-    }
 
+        // Convert the registered Player entity back to PlayerDTO and return it
+        PlayerDTO registeredPlayerDTO = playerService.convertToPlayerDTO(existingPlayer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registeredPlayerDTO);
+        
+    }
+    
     // Player would be able to retrieve his/her information when player inputs username
     @GetMapping("/players/{username}")
-    public ResponseEntity<Player>  getPlayer(@PathVariable String username) {
+    public ResponseEntity<PlayerDTO>  getPlayer(@PathVariable String username) {
         // Get the currently authenticated user's username
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedUsername = authentication.getName();  // The logged-in username
@@ -80,8 +89,9 @@ public class PlayerController {
         }
 
         // If they are allowed and username in found in DB 
-        Player player = existingPlayer.get();
-        return ResponseEntity.ok(player);
+        // Convert Player entity to PlayerDTO and return the DTO
+        PlayerDTO playerDTO = playerService.convertToPlayerDTO(existingPlayer.get());
+        return ResponseEntity.ok(playerDTO);
     }
 
     //test: working
@@ -93,34 +103,38 @@ public class PlayerController {
     }
 
     @GetMapping("/players")
-    public List<Player>  getAllPlayers() {
-        return playerService.getAllPlayers();
+    public List<PlayerDTO>  getAllPlayers() {
+
+        List<Player> players = playerService.getAllPlayers();
+        return players.stream()
+                        .map(player -> playerService.convertToPlayerDTO(player))
+                        .collect(Collectors.toList());
     }
 
-    @GetMapping("/players/admins")
-    public List<Player> getAllPlayerAdmins(){
-        return playerService.getAllAdmins();
-    }
+// @GetMapping("/players/admins")
+// public List<PlayerDTO> getAllPlayerAdmins(){
+//     return playerService.getAllAdmins();
+// }
 
-    @GetMapping("/players/users")
-    public List<Player> getAllPlayerUsers(){
-        return playerService.getAllPlayerUsers();
-    }
+// @GetMapping("/players/users")
+// public List<Player> getAllPlayerUsers(){
+//     return playerService.getAllPlayerUsers();
+// }
 
 
 
 // what if user want to change password and role?
     @PutMapping("/players")
-    public Player updatePlayerAttributes(@RequestParam String username, @RequestBody Map<String, String> updateFields) {
+    public PlayerDTO updatePlayerAttributes(@RequestParam String username, @RequestBody Map<String, String> updateFields) {
 
-            // Get the currently authenticated user's username
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String authenticatedUsername = authentication.getName();  // The logged-in username
-    
-            // Check if the authenticated user is requesting their own data
-            if (!authenticatedUsername.equals(username)) {
-                throw new AccessDeniedException("You cannot change data for Player: " + username);
-            }
+        // Get the currently authenticated user's username
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName();  // The logged-in username
+
+        // Check if the authenticated user is requesting their own data
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("You cannot change data for Player: " + username);
+        }
 
 
         Optional<Player> existingPlayer = playerService.findPlayerByUsername(username);
@@ -142,18 +156,21 @@ public class PlayerController {
             player.setUsername(newUsername);
         }
 
-        if (updateFields.containsKey("globalEloRating")) {
-            try {
-                double newEloRating = Double.parseDouble(updateFields.get("globalEloRating"));
-                player.setGlobalEloRating(newEloRating);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid Elo rating format");
-            }
-            // player.setGlobalEloRating(Double.parseDouble(updateFields.get("globalEloRating")));
-        }
+if (updateFields.containsKey("globalEloRating")) {
+    try {
+        double newEloRating = Double.parseDouble(updateFields.get("globalEloRating"));
+        player.setGlobalEloRating(newEloRating);
+    } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Invalid Elo rating format");
+    }
+    // player.setGlobalEloRating(Double.parseDouble(updateFields.get("globalEloRating")));
+}
 
         playerService.savePlayer(player);  // Save the updated player in DB
-        return player;
+
+        PlayerDTO updatedPlayerDTO = playerService.convertToPlayerDTO(player);
+        return updatedPlayerDTO;
+    
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

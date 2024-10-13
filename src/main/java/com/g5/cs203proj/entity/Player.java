@@ -31,6 +31,10 @@ import jakarta.persistence.Transient;
 // This class implements the UserDetails interface, which is required by Spring Security to manage user authentication
 public class Player implements UserDetails   {
 
+    public void setAuthorities(String authorities) {
+        this.authorities = authorities;
+    }
+
     private static final long serialVersionUID = 1L;
 
     private @Id @GeneratedValue (strategy = GenerationType.IDENTITY) Long id;
@@ -61,17 +65,17 @@ public class Player implements UserDetails   {
     
     @OneToMany(mappedBy = "player1")
     @JsonIgnore
-    private List<Match> matchesAsPlayer1;
+    private List<Match> matchesAsPlayer1 = new ArrayList<>();
 
     
     @OneToMany(mappedBy = "player2")
     @JsonIgnore
-    private List<Match> matchesAsPlayer2;
+    private List<Match> matchesAsPlayer2 = new ArrayList<>();
 
     
     @Transient // This field is not persisted directly, but computed
-    @JsonIgnore 
-    private List<Match> matchHistory;
+// @JsonIgnore
+    private List<Match> matchHistory = new ArrayList<>();
 
     public void setTournamentRegistered(Set<Tournament> tournamentRegistered) {
         this.tournamentRegistered = tournamentRegistered;
@@ -116,6 +120,11 @@ public class Player implements UserDetails   {
         return Arrays.asList(new SimpleGrantedAuthority(authorities));
     }
     
+
+    public void setMatchHistory(List<Match> matchHistory) {
+        this.matchHistory = matchHistory;
+    }
+
 
     // Getter for matchHistory which consolidates both lists
     // Getter for matchHistory which consolidates both lists
