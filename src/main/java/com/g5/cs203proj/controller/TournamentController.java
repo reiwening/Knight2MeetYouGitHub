@@ -95,7 +95,7 @@ public class TournamentController {
         return tournamentService.getTournamentRankings(id);
     }
 
-    // test: later !! (reiwen)
+    // test: ok
     // CHECK FOR THE DIFFERENT LOGIC TO REGISTER A PLAYER
     // Register a player to a tournament
     @PostMapping("/tournaments/{tournamentId}/players")
