@@ -1,5 +1,6 @@
 package com.g5.cs203proj.service;
 
+import com.g5.cs203proj.enums.*;
 import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
@@ -22,7 +23,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Autowired
     private MatchRepository matchRepository;
 
-    //Contructors
+//Contructors
     public TournamentServiceImpl(){};
     public TournamentServiceImpl(TournamentRepository tournamentRepository, PlayerRepository playerRepository, MatchRepository matchRepository){
         this.tournamentRepository = tournamentRepository;
@@ -31,9 +32,20 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
 
-    // Tournament cycle methods
+// Tournament cycle methods
     @Override
     public Tournament createTournament(Tournament tournament) {
+        //field validation
+        eloRangeValidation(tournament, tournament.getMinElo(), tournament.getMaxElo());
+        playerRangeValidation(tournament, tournament.getMinPlayers(), tournament.getMaxPlayers());
+        String style = tournament.getTournamentStyle().toUpperCase();
+        styleValidation(style);
+        String status = tournament.getTournamentStatus().toUpperCase();
+        statusValidation(status);
+        //safe to create
+        //make sure casing is correct
+        tournament.setTournamentStatus(status);
+        tournament.setTournamentStyle(style);
         return tournamentRepository.save(tournament);
     }
 
@@ -43,17 +55,32 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament existingTournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
 
+        String status = updatedTournament.getTournamentStatus().toUpperCase();
+        String style = updatedTournament.getTournamentStyle().toUpperCase();
+        int minPlayers = updatedTournament.getMinPlayers();
+        int maxPlayers = updatedTournament.getMaxPlayers();
+        int minElo = updatedTournament.getMinElo();
+        int maxElo = updatedTournament.getMaxElo();
+
+        //field validation
+        eloRangeValidation(existingTournament, minElo, maxElo);
+        playerRangeValidation(existingTournament, minPlayers, maxPlayers);
+        styleValidation(style);
+        statusValidation(status);
+
+        //safe to update
         existingTournament.setName(updatedTournament.getName());
-        existingTournament.setTournamentStatus(updatedTournament.getTournamentStatus());
-        existingTournament.setTournamentStyle(updatedTournament.getTournamentStyle());
-        existingTournament.setMaxPlayers(updatedTournament.getMaxPlayers());
-        existingTournament.setMinPlayers(updatedTournament.getMinPlayers());
-        existingTournament.setMinElo(updatedTournament.getMinElo());
-        existingTournament.setMaxElo(updatedTournament.getMaxElo());
+        existingTournament.setTournamentStatus(status);
+        existingTournament.setTournamentStyle(style);
+        existingTournament.setMaxPlayers(maxPlayers);
+        existingTournament.setMinPlayers(minPlayers);
+        existingTournament.setMinElo(minElo);
+        existingTournament.setMaxElo(maxElo);
         existingTournament.setRegistrationCutOff(updatedTournament.getRegistrationCutOff());
 
         // Update registered players if needed
         if (updatedTournament.getRegisteredPlayers() != null) {
+            playerRangeValidation(updatedTournament, minPlayers, maxPlayers);
             existingTournament.setRegisteredPlayers(updatedTournament.getRegisteredPlayers());
         }
 
@@ -87,7 +114,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> getAllRegisterableTournaments() {
-        return tournamentRepository.findByTournamentStatus("Registration");
+        return tournamentRepository.findByTournamentStatus("registration");
     }
 
     @Override
@@ -149,7 +176,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournament.getRegisteredPlayers();
     }
 
-    // Match management
+// Match management
 
     @Override
     public void scheduleMatches(Long tournamentId) {
@@ -173,35 +200,14 @@ public class TournamentServiceImpl implements TournamentService {
         
     }
 
-    // Tournament settings methods
-
-    // @Override
-    // public Tournament setTournamentEloRange(Tournament tournament, int minElo, int maxElo) {
-    //     tournament.setMinElo(minElo);
-    //     tournament.setMaxElo(maxElo);
-    //     return tournamentRepository.save(tournament);
-    // }
+// Tournament settings methods
     // Set Elo Range
     @Override
     public Tournament setTournamentEloRange(Long tournamentId, int minElo, int maxElo) {
         Tournament tournament = getTournamentById(tournamentId);
-
-        if (minElo < 0 || maxElo < 0) {
-            throw new InvalidEloValueException("Elo values cannot be negative");
-        }
-
-        if (minElo > maxElo) {
-            throw new InvalidEloValueException("minElo cannot be greater than maxElo");
-        }
-
-        // Optionally, check if existing players adhere to the new Elo range
-        boolean playersWithinRange = tournament.getRegisteredPlayers().stream()
-                .allMatch(player -> player.getGlobalEloRating() >= minElo && player.getGlobalEloRating() <= maxElo);
-
-        if (!playersWithinRange) {
-            throw new InvalidEloValueException("Not all players meet the new Elo range criteria");
-        }
-
+        //validate input
+        eloRangeValidation(tournament, minElo, maxElo);
+        //no exception, safe to add
         tournament.setMinElo(minElo);
         tournament.setMaxElo(maxElo);
         return tournamentRepository.save(tournament);
@@ -212,10 +218,8 @@ public class TournamentServiceImpl implements TournamentService {
     public Tournament setTournamentStatus(Long tournamentId, String status) {
         Tournament tournament = getTournamentById(tournamentId);
         // Validate status if necessary
-        List<String> validStatuses = Arrays.asList("Registration", "In Progress", "Cancelled", "Completed");
-        if (!validStatuses.contains(status)) {
-            throw new InvalidStatusException("Invalid tournament status: " + status);
-        }
+        statusValidation(status);
+        //nv throw exception, safe to add
         tournament.setTournamentStatus(status);
         return tournamentRepository.save(tournament);
     }
@@ -224,11 +228,9 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Tournament setTournamentStyle(Long tournamentId, String style) {
         Tournament tournament = getTournamentById(tournamentId);
-        // Validate style if necessary
-        List<String> validStyles = Arrays.asList("Single Elimination", "Double Elimination", "Round Robin", "Random");
-        if (!validStyles.contains(style)) {
-            throw new InvalidStyleException("Invalid tournament style: " + style);
-        }
+        // Validate style
+        styleValidation(style);
+        //no exception, safe to add
         tournament.setTournamentStyle(style);
         return tournamentRepository.save(tournament);
     }
@@ -237,20 +239,9 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Tournament setTournamentPlayerRange(Long tournamentId, int minPlayers, int maxPlayers) {
         Tournament tournament = getTournamentById(tournamentId);
-
-        if (minPlayers < 0 || maxPlayers < 0) {
-            throw new InvalidPlayerRangeException("Player count cannot be negative");
-        }
-
-        if (minPlayers > maxPlayers) {
-            throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
-        }
-
-        int playerCount = tournament.getRegisteredPlayers().size();
-        if (playerCount > maxPlayers) {
-            throw new InvalidPlayerRangeException(String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers));
-        }
-
+        //validation
+        playerRangeValidation(tournament, minPlayers, maxPlayers);
+        //nv throw exception, safe to add
         tournament.setMinPlayers(minPlayers);
         tournament.setMaxPlayers(maxPlayers);
         return tournamentRepository.save(tournament);
@@ -309,7 +300,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDTO;
     }
 
-    // Convert DTO to Entity
+// Convert DTO to Entity
     @Override
     public Tournament convertToEntity(TournamentDTO tournamentDTO) {
         Tournament tournament = new Tournament();
@@ -345,5 +336,47 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         return tournament;
+    }
+
+//field validation methods
+    private void playerRangeValidation(Tournament tournament, int minPlayers, int maxPlayers){
+        if (minPlayers < 0 || maxPlayers < 0) {
+            throw new InvalidPlayerRangeException("Player count cannot be negative");
+        }
+        if (minPlayers > maxPlayers) {
+            throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
+        }
+        int playerCount = tournament.getRegisteredPlayers().size();
+        if (playerCount > maxPlayers) {
+            throw new InvalidPlayerRangeException(String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers));
+        }
+    }
+
+    private void styleValidation(String style){
+        if (!Styles.isValidStyle(style)) {
+            throw new InvalidStyleException("Invalid tournament style: " + style);
+        }
+    }
+
+    private void statusValidation(String status){
+        if (!Statuses.isValidStatus(status)) {
+            throw new InvalidStatusException("Invalid tournament status: " + status);
+        }
+    }
+
+    private void eloRangeValidation(Tournament tournament, int minElo, int maxElo){
+        if (minElo < 0 || maxElo < 0) {
+            throw new InvalidEloValueException("Elo values cannot be negative");
+        }
+        if (minElo > maxElo) {
+            throw new InvalidEloValueException("minElo cannot be greater than maxElo");
+        }
+        //check if existing players adhere to the new Elo range
+        boolean playersWithinRange = tournament.getRegisteredPlayers().stream()
+                .allMatch(player -> player.getGlobalEloRating() >= minElo && player.getGlobalEloRating() <= maxElo);
+
+        if (!playersWithinRange) {
+            throw new InvalidEloValueException("Not all players meet the new Elo range criteria");
+        }
     }
 }

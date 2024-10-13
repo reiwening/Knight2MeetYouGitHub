@@ -1,6 +1,7 @@
 package com.g5.cs203proj.exception;
 
 import java.util.Map;
+import java.io.ObjectInputFilter.Status;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.g5.cs203proj.enums.*;
 
 
 @ControllerAdvice
@@ -155,6 +158,7 @@ public class GlobalControllerExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleInvalidStatusException(InvalidStatusException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", ex.getMessage());
+        body.put("valid statuses", Statuses.getValidStatuses());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
@@ -164,6 +168,7 @@ public class GlobalControllerExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleInvalidStyleException(InvalidStyleException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", ex.getMessage());
+        body.put("valid styles", Styles.getValidStyles());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
