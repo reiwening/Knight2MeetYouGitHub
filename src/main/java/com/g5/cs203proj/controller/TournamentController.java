@@ -85,9 +85,9 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentDTOs, HttpStatus.OK);
     }
 
-    //havent test yet
-    // Start or cancel a tournament based on registration cutoff
-    @PostMapping("/tournaments/{id}/start-or-cancel")
+//havent test yet
+// Start or cancel a tournament based on registration cutoff
+    @PutMapping("/tournaments/{id}/start-or-cancel")
     public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
         Tournament tournament = tournamentService.startOrCancelTournament(id);
         return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);

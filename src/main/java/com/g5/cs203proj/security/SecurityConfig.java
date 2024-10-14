@@ -55,9 +55,17 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/players").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/players/{username}").authenticated()
-                // .requestMatchers(HttpMethod.POST, "/players").permitAll()
-                // .requestMatchers(HttpMethod.GET, "/players").permitAll()
-                // .requestMatchers(HttpMethod.PUT, "/matches").permitAll()
+
+                // .requestMatchers(HttpMethod.PUT, "/tournaments/{id}").hasRole("ADMIN") 
+                .requestMatchers(HttpMethod.POST, "/tournaments").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/tournaments/{id}").hasRole("ADMIN")
+                // .requestMatchers(HttpMethod.POST, "/tournaments{tournamentId}/players").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/tournaments/{tournamentId}/players/{playerId}").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.PUT, "/tournaments/{id}/**").hasRole("ADMIN")
+
+
+                // .requestMatchers(HttpMethod.PUT, "/tournaments/{id}").hasRole("ADMIN") 
                 .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
                 .anyRequest().permitAll()
             )
