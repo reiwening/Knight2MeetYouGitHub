@@ -54,14 +54,6 @@ public class MatchServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-
-    /*
-     * When matchesAsPlayer1 is initialized as an empty list: Initializing it with an empty ArrayList 
-     * (new ArrayList<>()) ensures that the list is always ready to accept elements and removes the need to check for null. 
-     * This prevents accidental NullPointerException bugs throughout your code.
-     */
-
-
     @Test
     void assignRandomPlayers_twoPlayers_ReturnMatch() {
         // Arrange

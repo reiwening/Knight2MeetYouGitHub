@@ -17,3 +17,5 @@
 ### To get to the h2 database console, run the spring boot and type this in your browser : http://localhost:8080/h2-console
 
 #### JDBC URL : jdbc:h2:file:./data/testdb , username : username ,  password = password
+
+### To run the test files: use mvnw test -Dtest=MatchServiceTest and mvnw test -Dtest=SpringBootIntegrationTest
