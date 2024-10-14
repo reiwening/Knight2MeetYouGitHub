@@ -143,6 +143,7 @@ public class TournamentServiceImpl implements TournamentService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerNotFoundException(playerId));
 
+
         if (tournament.getRegisteredPlayers().contains(player)) {
             throw new PlayerAlreadyInTournamentException(playerId, tournamentId);
         }

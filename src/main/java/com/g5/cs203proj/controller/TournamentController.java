@@ -9,6 +9,9 @@ import com.g5.cs203proj.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -105,6 +108,20 @@ public class TournamentController {
     // Register a player to a tournament
     @PostMapping("/tournaments/{tournamentId}/players")
     public ResponseEntity<TournamentDTO> registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
+
+        //ADDED ONLY PLAYER CAN ADD ITSELF TO A TOURNAMENT
+
+        String username = playerService.getPlayerById(playerId).getUsername();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName();  // The logged-in username
+
+        // Check if the authenticated user is requesting their own data
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("You can only register yourself for a tournament.");
+        }
+
+        //
         Tournament updatedTournament = tournamentService.registerPlayer(playerId, tournamentId);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
