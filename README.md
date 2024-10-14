@@ -18,4 +18,6 @@
 
 #### JDBC URL : jdbc:h2:file:./data/testdb , username : username ,  password = password
 
-### To run the test files: use mvnw test -Dtest=MatchServiceTest and mvnw test -Dtest=SpringBootIntegrationTest
+### To run the test files: use 
+mvnw test -Dtest=MatchServiceTest 
+mvnw test -Dtest=SpringBootIntegrationTest
