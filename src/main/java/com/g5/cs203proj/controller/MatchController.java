@@ -89,6 +89,14 @@ public class MatchController {
 //     return savedMatchDTO;
 // }
     
+// test : ok
+    // get the match
+    @GetMapping("/matches/{matchId}")
+    public MatchDTO getMatch(@PathVariable Long matchId) {
+        Match match = matchService.findMatchById(matchId);
+        if (match == null) throw new MatchNotFoundException(matchId);
+        return matchService.convertToDTO(match);  
+    }
 
 // test : ok (but not fixed)
     // assign 2 random players to a create match for a tournament 
@@ -100,14 +108,6 @@ public class MatchController {
         return matchService.convertToDTO(match);
     }
 
-// test : ok
-    // get the match
-    @GetMapping("/matches/{matchId}")
-    public MatchDTO getMatch(@PathVariable Long matchId) {
-        Match match = matchService.findMatchById(matchId);
-        if (match == null) throw new MatchNotFoundException(matchId);
-        return matchService.convertToDTO(match);  
-    }
 
     // process match when it ends
     @PutMapping("/tournament/{tournamentId}/matches/{id}/updateresults")
@@ -116,9 +116,16 @@ public class MatchController {
         @RequestParam boolean isDraw, 
         @RequestBody(required = false) Player winner) {
         
+        // check if match exists
         Match match = matchService.findMatchById(id);
         if (match == null) throw new MatchNotFoundException(id);
-    
+
+        // check if winner is a player in this match
+        Long winnerId = winner.getId();
+        if (!isDraw) {
+            if (winnerId != match.getPlayer1().getId() && winnerId != match.getPlayer2().getId()) 
+            throw new InvalidMatchWinnerException("Winner must be a player in this match.");
+        }
         if (isDraw) {
             matchService.processMatchResult(match, null, true);
         } else {

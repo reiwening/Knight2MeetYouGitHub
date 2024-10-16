@@ -86,6 +86,15 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    // Handler for InvalidMatchWinnerException
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(InvalidMatchWinnerException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidMatchWinnerException(InvalidMatchWinnerException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
     // Handler for PlayerAlreadyInTournamentException
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(NotEnoughPlayersException.class)
