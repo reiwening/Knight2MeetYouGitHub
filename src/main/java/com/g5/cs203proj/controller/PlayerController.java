@@ -153,6 +153,14 @@ public class PlayerController {
         if (updateFields.containsKey("username")) {
             String newUsername = updateFields.get("username");
             if ( newUsername == null || newUsername.trim().isEmpty() ) { throw new IllegalArgumentException("Username cannot be null or empty"); }
+            
+            // check if username taken
+            List<Player> allPlayers = playerService.getAllPlayers();
+            for (Player p : allPlayers) {
+                if (p.getUsername().equals(newUsername)) {
+                    throw new IllegalArgumentException(newUsername + " is taken already.");
+                }
+            }
             player.setUsername(newUsername);
         }
 
