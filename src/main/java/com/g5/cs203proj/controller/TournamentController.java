@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -114,6 +115,12 @@ public class TournamentController {
         String username = playerService.getPlayerById(playerId).getUsername();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        // Check if authentication is null or not authenticated
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            throw new AccessDeniedException("You need authorisation to register for a tournament.");
+        }
+        
         String authenticatedUsername = authentication.getName();  // The logged-in username
 
         // Check if the authenticated user is requesting their own data

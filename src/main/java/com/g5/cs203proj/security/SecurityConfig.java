@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/tournaments/{id}").hasRole("ADMIN")
                 // .requestMatchers(HttpMethod.POST, "/tournaments{tournamentId}/players").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/tournaments/{tournamentId}/players/{playerId}").hasRole("ADMIN")
+                // .requestMatchers(HttpMethod.DELETE, "/tournaments/{tournamentId}/players/{playerId}").authenticated()
 
                 .requestMatchers(HttpMethod.PUT, "/tournaments/{id}/**").hasRole("ADMIN")
 
