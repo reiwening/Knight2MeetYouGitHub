@@ -12,6 +12,7 @@ import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.exception.InvalidMatchWinnerException;
 import com.g5.cs203proj.exception.MatchNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
@@ -64,10 +65,10 @@ public class MatchServiceImpl implements MatchService {
         return matchRepository.save(match);
     }
 
-    // @Override
-    // public void deleteMatch(Long id) {
-    //     matchRepository.delete(findMatchById(id));
-    // }
+    @Override
+    public void deleteMatch(Long id) {
+        matchRepository.delete(findMatchById(id));
+    }
 
     @Override
     public Match findMatchById(Long id) {

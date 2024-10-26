@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.PlayerNotFoundException;
+import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.TournamentService;
+import com.g5.cs203proj.service.MatchService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +25,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     private PlayerRepository playerRepository;
     private TournamentService tournamentService;
+    private MatchService matchService;
     private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before
                                                          // storing the password
                                                          // provided in the `SecurityConfig` Class
@@ -100,6 +103,78 @@ public class PlayerServiceImpl implements PlayerService {
     public List<Player> getAvailablePlayersForTournament(Long tournamentIdOfMatch){
         return playerRepository.findAllByTournamentIdAndNotInOngoingMatch(tournamentIdOfMatch);
     }
+    
+    public Player registerPlayer(Player playerToRegister ) {
+        Optional<Player> existingPlayer = findPlayerByUsername(playerToRegister.getUsername()); 
+        if (existingPlayer.isPresent()) {
+            return null;
+        } 
+        playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
+        /* else we have to save to the DB */
+        return savePlayer(playerToRegister);
+    }
+
+
+    public PlayerDTO convertToPlayerDTO(Player player) {
+        Set<Long> tournamentIds = player.getTournamentRegistered()
+            .stream()
+            .map(Tournament::getId)
+            .collect(Collectors.toSet());
+
+        List<Long> matchIds = player.getMatchHistory()
+            .stream()
+            .map(Match::getMatchId)
+            .collect(Collectors.toList());
+
+        // Include the authorities field in the DTO mapping
+        return new PlayerDTO(
+            player.getId(),
+            player.getUsername(),
+            null, // make this for use to see non-null , password shdnt be seen too
+            player.getGlobalEloRating(),
+            tournamentIds,
+            matchIds,
+            player.getAuthorities().iterator().next().getAuthority() // Getting the authorities string
+        ); 
+    }
+
+
+
+    public Player convertToEntity(PlayerDTO playerDTO) {
+        Player player = new Player();
+    
+        // player.setId(playerDTO.getId());
+        player.setUsername(playerDTO.getUsername());
+        player.setGlobalEloRating(playerDTO.getGlobalEloRating());
+        player.setPassword(playerDTO.getPassword()); // Set the raw password, will be hashed in registerPlayer method
+
+    
+        // Set authorities (e.g., ROLE_USER or ROLE_ADMIN)
+        player.setAuthorities(playerDTO.getAuthorities());
+
+        // get Match History based on match history ids 
+        List<Long> matchIds = playerDTO.getMatchHistoryIds();
+        List<Match> matchHistory = matchIds.stream()
+                                            .map(id -> matchService.findMatchById(id))
+                                            .filter(Objects::nonNull)  // Remove nulls in case of missing matches
+                                            .collect(Collectors.toList());
+        player.setMatchHistory(matchHistory);
+
+
+        // get TournamentReg 
+        Set<Long> tournamentIds = playerDTO.getTournamentRegisteredIds();
+        Set<Tournament> tournaments = tournamentIds.stream()
+            .map(id -> tournamentService.getTournamentById(id))
+            .filter(Objects::nonNull)  // Remove nulls in case of missing tournaments
+            .collect(Collectors.toSet());
+        player.setTournamentRegistered(tournaments);
+        
+
+        return player;
+    }
+    
+
+
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -114,8 +189,12 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    public Player deletePlayer(Long id) {
-        return null;
+    public void deletePlayer(String username) {
+        Optional<Player> p = findPlayerByUsername(username);
+        if (!p.isPresent()) {
+            throw new PlayerNotFoundException(username);
+        }
+        playerRepository.delete(p.get());
     }
 
     @Override
@@ -128,17 +207,6 @@ public class PlayerServiceImpl implements PlayerService {
         return null;
     }
 
-    public Player registerPlayer(Player playerToRegister ) {
-        Optional<Player> existingPlayer = findPlayerByUsername(playerToRegister.getUsername()); 
-        if (existingPlayer.isPresent()) {
-            return null;
-        } 
+
     
-    
-        playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
-    
-        /* else we have to save to the DB */
-        return savePlayer(playerToRegister);
-    
-    }
 }

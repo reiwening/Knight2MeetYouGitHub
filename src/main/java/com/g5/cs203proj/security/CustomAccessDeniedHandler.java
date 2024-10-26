@@ -25,7 +25,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         // Create a custom response body
         Map<String, Object> body = new HashMap<>();
-        body.put("error", "You are not allowed to access information from other players");
+        body.put("error", "You are not authorised for this.");
         body.put("details", accessDeniedException.getMessage());
 
         // Convert the response body to JSON and write it to the response

@@ -3,6 +3,7 @@ package com.g5.cs203proj.service;
 import java.util.*;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Match;
 
 
@@ -14,7 +15,7 @@ public interface PlayerService {
 
     Player savePlayer( Player player );
     Player updatePlayer(Long id, Player updatedPlayer);
-    Player deletePlayer(Long id);
+    void deletePlayer(String username);
     Player registerPlayer(Player playerToRegister );
     List<Player> getAllAdmins() ;
     List<Player> getAllPlayerUsers();
@@ -31,6 +32,9 @@ public interface PlayerService {
 
     Optional<Player> findPlayerByUsername(String username);
     List<Player> getAvailablePlayersForTournament(Long tournamentIdOfMatch);
+    
+    Player convertToEntity(PlayerDTO playerDTO);
+    PlayerDTO convertToPlayerDTO(Player player) ;
 
     // List<Match> getMatchesAsPlayer1(Player player);
     // List<Match> getMatchesAsPlayer2(Player player);
