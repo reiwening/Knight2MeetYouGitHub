@@ -120,6 +120,13 @@ public class TournamentController {
         if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
             throw new AccessDeniedException("You need authorisation to register for a tournament.");
         }
+
+        // Check if the authenticated user is an ADMIN
+        boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            throw new AccessDeniedException("Admins are not allowed to register for tournaments.");
+        }
         
         String authenticatedUsername = authentication.getName();  // The logged-in username
 
