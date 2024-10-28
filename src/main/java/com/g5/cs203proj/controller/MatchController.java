@@ -112,6 +112,7 @@ public class MatchController {
     // process match when it ends
     @PutMapping("/tournament/{tournamentId}/matches/{id}/updateresults")
     public MatchDTO updateMatchResults(
+        @PathVariable Long tournamentId,
         @PathVariable Long id, 
         @RequestParam boolean isDraw, 
         @RequestBody(required = false) Player winner) {
@@ -127,7 +128,13 @@ public class MatchController {
             throw new InvalidMatchWinnerException("Winner must be a player in this match.");
         }
         if (isDraw) {
+            // Process current match results
             matchService.processMatchResult(match, null, true);
+
+            // Call createMatchForTournament logic if it's a draw
+            MatchDTO newMatchDTO = createMatchForTournament(tournamentId);
+            Long newMatchId = newMatchDTO.getId();
+            matchService.reassignPlayersToMatch(id, newMatchId);
         } else {
             Player managedPlayer = playerService.getPlayerById(winner.getId());
             if (managedPlayer == null) throw new PlayerNotFoundException(winner.getId());

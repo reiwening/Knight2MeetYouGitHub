@@ -18,6 +18,9 @@ import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
+
+import jakarta.validation.OverridesAttribute;
+
 import com.g5.cs203proj.exception.NotEnoughPlayersException;
 
 
@@ -103,6 +106,26 @@ public class MatchServiceImpl implements MatchService {
         playerService.savePlayer(p2);
         return match;
 
+    }
+
+    @Override
+    public Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId) {
+            Match oldMatch = findMatchById(oldMatchId);
+            Match newMatch = findMatchById(newMatchId);
+        
+            Player p1 = oldMatch.getPlayer1();
+            Player p2 = oldMatch.getPlayer2();
+            newMatch.setPlayer1(p1);
+            newMatch.setPlayer2(p2);
+            matchRepository.save(newMatch);
+
+            // then we need to add the players to match histories
+            p1.addMatchesAsPlayer1(newMatch);
+            p2.addMatchesAsPlayer2(newMatch);
+            playerService.savePlayer(p1);
+            playerService.savePlayer(p2);
+
+            return newMatch;
     }
 
 // @Override

@@ -15,6 +15,7 @@ public interface MatchService {
     Match findMatchById(Long id);
     
     Match assignRandomPlayers(Long MatchId);
+    Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 
