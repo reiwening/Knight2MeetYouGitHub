@@ -120,7 +120,8 @@ public class MatchServiceImpl implements MatchService {
         
         List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
 
-        System.out.println("Total available players: " + players.size());
+        //System.out.println("Total available players: " + players.size());
+        
         
         if (players.size() > 16) {
             throw new TooManyPlayersException(players.size());
