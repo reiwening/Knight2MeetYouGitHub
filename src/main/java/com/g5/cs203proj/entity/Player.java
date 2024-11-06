@@ -45,6 +45,7 @@ public class Player implements UserDetails   {
 
     @NotNull(message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters")
+    @JsonIgnore
     private String password;
 
     @NotNull(message="Authorities should not be null")
@@ -55,7 +56,7 @@ public class Player implements UserDetails   {
     private double globalEloRating;
 
     @ManyToMany 
-// @JsonIgnore
+    @JsonIgnore
     @JoinTable(
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 

@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Tournament;
@@ -14,10 +15,13 @@ import com.g5.cs203proj.service.PlayerDetailsService;
 import com.g5.cs203proj.service.PlayerService;
 
 import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -90,6 +94,14 @@ public class PlayerController {
         return ResponseEntity.ok(playerDTO);
     }
 
+    //test: working
+    // delete a player 
+    @DeleteMapping("/players/{username}")
+    public String deletePlayer(@PathVariable String username) {
+        playerService.deletePlayer(username);
+        return "Player " + username + " deleted successfully";
+    }
+
     @GetMapping("/players")
     public List<PlayerDTO>  getAllPlayers() {
 
@@ -141,6 +153,14 @@ public class PlayerController {
         if (updateFields.containsKey("username")) {
             String newUsername = updateFields.get("username");
             if ( newUsername == null || newUsername.trim().isEmpty() ) { throw new IllegalArgumentException("Username cannot be null or empty"); }
+            
+            // check if username taken
+            List<Player> allPlayers = playerService.getAllPlayers();
+            for (Player p : allPlayers) {
+                if (p.getUsername().equals(newUsername)) {
+                    throw new IllegalArgumentException(newUsername + " is taken already.");
+                }
+            }
             player.setUsername(newUsername);
         }
 
@@ -161,6 +181,32 @@ if (updateFields.containsKey("globalEloRating")) {
     
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    // get all the players who registered for that tournament 
+    @GetMapping("/players/tournamentsReg/{username}")
+    public Set<String> getNameOfTournamentRegByPlayer(@PathVariable String username) {
+        // Get the currently authenticated user's username
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName();  // The logged-in username
+
+        // Check if the authenticated user is requesting their own data
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("You are trying to access data for Player: " + username);
+        }
+
+        Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
+        if(!existingPlayer.isPresent()) {
+            throw new UsernameNotFoundException(username); // can do testing to see if this exception is thrown 
+        }
+
+        // If they are allowed and username in found in DB 
+        Player player = existingPlayer.get();
+        Set<Tournament> tournamentReg = player.getTournamentRegistered();
+        return tournamentReg.stream()
+                            .map(Tournament :: getName)
+                            .collect(Collectors.toSet());
+    }
 
 
 }
@@ -168,7 +214,6 @@ if (updateFields.containsKey("globalEloRating")) {
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
 
     // // get the player
     // @GetMapping("/players/{id}")

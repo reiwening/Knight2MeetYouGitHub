@@ -11,10 +11,11 @@ public interface MatchService {
     // long createMatch();
 
     Match saveMatch(Match match);
-    // Match deleteMatch(Long id);
+    void deleteMatch(Long id);
     Match findMatchById(Long id);
     
     Match assignRandomPlayers(Long MatchId);
+    List<Match> createRoundRobinMatches(Long tournamentId);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 

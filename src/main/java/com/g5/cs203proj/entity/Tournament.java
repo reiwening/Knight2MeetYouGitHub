@@ -34,7 +34,9 @@ public class Tournament {
     private List<Match> tournamentMatchHistory;
 
     private String tournamentStatus;
-    private String tournamentStyle = "random"; // random by default 
+
+    @Column(name="tournament_style")
+    private String tournamentStyle; // Can be "RANDOM" or "ROUND_ROBIN"
 
     @ManyToMany
     @JoinTable(

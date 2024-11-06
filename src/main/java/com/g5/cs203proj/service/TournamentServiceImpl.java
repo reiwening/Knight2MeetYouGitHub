@@ -143,6 +143,7 @@ public class TournamentServiceImpl implements TournamentService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerNotFoundException(playerId));
 
+
         if (tournament.getRegisteredPlayers().contains(player)) {
             throw new PlayerAlreadyInTournamentException(playerId, tournamentId);
         }
@@ -220,7 +221,7 @@ public class TournamentServiceImpl implements TournamentService {
         // Validate status if necessary
         statusValidation(status);
         //nv throw exception, safe to add
-        tournament.setTournamentStatus(status);
+        tournament.setTournamentStatus(status.toUpperCase());
         return tournamentRepository.save(tournament);
     }
 
@@ -231,7 +232,7 @@ public class TournamentServiceImpl implements TournamentService {
         // Validate style
         styleValidation(style);
         //no exception, safe to add
-        tournament.setTournamentStyle(style);
+        tournament.setTournamentStyle(style.toUpperCase());
         return tournamentRepository.save(tournament);
     }
 

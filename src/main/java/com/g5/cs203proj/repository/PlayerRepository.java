@@ -21,7 +21,7 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
            "AND NOT EXISTS (" +
            "  SELECT m FROM Match m WHERE " +
            "  (m.player1 = p OR m.player2 = p) " +
-           "  AND m.matchStatus = 'IN_PROGRESS'" + // checks if either player 1 or player 2 is in a match that is ON_GOING
+           // "  AND m.matchStatus = 'IN_PROGRESS'" + // checks if either player 1 or player 2 is in a match that is ON_GOING
            ")")
     List<Player> findAllByTournamentIdAndNotInOngoingMatch(@Param("tournamentId") Long tournamentId);
     

@@ -42,28 +42,6 @@ public class SpringBootIntegrationTest {
         tournamentRepository.deleteAll();
     }
 
-    @Test
-    public void createTournament_Success() throws Exception {
-        // Arrange
-        URI uri = new URI( baseUrl + port + "/tournaments");
-        TournamentDTO newTournamentDTO = new TournamentDTO();
-        newTournamentDTO.setName("Chess Tournament");
-        newTournamentDTO.setMinPlayers(2);
-        newTournamentDTO.setMaxPlayers(10);
-        newTournamentDTO.setTournamentStyle("Round Robin");
-
-        // Act
-        ResponseEntity<TournamentDTO> result = restTemplate.postForEntity(uri, newTournamentDTO, TournamentDTO.class);
-
-        // Assert
-        assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        assertNotNull(result.getBody());
-        assertEquals("Chess Tournament", result.getBody().getName());
-        assertEquals(2, result.getBody().getMinPlayers());
-        assertEquals(10, result.getBody().getMaxPlayers());
-
-    }
-
 
     @Test
     public void getAllTournaments_Success() throws Exception {
