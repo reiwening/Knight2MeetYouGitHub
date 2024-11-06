@@ -21,3 +21,5 @@
 ### To run the test files: use 
 mvnw test -Dtest=MatchServiceTest 
 mvnw test -Dtest=SpringBootIntegrationTest
+
+### To see our Knight2MeetYouAPI, type this in your browser : http://localhost:8080/swagger-ui/index.html
