@@ -61,7 +61,7 @@ public class Player implements UserDetails   {
         name = "player_tournament", 
         joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "tournament_id"))
-    private Set<Tournament> tournamentRegistered;
+    private Set<Tournament> tournamentRegistered = new HashSet<>();
 // can make it Set<Tournament>
     
     @OneToMany(mappedBy = "player1")
@@ -130,18 +130,28 @@ public class Player implements UserDetails   {
     // Getter for matchHistory which consolidates both lists
     // Getter for matchHistory which consolidates both lists
     public List<Match> getMatchHistory() {
-        if (matchHistory == null) {
-            matchHistory = new ArrayList<>();  // Initialize the list if it's null
-        }
-        matchHistory.clear();  // Clear the list to ensure no duplicate entries
+        List<Match> combinedMatchHistory = new ArrayList<>();  // Create a new list to avoid modifying matchHistory
         if (matchesAsPlayer1 != null) {
-            matchHistory.addAll(matchesAsPlayer1);
+            combinedMatchHistory.addAll(matchesAsPlayer1);
         }
         if (matchesAsPlayer2 != null) {
-            matchHistory.addAll(matchesAsPlayer2);
+            combinedMatchHistory.addAll(matchesAsPlayer2);
         }
-        return matchHistory;
+        return combinedMatchHistory;  // Return the combined list
     }
+// public List<Match> getMatchHistory() {
+//     if (matchHistory == null) {
+//         matchHistory = new ArrayList<>();  // Initialize the list if it's null
+//     }
+//     matchHistory.clear();  // Clear the list to ensure no duplicate entries
+//     if (matchesAsPlayer1 != null) {
+//         matchHistory.addAll(matchesAsPlayer1);
+//     }
+//     if (matchesAsPlayer2 != null) {
+//         matchHistory.addAll(matchesAsPlayer2);
+//     }
+//     return matchHistory;
+// }
 
     
     @Override

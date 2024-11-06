@@ -31,7 +31,7 @@ public class Tournament {
     
     @OneToMany
     @JoinColumn(name = "tournament_id")  // Foreign key in the Match table
-    private List<Match> tournamentMatchHistory;
+    private List<Match> tournamentMatchHistory = new ArrayList<>();
 
     private String tournamentStatus;
 

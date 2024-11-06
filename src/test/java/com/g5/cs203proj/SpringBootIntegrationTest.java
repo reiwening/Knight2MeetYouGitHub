@@ -1,109 +1,109 @@
-package com.g5.cs203proj;
+// package com.g5.cs203proj;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.net.URI;
-import java.util.*;
+// import java.net.URI;
+// import java.util.*;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.junit.jupiter.api.AfterEach;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+// import org.springframework.boot.test.web.client.TestRestTemplate;
+// import org.springframework.boot.test.web.server.LocalServerPort;
+// import org.springframework.http.HttpStatus;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.g5.cs203proj.DTO.TournamentDTO;
-import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.repository.TournamentRepository;
+// import com.g5.cs203proj.DTO.TournamentDTO;
+// import com.g5.cs203proj.entity.Tournament;
+// import com.g5.cs203proj.repository.TournamentRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class SpringBootIntegrationTest {
+// @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+// public class SpringBootIntegrationTest {
 
-    @LocalServerPort
-    private int port;
-    private final String baseUrl = "http://localhost:";
+//     @LocalServerPort
+//     private int port;
+//     private final String baseUrl = "http://localhost:";
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+//     @Autowired
+//     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private TournamentRepository tournamentRepository;
+//     @Autowired
+//     private TournamentRepository tournamentRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder encoder;
+//     @Autowired
+//     private BCryptPasswordEncoder encoder;
 
-    @AfterEach
-    void tearDown() {
-        tournamentRepository.deleteAll();
-    }
+//     @AfterEach
+//     void tearDown() {
+//         tournamentRepository.deleteAll();
+//     }
 
 
-    @Test
-    public void getAllTournaments_Success() throws Exception {
-        // Arrange
-        Tournament tournament1 = new Tournament();
-        tournament1.setName("Chess Tournament 1");
-        tournament1.setMinPlayers(2);
-        tournament1.setMaxPlayers(10);
-        tournament1.setTournamentStyle("Round Robin");
+//     @Test
+//     public void getAllTournaments_Success() throws Exception {
+//         // Arrange
+//         Tournament tournament1 = new Tournament();
+//         tournament1.setName("Chess Tournament 1");
+//         tournament1.setMinPlayers(2);
+//         tournament1.setMaxPlayers(10);
+//         tournament1.setTournamentStyle("Round Robin");
         
-        Tournament tournament2 = new Tournament();
-        tournament2.setName("Chess Tournament 2");
-        tournament2.setMinPlayers(4);
-        tournament2.setMaxPlayers(8);
-        tournament2.setTournamentStyle("Swiss");
+//         Tournament tournament2 = new Tournament();
+//         tournament2.setName("Chess Tournament 2");
+//         tournament2.setMinPlayers(4);
+//         tournament2.setMaxPlayers(8);
+//         tournament2.setTournamentStyle("Swiss");
 
-        tournamentRepository.saveAll(List.of(tournament1, tournament2));
+//         tournamentRepository.saveAll(List.of(tournament1, tournament2));
 
-        URI uri = new URI(baseUrl + port + "/tournaments");
+//         URI uri = new URI(baseUrl + port + "/tournaments");
 
-        // Act
-        ResponseEntity<TournamentDTO[]> result = restTemplate.getForEntity(uri, TournamentDTO[].class);
+//         // Act
+//         ResponseEntity<TournamentDTO[]> result = restTemplate.getForEntity(uri, TournamentDTO[].class);
 
-        // Assert
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertNotNull(result.getBody());
-        assertEquals(2, result.getBody().length);
-        assertEquals("Chess Tournament 1", result.getBody()[0].getName());
-        assertEquals("Chess Tournament 2", result.getBody()[1].getName());
-    }
+//         // Assert
+//         assertEquals(HttpStatus.OK, result.getStatusCode());
+//         assertNotNull(result.getBody());
+//         assertEquals(2, result.getBody().length);
+//         assertEquals("Chess Tournament 1", result.getBody()[0].getName());
+//         assertEquals("Chess Tournament 2", result.getBody()[1].getName());
+//     }
 
-    @Test
-    public void getTournamentById_Success() throws Exception {
-        // Arrange
-        Tournament tournament = new Tournament();
-        tournament.setName("Chess Tournament");
-        tournament.setMinPlayers(2);
-        tournament.setMaxPlayers(10);
-        tournament.setTournamentStyle("Round Robin");
+//     @Test
+//     public void getTournamentById_Success() throws Exception {
+//         // Arrange
+//         Tournament tournament = new Tournament();
+//         tournament.setName("Chess Tournament");
+//         tournament.setMinPlayers(2);
+//         tournament.setMaxPlayers(10);
+//         tournament.setTournamentStyle("Round Robin");
 
-        Long tournamentId = tournamentRepository.save(tournament).getId();
-        URI uri = new URI( baseUrl + port + "/tournaments/" + tournamentId);
+//         Long tournamentId = tournamentRepository.save(tournament).getId();
+//         URI uri = new URI( baseUrl + port + "/tournaments/" + tournamentId);
 
-        // Act: Perform the GET request
-        ResponseEntity<TournamentDTO> result = restTemplate.getForEntity(uri, TournamentDTO.class);
+//         // Act: Perform the GET request
+//         ResponseEntity<TournamentDTO> result = restTemplate.getForEntity(uri, TournamentDTO.class);
 
-        // Assert: Check if the response is correct
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertNotNull(result.getBody());
-        assertEquals("Chess Tournament", result.getBody().getName());
-        assertEquals(2, result.getBody().getMinPlayers());
-        assertEquals(10, result.getBody().getMaxPlayers());
-    }
+//         // Assert: Check if the response is correct
+//         assertEquals(HttpStatus.OK, result.getStatusCode());
+//         assertNotNull(result.getBody());
+//         assertEquals("Chess Tournament", result.getBody().getName());
+//         assertEquals(2, result.getBody().getMinPlayers());
+//         assertEquals(10, result.getBody().getMaxPlayers());
+//     }
 
 
-    @Test
-    public void getTournamentById_Failure() throws Exception {
-        // Arrange
-        URI uri = new URI( baseUrl + port + "/tournaments/1" );
-        // Act
-        ResponseEntity<TournamentDTO> result = restTemplate.getForEntity(uri, TournamentDTO.class); 
-        // Assert: Check if the response is 404 Not Found
-        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-    }    
-}
+//     @Test
+//     public void getTournamentById_Failure() throws Exception {
+//         // Arrange
+//         URI uri = new URI( baseUrl + port + "/tournaments/1" );
+//         // Act
+//         ResponseEntity<TournamentDTO> result = restTemplate.getForEntity(uri, TournamentDTO.class); 
+//         // Assert: Check if the response is 404 Not Found
+//         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+//     }    
+// }

@@ -116,12 +116,12 @@ public class PlayerServiceImpl implements PlayerService {
 
 
     public PlayerDTO convertToPlayerDTO(Player player) {
-        Set<Long> tournamentIds = player.getTournamentRegistered()
+        Set<Long> tournamentIds = player.getTournamentRegistered() == null ? Collections.emptySet() : player.getTournamentRegistered()
             .stream()
             .map(Tournament::getId)
             .collect(Collectors.toSet());
 
-        List<Long> matchIds = player.getMatchHistory()
+        List<Long> matchIds = player.getMatchHistory() == null ? Collections.emptyList() : player.getMatchHistory()
             .stream()
             .map(Match::getMatchId)
             .collect(Collectors.toList());
