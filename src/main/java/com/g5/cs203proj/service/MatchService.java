@@ -15,6 +15,7 @@ public interface MatchService {
     Match findMatchById(Long id);
     
     Match assignRandomPlayers(Long MatchId);
+    List<Match> createRoundRobinMatches(Long tournamentId);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 

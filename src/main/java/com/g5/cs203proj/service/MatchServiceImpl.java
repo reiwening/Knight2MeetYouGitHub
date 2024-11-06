@@ -1,5 +1,6 @@
 package com.g5.cs203proj.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +17,12 @@ import com.g5.cs203proj.exception.InvalidMatchWinnerException;
 import com.g5.cs203proj.exception.MatchNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
+import com.g5.cs203proj.repository.TournamentRepository;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
 import com.g5.cs203proj.exception.NotEnoughPlayersException;
+import com.g5.cs203proj.exception.TooManyPlayersException;
+import com.g5.cs203proj.exception.TournamentNotFoundException;
 
 
 /**
@@ -29,6 +33,9 @@ import com.g5.cs203proj.exception.NotEnoughPlayersException;
 public class MatchServiceImpl implements MatchService {
 
     private MatchRepository matchRepository;
+
+    @Autowired
+    private TournamentRepository tournamentRepository;
 
     @Autowired
     private PlayerService playerService;
@@ -104,6 +111,43 @@ public class MatchServiceImpl implements MatchService {
         return match;
 
     }
+
+    @Override
+    public List<Match> createRoundRobinMatches(Long tournamentId) {
+        // Retrieve tournament and players
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+            .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        
+        List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
+
+        //System.out.println("Total available players: " + players.size());
+        
+        
+        if (players.size() > 16) {
+            throw new TooManyPlayersException(players.size());
+        }
+
+
+        List<Match> matches = new ArrayList<>();
+        int totalPlayers = players.size();
+
+        for (int i = 0; i < totalPlayers; i++) {
+            for (int j = i + 1; j < totalPlayers; j++) {
+                Match match = new Match();
+                match.setPlayer1(players.get(i));
+                match.setPlayer2(players.get(j));
+                match.setTournament(tournament);
+                matches.add(match);
+                matchRepository.save(match);
+            }
+        }
+
+        tournament.getTournamentMatchHistory().addAll(matches);
+        tournamentRepository.save(tournament);
+
+        return matches;
+}
+
 
 // @Override
 // public void assignPlayerToMatch(Match match, Player player) {

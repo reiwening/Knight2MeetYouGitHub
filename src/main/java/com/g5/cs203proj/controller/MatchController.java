@@ -69,6 +69,12 @@ public class MatchController {
         return savedMatchDTO;
     }
 
+    @PostMapping("/tournament/{tournamentId}/round-robin-matches")
+    public List<MatchDTO> createRoundRobinMatches(@PathVariable Long tournamentId) {
+        List<Match> matches = matchService.createRoundRobinMatches(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
+    }
+
     //test: ok
     // delete a match from a tournament
     @DeleteMapping("/tournament/{tournamentId}/matches/{matchId}")
@@ -98,13 +104,12 @@ public class MatchController {
         return matchService.convertToDTO(match);  
     }
 
-// test : ok (but not fixed)
+// test : ok
     // assign 2 random players to a create match for a tournament 
     @PutMapping("/tournament/{tournamentId}/matches/{matchId}/random-players")
     public MatchDTO assignRandomPlayersToMatch(@PathVariable Long matchId){
        
         Match match = matchService.assignRandomPlayers(matchId);
-// note match status is still NOT_STARTED
         return matchService.convertToDTO(match);
     }
 
