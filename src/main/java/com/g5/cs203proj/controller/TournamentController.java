@@ -35,8 +35,10 @@ public class TournamentController {
         this.tournamentService = tournamentService;
         this.playerService = playerService;
     }
-    //test: ok (matt 13/10/24)
-    // Create a new tournament
+    
+    /**
+     * Create a new tournament.
+     */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/tournaments")
     public ResponseEntity<TournamentDTO> createTournament(@Valid @RequestBody TournamentDTO tournamentDTO) {
@@ -44,16 +46,18 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(savedTournament), HttpStatus.CREATED);
     }
 
-    //test: ok but no field validation (matt 13/10/24)
-    // Update a tournament by ID
+    /**
+     * Update an existing tournament by ID.
+     */
     @PutMapping("/tournaments/{id}")
     public ResponseEntity<TournamentDTO> updateTournament(@PathVariable Long id, @RequestBody TournamentDTO updatedTournamentDTO) {
         Tournament updatedTournament = tournamentService.updateTournament(id, tournamentService.convertToEntity(updatedTournamentDTO));
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (matt 13/10/24)
-    // Delete a tournament by ID
+    /**
+     * Delete a tournament by ID.
+     */
     @DeleteMapping("/tournaments/{id}")
     public ResponseEntity<Map<String, String>> deleteTournament(@PathVariable Long id) {
         tournamentService.deleteTournament(id);
@@ -62,8 +66,9 @@ public class TournamentController {
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
-    //test: ok (matt 13/10/24)
-    // Get a specific tournament by ID
+    /**
+     * Get a specific tournament by ID.
+     */
     @GetMapping("/tournaments/{id}")
     public ResponseEntity<TournamentDTO> getTournamentById(@PathVariable Long id) {
         Tournament tournament = tournamentService.getTournamentById(id);
@@ -71,8 +76,9 @@ public class TournamentController {
     }
 
 
-    //test: ok (matt 13/10/24)
-    // Get all tournaments
+    /**
+     * Get a list of all tournaments.
+     */
     @GetMapping("/tournaments")
     public ResponseEntity<List<TournamentDTO>> getAllTournaments() {
         List<TournamentDTO> tournamentDTOs = tournamentService.getAllTournaments()
@@ -81,8 +87,10 @@ public class TournamentController {
                 .collect(Collectors.toList());
         return new ResponseEntity<>(tournamentDTOs, HttpStatus.OK);
     }
-    //test: ok (matt 13/10/24)
-    // Get all registerable tournaments
+
+    /**
+     * Get a list of all tournaments that are open for registration.
+     */
     @GetMapping("/tournaments/reg")
     public ResponseEntity<List<TournamentDTO>> getAllRegisterableTournaments() {
         List<TournamentDTO> tournamentDTOs = tournamentService.getAllRegisterableTournaments()
@@ -92,24 +100,10 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentDTOs, HttpStatus.OK);
     }
 
-//havent test yet
-// Start or cancel a tournament based on registration cutoff
-    @PutMapping("/tournaments/{id}/start-or-cancel")
-    public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
-        Tournament tournament = tournamentService.startOrCancelTournament(id);
-        return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
-    }
-
-    //havent tested
-    // Get tournament rankings by ID
-    @GetMapping("/tournaments/{id}/rankings")
-    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
-        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
-        return new ResponseEntity<>(rankings, HttpStatus.OK);
-    }
-
-    // test: ok (matt 13/10/24)
-    // Register a player to a tournament
+    /**
+     * Register a player to a tournament.
+     * Only the authenticated user can register themselves.
+     */
     @PostMapping("/tournaments/{tournamentId}/players")
     public ResponseEntity<TournamentDTO> registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
 
@@ -143,48 +137,54 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (matt 13/10/24)
-    //remove player from a tournament
+    /**
+     * Remove a player from a tournament.
+     */
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
     public ResponseEntity<TournamentDTO> removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
         Tournament updatedTournament = tournamentService.removePlayer(playerId, tournamentId);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok but need matchDTO to not keep recurring (matt 13/10/24)
-    // Get a list of registered players in a tournament
+    /**
+     * Get a list of players registered in a tournament by tournament ID.
+     */
     @GetMapping("/tournaments/{id}/players")
     public ResponseEntity<Set<Player>> getRegisteredPlayers(@PathVariable Long id) {
         Set<Player> players = tournamentService.getRegisteredPlayers(id);
         return new ResponseEntity<>(players, HttpStatus.OK);
     }
 
-    //test: ok (matt 13/10/24)
-    // Update the Elo range for the tournament
+    /**
+     * Update the Elo rating range for a tournament.
+     */
     @PutMapping("/tournaments/{id}/elo-range")
     public ResponseEntity<TournamentDTO> setTournamentEloRange(@PathVariable Long id, @RequestParam int minElo, @RequestParam int maxElo) {
         Tournament updatedTournament = tournamentService.setTournamentEloRange(id, minElo, maxElo);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
     
-    //test: ok (matt 13/10/24)
-    // Update the tournament status
+     /**
+     * Update the tournament status.
+     */
     @PutMapping("/tournaments/{id}/status")
     public ResponseEntity<TournamentDTO> setTournamentStatus(@PathVariable Long id, @RequestParam String status) {
         Tournament updatedTournament = tournamentService.setTournamentStatus(id, status);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
     
-    //test: ok (matt 13/10/24)
-    // Update the tournament style
+    /**
+     * Update the tournament style.
+     */
     @PutMapping("/tournaments/{id}/style")
     public ResponseEntity<TournamentDTO> setTournamentStyle(@PathVariable Long id, @RequestParam String style) {
         Tournament updatedTournament = tournamentService.setTournamentStyle(id, style);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //Test: ok (matt 13/10/24)
-    // Update the player range (min/max players)
+    /**
+     * Update the player range (min and max players) for a tournament.
+     */
     @PutMapping("/tournaments/{id}/player-range")
     public ResponseEntity<TournamentDTO> setTournamentPlayerRange(
         @PathVariable Long id, @RequestParam int minPlayers, @RequestParam int maxPlayers) {
@@ -192,8 +192,9 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (matt 13/10/24)
-    // Update the registration cutoff time
+    /**
+     * Update the registration cutoff time for a tournament.
+     */
     @PutMapping("/tournaments/{id}/registration-cutoff")
     public ResponseEntity<TournamentDTO> setTournamentRegistrationCutOff(
         @PathVariable Long id, @RequestParam int year,  @RequestParam int monthOfYear, 
@@ -203,12 +204,31 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (matt 13/10/24)
-    // Update the tournament name
+    /**
+     * Update the name of a tournament.
+     */
     @PutMapping("/tournaments/{id}/name")
     public ResponseEntity<TournamentDTO> setName(@PathVariable Long id, @RequestParam String newName) {
         Tournament updatedTournament = tournamentService.setName(id, newName);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
+    }
+
+    /*
+     * Start or cancel a tournament based on registration cutoff
+     */
+    @PutMapping("/tournaments/{id}/start-or-cancel")
+    public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
+        Tournament tournament = tournamentService.startOrCancelTournament(id);
+        return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
+    }
+    
+    /*
+     * Get tournament rankings by ID
+     */
+    @GetMapping("/tournaments/{id}/rankings")
+    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
+        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
+        return new ResponseEntity<>(rankings, HttpStatus.OK);
     }
 }
 
