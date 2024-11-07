@@ -1,7 +1,11 @@
 package com.g5.cs203proj.service;
 
 import com.g5.cs203proj.enums.*;
-import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.exception.player.*;
+import com.g5.cs203proj.exception.tournament.*;
+import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
+import com.g5.cs203proj.exception.inputs.InvalidStatusException;
+import com.g5.cs203proj.exception.inputs.InvalidStyleException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
 // import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;

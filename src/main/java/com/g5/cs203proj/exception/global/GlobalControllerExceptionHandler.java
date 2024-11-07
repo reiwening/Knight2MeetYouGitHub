@@ -1,4 +1,4 @@
-package com.g5.cs203proj.exception;
+package com.g5.cs203proj.exception.global;
 
 import java.util.Map;
 import java.io.ObjectInputFilter.Status;
@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.g5.cs203proj.enums.*;
+import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
+import com.g5.cs203proj.exception.inputs.InvalidStatusException;
+import com.g5.cs203proj.exception.inputs.InvalidStyleException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
 // import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
 // import com.g5.cs203proj.exception.player.NotEnoughPlayersException;

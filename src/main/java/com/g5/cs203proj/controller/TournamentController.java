@@ -2,13 +2,11 @@ package com.g5.cs203proj.controller;
 
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
-import com.g5.cs203proj.exception.*;
+// import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
 
 import jakarta.validation.Valid;
-
-import com.g5.cs203proj.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
