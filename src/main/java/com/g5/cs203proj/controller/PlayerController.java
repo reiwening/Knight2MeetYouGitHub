@@ -49,16 +49,6 @@ public class PlayerController {
         this.playerService = playerService;
         
     }
-
-     /*
-      * Helper method to ensure the user is authorised to update their own data
-      */
-    public static void validateUserAccess(String username) {
-        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!authenticatedUsername.equals(username)) {
-            throw new AccessDeniedException("Cannot modify data for Player " + username);
-        }
-    }
     
     /**
      * Create a new player.
@@ -90,7 +80,7 @@ public class PlayerController {
     @GetMapping("/players/{username}")
     public ResponseEntity<PlayerDTO>  getPlayer(@PathVariable String username) {
         
-        validateUserAccess(username);
+        playerService.validateUserAccess(username);
 
         Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
         if(!existingPlayer.isPresent()) {
@@ -151,7 +141,7 @@ public class PlayerController {
     @PutMapping("/players")
     public PlayerDTO updatePlayerAttributes(@RequestParam String username, @RequestBody Map<String, String> updateFields) {
 
-        validateUserAccess(username);
+        playerService.validateUserAccess(username);
 
         Player player = playerService.findPlayerByUsername(username)
             .orElseThrow(() -> new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND));

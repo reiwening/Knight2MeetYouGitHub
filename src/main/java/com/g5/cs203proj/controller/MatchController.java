@@ -48,8 +48,11 @@ public class MatchController {
      * Helper method to check if the match exists
     */
     private Match findMatchOrThrow(Long matchId) {
-        return matchService.findMatchById(matchId)
-            .orElseThrow(() -> new MatchNotFoundException(matchId));
+        Match match = matchService.findMatchById(matchId);
+        if (match == null) {
+            throw new MatchNotFoundException(matchId);
+        }
+        return match;   
     }
 
 

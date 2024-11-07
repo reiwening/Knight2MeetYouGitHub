@@ -126,7 +126,7 @@ public class TournamentController {
         }
         
         String authenticatedUsername = authentication.getName();  // The logged-in username
-        validateUserAccess(authenticatedUsername);
+        playerService.validateUserAccess(authenticatedUsername);
 
         //
         Tournament updatedTournament = tournamentService.registerPlayer(playerId, tournamentId);

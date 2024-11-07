@@ -8,7 +8,7 @@ import java.util.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
-
+import jakarta.validation.constraints.Email;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,20 +19,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
 
-// import lombok.*;
-
 @Entity
-// This class implements the UserDetails interface, which is required by Spring Security to manage user authentication
-public class Player implements UserDetails   {
+public class Player implements UserDetails {
 
-    public void setAuthorities(String authorities) {
-        this.authorities = authorities;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     private static final long serialVersionUID = 1L;
@@ -45,12 +43,15 @@ public class Player implements UserDetails   {
 
     @NotNull(message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters")
-    // @JsonIgnore
     private String password;
+
+    @NotNull(message="Email should not be null")
+    @Email(message = "Email should be valid")
+    @Column(name = "email", nullable = false)
+    private String email;
 
     @NotNull(message="Authorities should not be null")
     @Pattern(regexp = "ROLE_USER|ROLE_ADMIN", message = "Authorities must be either ROLE_USER or ROLE_ADMIN")
-    // We define two roles/authorities: ROLE_USER or ROLE_ADMIN
     private String authorities;
 
     private double globalEloRating;
@@ -62,50 +63,54 @@ public class Player implements UserDetails   {
         joinColumns = @JoinColumn(name = "player_id"), 
         inverseJoinColumns = @JoinColumn(name = "tournament_id"))
     private Set<Tournament> tournamentRegistered = new HashSet<>();
-// can make it Set<Tournament>
     
     @OneToMany(mappedBy = "player1")
     @JsonIgnore
     private List<Match> matchesAsPlayer1 = new ArrayList<>();
 
-    
     @OneToMany(mappedBy = "player2")
     @JsonIgnore
     private List<Match> matchesAsPlayer2 = new ArrayList<>();
 
-    
-    @Transient // This field is not persisted directly, but computed
-// @JsonIgnore
+    @Transient
     private List<Match> matchHistory = new ArrayList<>();
 
     public void setTournamentRegistered(Set<Tournament> tournamentRegistered) {
         this.tournamentRegistered = tournamentRegistered;
     }
 
+    public Player() {}
 
-    public Player() {
-    
-    }
-    
-
-    public Player(String username, String password, String authorities) {
-        // this.id = id;
+    public Player(String username, String password, String email, String authorities) {
         this.username = username;
-        this.authorities =authorities;
         this.password = password;
+        this.email = email;
+        this.authorities = authorities;
     }
 
-    public Player(String username, String password, String authorities, double globalEloRating) {
-        // this.id = id;
+    public Player(String username, String password, String email, String authorities, double globalEloRating) {
         this.username = username;
-        this.authorities =authorities;
         this.password = password;
+        this.email = email;
+        this.authorities = authorities;
+        this.globalEloRating = globalEloRating;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setAuthorities(String authorities) {
+        this.authorities = authorities;
     }
 
     public Long getId() {
         return this.id;
     }
-
 
     public double getGlobalEloRating() {
         return globalEloRating;
@@ -115,29 +120,24 @@ public class Player implements UserDetails   {
         this.globalEloRating = globalEloRating;
     }
 
-    // makes me a ROLE_USER or ROLE_ADMIN object 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Arrays.asList(new SimpleGrantedAuthority(authorities));
     }
-    
 
     public void setMatchHistory(List<Match> matchHistory) {
         this.matchHistory = matchHistory;
     }
 
-
-    // Getter for matchHistory which consolidates both lists
-    // Getter for matchHistory which consolidates both lists
     public List<Match> getMatchHistory() {
-        List<Match> combinedMatchHistory = new ArrayList<>();  // Create a new list to avoid modifying matchHistory
+        List<Match> combinedMatchHistory = new ArrayList<>();
         if (matchesAsPlayer1 != null) {
             combinedMatchHistory.addAll(matchesAsPlayer1);
         }
         if (matchesAsPlayer2 != null) {
             combinedMatchHistory.addAll(matchesAsPlayer2);
         }
-        return combinedMatchHistory;  // Return the combined list
+        return combinedMatchHistory;
     }
     
     @Override
@@ -145,10 +145,8 @@ public class Player implements UserDetails   {
         return username;
     }
 
-
     public void setUsername(String username) {
         this.username = username;
-        
     }
 
     @Override
@@ -160,23 +158,24 @@ public class Player implements UserDetails   {
         this.password = password;
     }
 
-
-    // need to implement all methods in UserDetails first 
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
+
     @Override
     @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
+
     @Override
     @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }
+
     @Override
     @JsonIgnore
     public boolean isEnabled() {
@@ -185,19 +184,16 @@ public class Player implements UserDetails   {
     
     public Set<Tournament> getTournamentRegistered() {
         return tournamentRegistered;
-
     }
 
     public List<Match> getMatchesAsPlayer1() {
         return matchesAsPlayer1;
     }
 
-
     public Match addMatchesAsPlayer1(Match match) {
         this.matchesAsPlayer1.add(match);
         return match;
     }
-
 
     public List<Match> getMatchesAsPlayer2() {
         return matchesAsPlayer2;
@@ -208,4 +204,3 @@ public class Player implements UserDetails   {
         return match;
     }
 }
-

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.SimpleMailMessage;
 
 import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
@@ -24,13 +25,12 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
-// import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
-// import com.g5.cs203proj.exception.player.TooManyPlayersException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
 import com.g5.cs203proj.service.MatchServiceImpl;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
+import com.g5.cs203proj.service.EmailService;
 
 @ExtendWith(MockitoExtension.class)
 public class MatchServiceTest {
@@ -43,6 +43,8 @@ public class MatchServiceTest {
     private TournamentService tournamentService;
     @Mock
     private TournamentRepository tournamentRepository;
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private MatchServiceImpl matchService;
@@ -57,10 +59,10 @@ public class MatchServiceTest {
         MockitoAnnotations.openMocks(this);
         
         // Initialize test data
-        player1 = new Player("player1", "password123", "ROLE_USER");
+        player1 = new Player("player1", "password123", "player1@test.com", "ROLE_USER");
         player1.setGlobalEloRating(1500);
         
-        player2 = new Player("player2", "password123", "ROLE_USER");
+        player2 = new Player("player2", "password123", "player2@test.com", "ROLE_USER");
         player2.setGlobalEloRating(1500);
         
         tournament = new Tournament();
@@ -80,8 +82,8 @@ public class MatchServiceTest {
         Tournament tournament = new Tournament();
         tournament.setId(1L);
         match.setTournament(tournament);
-        Player p1 = new Player("testPlayer1", "password123", "ROLE_USER");
-        Player p2 = new Player("testPlayer2", "password123", "ROLE_USER");
+        Player p1 = new Player("testPlayer1", "password123", "test1@test.com", "ROLE_USER");
+        Player p2 = new Player("testPlayer2", "password123", "test2@test.com", "ROLE_USER");
         
         List<Player> availablePlayers = new ArrayList<>(List.of(p1,p2));
 
@@ -165,7 +167,7 @@ public class MatchServiceTest {
         // Arrange
         List<Player> players = new ArrayList<>();
         for (int i = 0; i < 17; i++) {
-            players.add(new Player("player" + i, "password123", "ROLE_USER"));
+            players.add(new Player("player" + i, "password123", "player" + i + "@test.com", "ROLE_USER"));
         }
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
@@ -324,4 +326,32 @@ public class MatchServiceTest {
         // Assert
         assertNull(foundMatch);
     }
+
+//     @Test
+// public void testEmailNotificationOnMatchCreation() {
+//     // Arrange: Create two players and add them to a list of available players
+//     Player player1 = new Player("playerOne", "password123", "playerOne@example.com", "ROLE_USER");
+//     player1.setId(1L);
+//     Player player2 = new Player("playerTwo", "password123", "playerTwo@example.com", "ROLE_USER");
+//     player2.setId(2L);
+
+//     List<Player> availablePlayers = new ArrayList<>(List.of(player1, player2));
+//     when(playerService.getAvailablePlayersForTournament(anyLong())).thenReturn(availablePlayers);
+
+//     // Arrange: Create a match and mock its retrieval and saving
+//     Match match = new Match();
+//     match.setMatchId(1L);
+//     match.setTournament(new Tournament());  // Only if the tournament is needed within the method
+//     when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+//     when(matchRepository.save(any(Match.class))).thenReturn(match);
+
+//     // Act: Use assignRandomPlayers to assign players and trigger the email notification
+//     matchService.assignRandomPlayers(match.getMatchId());
+
+//     // Assert: Verify that the emailService.sendMatchNotification was called
+//     verify(emailService, times(1)).sendMatchNotification(match);
+// }
+
+
+   
 }
