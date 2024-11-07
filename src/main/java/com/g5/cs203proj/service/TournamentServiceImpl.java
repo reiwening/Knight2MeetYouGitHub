@@ -257,12 +257,12 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     // Set Admin
-    @Override
-    public Tournament setAdmin(Long tournamentId, Admin newAdmin) {
-        Tournament tournament = getTournamentById(tournamentId);
-        tournament.setAdmin(newAdmin);
-        return tournamentRepository.save(tournament);
-    }
+    // @Override
+    // public Tournament setAdmin(Long tournamentId, Admin newAdmin) {
+    //     Tournament tournament = getTournamentById(tournamentId);
+    //     tournament.setAdmin(newAdmin);
+    //     return tournamentRepository.save(tournament);
+    // }
 
     // Set Name
     @Override

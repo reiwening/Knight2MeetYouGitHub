@@ -31,7 +31,7 @@ public class Tournament {
     
     @OneToMany
     @JoinColumn(name = "tournament_id")  // Foreign key in the Match table
-    private List<Match> tournamentMatchHistory;
+    private List<Match> tournamentMatchHistory = new ArrayList<>();
 
     private String tournamentStatus;
 
@@ -60,9 +60,9 @@ public class Tournament {
 
     private LocalDateTime registrationCutOff;
 
-    @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
-    @JoinColumn(name = "admin_id") 
-    private Admin admin;  
+    // @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
+    // @JoinColumn(name = "admin_id") 
+    // private Admin admin;  
 
     // Constructors, getters, and setters
     public Tournament() {
@@ -176,12 +176,12 @@ public class Tournament {
         this.registrationCutOff = registrationCutOff;
     }
 
-    public Admin getAdmin() {
-        return admin;
-    }
+    // public Admin getAdmin() {
+    //     return admin;
+    // }
 
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
-    }
+    // public void setAdmin(Admin admin) {
+    //     this.admin = admin;
+    // }
 
 }
