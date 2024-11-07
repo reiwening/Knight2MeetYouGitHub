@@ -150,16 +150,6 @@ public class MatchServiceImpl implements MatchService {
         return matches;
 }
 
-
-// @Override
-// public void assignPlayerToMatch(Match match, Player player) {
-//     if (match.getPlayer1() == null) {
-//         match.setPlayer1(player);
-//     } else if (match.getPlayer2() == null) {
-//         match.setPlayer2(player);
-//     }
-// }
-
     @Override
     public void processMatchResult(Match match, Player winner, boolean isDraw) {
         match.setMatchStatus("COMPLETED");

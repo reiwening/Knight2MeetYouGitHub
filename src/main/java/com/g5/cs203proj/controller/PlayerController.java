@@ -51,7 +51,9 @@ public class PlayerController {
     }
     
     
-    // create a new player
+    /**
+     * Create a new player.
+     */
     @PostMapping("/players")
     public ResponseEntity<?> createPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
 
@@ -72,7 +74,10 @@ public class PlayerController {
         
     }
     
-    // Player would be able to retrieve his/her information when player inputs username
+    
+    /**
+     * Retrieve authenticated player's information by username.
+     */
     @GetMapping("/players/{username}")
     public ResponseEntity<PlayerDTO>  getPlayer(@PathVariable String username) {
         // Get the currently authenticated user's username
@@ -95,14 +100,18 @@ public class PlayerController {
         return ResponseEntity.ok(playerDTO);
     }
 
-    //test: working
-    // delete a player 
+    /**
+     * Delete a player by username.
+     */
     @DeleteMapping("/players/{username}")
     public String deletePlayer(@PathVariable String username) {
         playerService.deletePlayer(username);
         return "Player " + username + " deleted successfully";
     }
 
+    /**
+     * Get a list of all players.
+     */
     @GetMapping("/players")
     public List<PlayerDTO>  getAllPlayers() {
 
@@ -112,7 +121,11 @@ public class PlayerController {
                         .collect(Collectors.toList());
     }
 
-// what if user want to change password and role?
+
+    /**
+     * Update player attributes 
+     * Only the authenticated user can update their own data.
+     */
     @PutMapping("/players")
     public PlayerDTO updatePlayerAttributes(@RequestParam String username, @RequestBody Map<String, String> updateFields) {
 
@@ -162,7 +175,6 @@ if (updateFields.containsKey("globalEloRating")) {
     } catch (NumberFormatException e) {
         throw new IllegalArgumentException("Invalid Elo rating format");
     }
-    // player.setGlobalEloRating(Double.parseDouble(updateFields.get("globalEloRating")));
 }
 
         playerService.savePlayer(player);  // Save the updated player in DB
@@ -175,29 +187,29 @@ if (updateFields.containsKey("globalEloRating")) {
     ///////////////////////////////////////////////////////////////////////////////////////////
     
     // get all the players who registered for that tournament 
-    @GetMapping("/players/tournamentsReg/{username}")
-    public Set<String> getNameOfTournamentRegByPlayer(@PathVariable String username) {
-        // Get the currently authenticated user's username
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedUsername = authentication.getName();  // The logged-in username
+    // @GetMapping("/players/tournamentsReg/{username}")
+    // public Set<String> getNameOfTournamentRegByPlayer(@PathVariable String username) {
+    //     // Get the currently authenticated user's username
+    //     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    //     String authenticatedUsername = authentication.getName();  // The logged-in username
 
-        // Check if the authenticated user is requesting their own data
-        if (!authenticatedUsername.equals(username)) {
-            throw new AccessDeniedException("You are trying to access data for Player: " + username);
-        }
+    //     // Check if the authenticated user is requesting their own data
+    //     if (!authenticatedUsername.equals(username)) {
+    //         throw new AccessDeniedException("You are trying to access data for Player: " + username);
+    //     }
 
-        Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
-        if(!existingPlayer.isPresent()) {
-            throw new UsernameNotFoundException(username); // can do testing to see if this exception is thrown 
-        }
+    //     Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
+    //     if(!existingPlayer.isPresent()) {
+    //         throw new UsernameNotFoundException(username); // can do testing to see if this exception is thrown 
+    //     }
 
-        // If they are allowed and username in found in DB 
-        Player player = existingPlayer.get();
-        Set<Tournament> tournamentReg = player.getTournamentRegistered();
-        return tournamentReg.stream()
-                            .map(Tournament :: getName)
-                            .collect(Collectors.toSet());
-    }
+    //     // If they are allowed and username in found in DB 
+    //     Player player = existingPlayer.get();
+    //     Set<Tournament> tournamentReg = player.getTournamentRegistered();
+    //     return tournamentReg.stream()
+    //                         .map(Tournament :: getName)
+    //                         .collect(Collectors.toSet());
+    // }
 
 
 }

@@ -203,14 +203,6 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test later, NOT SURE ABT ADMIN 
-    // Update the tournament admin
-    // @PutMapping("/tournaments/{id}/admin")
-    // public ResponseEntity<TournamentDTO> setAdmin(@PathVariable Long id, @RequestBody Admin newAdmin) {
-    //     Tournament updatedTournament = tournamentService.setAdmin(id, newAdmin);
-    //     return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
-    // }
-
     //test: ok (matt 13/10/24)
     // Update the tournament name
     @PutMapping("/tournaments/{id}/name")

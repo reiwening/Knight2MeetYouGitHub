@@ -39,7 +39,6 @@ public class TournamentDTO {
     @Positive(message = "Min players must be positive")
     private int minPlayers;
 
-    // @Min(value = 0, message = "Minimum Elo rating cannot be negative")
     private int minElo;
 
     @Positive(message = "Max Elo rating must be positive")
@@ -146,8 +145,5 @@ public class TournamentDTO {
 
     public void setRegistrationCutOff(LocalDateTime registrationCutOff) {
         this.registrationCutOff = registrationCutOff;
-    }
-
-
-    
+    } 
 }

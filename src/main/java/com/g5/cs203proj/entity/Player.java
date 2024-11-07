@@ -139,20 +139,6 @@ public class Player implements UserDetails   {
         }
         return combinedMatchHistory;  // Return the combined list
     }
-// public List<Match> getMatchHistory() {
-//     if (matchHistory == null) {
-//         matchHistory = new ArrayList<>();  // Initialize the list if it's null
-//     }
-//     matchHistory.clear();  // Clear the list to ensure no duplicate entries
-//     if (matchesAsPlayer1 != null) {
-//         matchHistory.addAll(matchesAsPlayer1);
-//     }
-//     if (matchesAsPlayer2 != null) {
-//         matchHistory.addAll(matchesAsPlayer2);
-//     }
-//     return matchHistory;
-// }
-
     
     @Override
     public String getUsername() {
