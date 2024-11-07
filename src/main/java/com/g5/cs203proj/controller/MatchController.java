@@ -44,32 +44,35 @@ public class MatchController {
         this.playerService = playerService;
     }
 
+    /* 
+     * Helper method to check if the match exists
+    */
+    private Match findMatchOrThrow(Long matchId) {
+        return matchService.findMatchById(matchId)
+            .orElseThrow(() -> new MatchNotFoundException(matchId));
+    }
+
 
     /**
      * Create a new match for a specified tournament.
      */
     @PostMapping("/tournament/{id}/matches")
     public MatchDTO createMatchForTournament(@PathVariable Long id) {
-        // Find the tournament by ID
+    
         Tournament tournament = tournamentService.getTournamentById(id);
         if (tournament == null) {
             throw new TournamentNotFoundException(id);  
         }
-        
-        // Create a new Match with the specified tournament
+ 
         Match newMatch = new Match();
         newMatch.setTournament(tournament);
 
-        // Add the new match to the tournament's match history
         tournament.getTournamentMatchHistory().add(newMatch);
         
-        // Save the match in the database
         Match savedMatch = matchService.saveMatch(newMatch);
 
-        // Save the updated tournament to include the new match
-        tournamentService.updateTournament(id, tournament); // because we changed the match history 
+        tournamentService.updateTournament(id, tournament); 
         
-        // Convert the saved Match entity back to DTO and return it
         MatchDTO savedMatchDTO = matchService.convertToDTO(savedMatch);
         return savedMatchDTO;
     }
@@ -97,8 +100,7 @@ public class MatchController {
      */
     @GetMapping("/matches/{matchId}")
     public MatchDTO getMatch(@PathVariable Long matchId) {
-        Match match = matchService.findMatchById(matchId);
-        if (match == null) throw new MatchNotFoundException(matchId);
+        Match match = findMatchOrThrow(matchId);
         return matchService.convertToDTO(match);  
     }
 
@@ -125,21 +127,18 @@ public class MatchController {
         @RequestParam boolean isDraw, 
         @RequestBody(required = false) Player winner) {
         
-        // check if match exists
-        Match match = matchService.findMatchById(id);
-        if (match == null) throw new MatchNotFoundException(id);
+        Match match = findMatchOrThrow(id);
 
         // check if winner is a player in this match
         Long winnerId = winner.getId();
         if (!isDraw) {
             if (winnerId != match.getPlayer1().getId() && winnerId != match.getPlayer2().getId()) 
             throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
-            // throw new InvalidMatchWinnerException("Winner must be a player in this match.");
         }
         if (isDraw) {
             matchService.processMatchResult(match, null, true);
         } else {
-            Player managedPlayer = playerService.getPlayerById(winner.getId());
+            Player managedPlayer = playerService.getPlayerById(winnerId);
             if (managedPlayer == null) throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
 
             matchService.processMatchResult(match, managedPlayer, false);

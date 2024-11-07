@@ -49,7 +49,16 @@ public class PlayerController {
         this.playerService = playerService;
         
     }
-    
+
+     /*
+      * Helper method to ensure the user is authorised to update their own data
+      */
+    public static void validateUserAccess(String username) {
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("Cannot modify data for Player " + username);
+        }
+    }
     
     /**
      * Create a new player.
@@ -80,22 +89,14 @@ public class PlayerController {
      */
     @GetMapping("/players/{username}")
     public ResponseEntity<PlayerDTO>  getPlayer(@PathVariable String username) {
-        // Get the currently authenticated user's username
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedUsername = authentication.getName();  // The logged-in username
-
-        // Check if the authenticated user is requesting their own data
-        if (!authenticatedUsername.equals(username)) {
-            throw new AccessDeniedException("You are trying to access data for Player: " + username);
-        }
+        
+        validateUserAccess(username);
 
         Optional<Player> existingPlayer = playerService.findPlayerByUsername(username); 
         if(!existingPlayer.isPresent()) {
             throw new UsernameNotFoundException(username); // can do testing to see if this exception is thrown 
         }
 
-        // If they are allowed and username in found in DB 
-        // Convert Player entity to PlayerDTO and return the DTO
         PlayerDTO playerDTO = playerService.convertToPlayerDTO(existingPlayer.get());
         return ResponseEntity.ok(playerDTO);
     }
@@ -121,7 +122,28 @@ public class PlayerController {
                         .collect(Collectors.toList());
     }
 
-
+    /* 
+     * Helper methods for updatePlayerAttributes() 
+     */    
+    private void checkNullAndEmptyFields(Map<String, String> updateFields) {
+        if (updateFields == null || updateFields.isEmpty()) {
+            throw new IllegalArgumentException("No fields to update");
+        }
+    }
+    private void updateUsername(String newUsername, Player player) {
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+        boolean usernameExists = playerService.getAllPlayers().stream()
+            .filter(p -> p.getUsername() != null)
+            .anyMatch(p -> p.getUsername().equals(newUsername));
+    
+        if (usernameExists) {
+            throw new IllegalArgumentException(newUsername + " is already taken.");
+        }
+        player.setUsername(newUsername);
+    }
+    
     /**
      * Update player attributes 
      * Only the authenticated user can update their own data.
@@ -129,61 +151,30 @@ public class PlayerController {
     @PutMapping("/players")
     public PlayerDTO updatePlayerAttributes(@RequestParam String username, @RequestBody Map<String, String> updateFields) {
 
-        // Get the currently authenticated user's username
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedUsername = authentication.getName();  // The logged-in username
+        validateUserAccess(username);
 
-        // Check if the authenticated user is requesting their own data
-        if (!authenticatedUsername.equals(username)) {
-            throw new AccessDeniedException("You cannot change data for Player: " + username);
-        }
-
-
-        Optional<Player> existingPlayer = playerService.findPlayerByUsername(username);
-        if (!existingPlayer.isPresent()) {
-            throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
-
-        } 
-        Player player = existingPlayer.get();
+        Player player = playerService.findPlayerByUsername(username)
+            .orElseThrow(() -> new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND));
 
         // Null check and prevent empty updates
-        if (updateFields == null || updateFields.isEmpty()) {
-            throw new IllegalArgumentException("No fields to update");
+        checkNullAndEmptyFields(updateFields);
+        
+        if (updateFields.containsKey("globalEloRating")) {
+            throw new IllegalArgumentException("Haha, clever move! But modifying your own Elo rating? Dream on, my friend...");
         }
-
 
         // Check for each key in the map and update the corresponding field
         if (updateFields.containsKey("username")) {
             String newUsername = updateFields.get("username");
-            if ( newUsername == null || newUsername.trim().isEmpty() ) { throw new IllegalArgumentException("Username cannot be null or empty"); }
-            
-            // check if username taken
-            List<Player> allPlayers = playerService.getAllPlayers();
-            for (Player p : allPlayers) {
-                if ( p.getUsername() == null ) { continue; }
-                if (p.getUsername().equals(newUsername)) {
-                    throw new IllegalArgumentException(newUsername + " is taken already.");
-                }
-            }
-            player.setUsername(newUsername);
+            updateUsername(newUsername, player);
         }
 
-if (updateFields.containsKey("globalEloRating")) {
-    try {
-        double newEloRating = Double.parseDouble(updateFields.get("globalEloRating"));
-        player.setGlobalEloRating(newEloRating);
-    } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("Invalid Elo rating format");
-    }
-}
-
-        playerService.savePlayer(player);  // Save the updated player in DB
-
+        playerService.savePlayer(player);  
         PlayerDTO updatedPlayerDTO = playerService.convertToPlayerDTO(player);
         return updatedPlayerDTO;
     
     }
-
+}
     ///////////////////////////////////////////////////////////////////////////////////////////
     
     // get all the players who registered for that tournament 
@@ -210,7 +201,4 @@ if (updateFields.containsKey("globalEloRating")) {
     //                         .map(Tournament :: getName)
     //                         .collect(Collectors.toSet());
     // }
-
-
-}
 

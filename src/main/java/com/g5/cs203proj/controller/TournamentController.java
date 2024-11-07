@@ -126,11 +126,7 @@ public class TournamentController {
         }
         
         String authenticatedUsername = authentication.getName();  // The logged-in username
-
-        // Check if the authenticated user is requesting their own data
-        if (!authenticatedUsername.equals(username)) {
-            throw new AccessDeniedException("You can only register yourself for a tournament.");
-        }
+        validateUserAccess(authenticatedUsername);
 
         //
         Tournament updatedTournament = tournamentService.registerPlayer(playerId, tournamentId);
@@ -221,7 +217,7 @@ public class TournamentController {
         Tournament tournament = tournamentService.startOrCancelTournament(id);
         return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
     }
-    
+
     /*
      * Get tournament rankings by ID
      */
