@@ -27,6 +27,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,7 +38,7 @@ import org.springframework.security.core.Authentication;
 
 
 
-
+@Validated
 @RestController
 public class PlayerController {
     private PlayerService playerService;
@@ -110,18 +111,6 @@ public class PlayerController {
                         .map(player -> playerService.convertToPlayerDTO(player))
                         .collect(Collectors.toList());
     }
-
-// @GetMapping("/players/admins")
-// public List<PlayerDTO> getAllPlayerAdmins(){
-//     return playerService.getAllAdmins();
-// }
-
-// @GetMapping("/players/users")
-// public List<Player> getAllPlayerUsers(){
-//     return playerService.getAllPlayerUsers();
-// }
-
-
 
 // what if user want to change password and role?
     @PutMapping("/players")
@@ -211,22 +200,3 @@ if (updateFields.containsKey("globalEloRating")) {
 
 }
 
-
-
-
-
-    // // get the player
-    // @GetMapping("/players/{id}")
-    // public Player getPlayer(@PathVariable Long id) {
-    //     Player player = playerService.getPlayerById(id);
-    //     if (player == null) throw new PlayerNotFoundException(id);
-    //     return player;
-    // }
-
-    // @GetMapping("/players/{id}/globalEloRating")
-    // public double getGlobalEloRating(@PathVariable Long id) {
-    //     Player player = playerService.getPlayerById(id);
-    //     if(player==null) throw new PlayerNotFoundException(id);
-    //     return player.getGlobalEloRating();
-    // }
-    

@@ -7,14 +7,34 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+
 public class PlayerDTO {
     
+    @NotNull(message = "ID cannot be null")
     private Long id;
+
+    @NotNull(message="Username should not be null")
+    @Size(min = 5, max = 20, message = "Username should be between 5 and 20 characters")
     private String username;
+
+    @NotNull(message = "Password should not be null")
+    @Size(min = 8, message = "Password should be at least 8 characters")
     private String password;
+
+    @PositiveOrZero(message = "Global Elo Rating cannot be negative")
     private Double globalEloRating;
+
     private Set<Long> tournamentRegisteredIds = new HashSet<>();
+
     private List<Long> matchHistoryIds = new ArrayList<>();
+
+    @NotNull(message="Authorities should not be null")
+    @Pattern(regexp = "ROLE_USER|ROLE_ADMIN", message = "Authorities must be either ROLE_USER or ROLE_ADMIN")
     private String authorities;
 
     public PlayerDTO(Long id, String username, String password, Double globalEloRating, Set<Long> tournamentRegisteredIds,

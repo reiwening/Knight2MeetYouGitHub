@@ -2,17 +2,29 @@ package com.g5.cs203proj.DTO;
 
 import com.g5.cs203proj.entity.Player;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+
 public class MatchDTO {
     
+    @NotNull(message = "Match ID cannot be null")
     private Long id;  
+
     private Long player1Id;
     private Long player2Id;
+    @NotNull(message = "Tournament ID cannot be null")
     private Long tournamentId;
     private boolean statusP1;
     private boolean statusP2;
     private Long winnerId;
     private boolean isDraw;
+
+    @NotNull(message = "Match status cannot be null")
+    @Pattern(regexp = "NOT_STARTED|COMPLETED|ONGOING", message = "Match status must be one of: NOT_STARTED, ONGOING, COMPLETED")
     private String matchStatus = "NOT_STARTED";
+
+    @PositiveOrZero(message = "Elo change cannot be negative")
     private Double eloChange;
     
     public MatchDTO(){

@@ -5,6 +5,9 @@ import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
+
+import jakarta.validation.Valid;
+
 import com.g5.cs203proj.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,12 +16,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 public class TournamentController {
 
@@ -36,7 +41,7 @@ public class TournamentController {
     // Create a new tournament
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/tournaments")
-    public ResponseEntity<TournamentDTO> createTournament(@RequestBody TournamentDTO tournamentDTO) {
+    public ResponseEntity<TournamentDTO> createTournament(@Valid @RequestBody TournamentDTO tournamentDTO) {
         Tournament savedTournament = tournamentService.createTournament(tournamentService.convertToEntity(tournamentDTO));
         return new ResponseEntity<>(tournamentService.convertToDTO(savedTournament), HttpStatus.CREATED);
     }
