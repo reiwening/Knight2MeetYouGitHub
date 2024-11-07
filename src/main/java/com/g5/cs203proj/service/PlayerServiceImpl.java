@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.PlayerNotFoundException;
+import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
@@ -192,7 +192,7 @@ public class PlayerServiceImpl implements PlayerService {
     public void deletePlayer(String username) {
         Optional<Player> p = findPlayerByUsername(username);
         if (!p.isPresent()) {
-            throw new PlayerNotFoundException(username);
+            throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
         }
         playerRepository.delete(p.get());
     }

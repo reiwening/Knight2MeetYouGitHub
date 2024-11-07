@@ -13,16 +13,16 @@ import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.InvalidMatchWinnerException;
-import com.g5.cs203proj.exception.MatchNotFoundException;
+import com.g5.cs203proj.exception.match.InvalidMatchWinnerException;
+import com.g5.cs203proj.exception.match.MatchNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
-import com.g5.cs203proj.exception.NotEnoughPlayersException;
-import com.g5.cs203proj.exception.TooManyPlayersException;
-import com.g5.cs203proj.exception.TournamentNotFoundException;
+import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
+import com.g5.cs203proj.exception.player.TooManyPlayersException;
+import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
 
 
 /**

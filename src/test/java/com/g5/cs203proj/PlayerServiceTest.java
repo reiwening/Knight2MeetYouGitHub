@@ -18,7 +18,7 @@ import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.PlayerNotFoundException;
+import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.PlayerServiceImpl;
 import com.g5.cs203proj.service.TournamentService;
@@ -181,7 +181,7 @@ public class PlayerServiceTest {
     void deletePlayer_NotFound() {
         when(playerRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
 
-        assertThrows(PlayerNotFoundException.class, () -> {
+        assertThrows(PlayerAvailabilityException.class, () -> {
             playerService.deletePlayer("nonexistent");
         });
     }

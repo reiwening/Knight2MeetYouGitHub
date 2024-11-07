@@ -8,13 +8,14 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 public class MatchDTO {
     
-    @NotNull(message = "Match ID cannot be null")
     private Long id;  
 
     private Long player1Id;
     private Long player2Id;
+
     @NotNull(message = "Tournament ID cannot be null")
     private Long tournamentId;
+
     private boolean statusP1;
     private boolean statusP2;
     private Long winnerId;

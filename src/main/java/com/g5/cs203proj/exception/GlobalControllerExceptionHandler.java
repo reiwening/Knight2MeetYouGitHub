@@ -18,20 +18,33 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.g5.cs203proj.enums.*;
+import com.g5.cs203proj.exception.match.InvalidMatchWinnerException;
+import com.g5.cs203proj.exception.match.MatchNotFoundException;
+import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
+import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
+import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
+// import com.g5.cs203proj.exception.to_be_deleted.PlayerNotFoundException;
+// import com.g5.cs203proj.exception.to_be_deleted.PlayerAlreadyInTournamentException;
+// import com.g5.cs203proj.exception.to_be_deleted.PlayerNotFoundException;
+// import com.g5.cs203proj.exception.to_be_deleted.PlayerNotInTournamentException;
+import com.g5.cs203proj.exception.tournament.TournamentAlreadyRegisteredException;
+import com.g5.cs203proj.exception.tournament.TournamentFullException;
+import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
+import com.g5.cs203proj.exception.tournament.TournamentNotInRegistrationException;
 
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(PlayerNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handlePlayerNotFoundException(PlayerNotFoundException ex) {
-        // what happens if a PlayerNotFoundException is thrown
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", "Player not found");
-        body.put("player id: ", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }
+    // @ResponseStatus(HttpStatus.NOT_FOUND)
+    // @ExceptionHandler(PlayerNotFoundException.class)
+    // public ResponseEntity<Map<String, Object>> handlePlayerNotFoundException(PlayerNotFoundException ex) {
+    //     // what happens if a PlayerNotFoundException is thrown
+    //     Map<String, Object> body = new HashMap<>();
+    //     body.put("error", "Player not found");
+    //     body.put("player id: ", ex.getMessage());
+    //     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    // }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -97,16 +110,8 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    // Handler for PlayerAlreadyInTournamentException
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(NotEnoughPlayersException.class)
-    public ResponseEntity<Map<String, Object>> handleNotEnoughPlayersException(NotEnoughPlayersException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
-    }
-
-//Tournament Exceptions
+    
+    //Tournament Exceptions
     // Handler for TournamentNotFoundException
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(TournamentNotFoundException.class)
@@ -116,15 +121,58 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    // Handler for PlayerAlreadyInTournamentException
+   // Generic handler for PlayerAvailabilityException
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(PlayerAlreadyInTournamentException.class)
-    public ResponseEntity<Map<String, Object>> handlePlayerAlreadyInTournamentException(PlayerAlreadyInTournamentException ex) {
+    @ExceptionHandler(PlayerAvailabilityException.class)
+    public ResponseEntity<Map<String, Object>> handlePlayerAvailabilityException(PlayerAvailabilityException ex) {
         Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
-        // body.put("timestamp", LocalDateTime.now());
+        
+        switch (ex.getType()) {
+            case NOT_FOUND -> {
+                body.put("error", "Player not found");
+                body.put("details", ex.getMessage());
+            }
+            case NOT_IN_TOURNAMENT -> {
+                body.put("error", "Player not in tournament");
+                body.put("details", ex.getMessage());
+            }
+            case ALREADY_IN_TOURNAMENT -> {
+                body.put("error", "Player already in tournament");
+                body.put("details", ex.getMessage());
+            }
+        }
+
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
+
+    
+    // Handler for PlayerAlreadyInTournamentException
+    // @ResponseStatus(HttpStatus.CONFLICT)
+    // @ExceptionHandler(NotEnoughPlayersException.class)
+    // public ResponseEntity<Map<String, Object>> handleNotEnoughPlayersException(NotEnoughPlayersException ex) {
+    //     Map<String, Object> body = new HashMap<>();
+    //     body.put("error", ex.getMessage());
+    //     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    // }
+
+    // Handler for PlayerAlreadyInTournamentException
+    // @ResponseStatus(HttpStatus.CONFLICT)
+    // @ExceptionHandler(PlayerAlreadyInTournamentException.class)
+    // public ResponseEntity<Map<String, Object>> handlePlayerAlreadyInTournamentException(PlayerAlreadyInTournamentException ex) {
+    //     Map<String, Object> body = new HashMap<>();
+    //     body.put("error", ex.getMessage());
+    //     // body.put("timestamp", LocalDateTime.now());
+    //     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    // }
+    
+    // Handler for PlayerNotInTournamentException
+    // @ResponseStatus(HttpStatus.CONFLICT)
+    // @ExceptionHandler(PlayerNotInTournamentException.class)
+    // public ResponseEntity<Map<String, Object>> handlePlayerNotInTournamentException(PlayerNotInTournamentException ex) {
+    //     Map<String, Object> body = new HashMap<>();
+    //     body.put("error", ex.getMessage());
+    //     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    // }
 
     // Handler for PlayerAlreadyInTournamentException
     @ResponseStatus(HttpStatus.CONFLICT)
@@ -145,14 +193,6 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
-    // Handler for PlayerNotInTournamentException
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(PlayerNotInTournamentException.class)
-    public ResponseEntity<Map<String, Object>> handlePlayerNotInTournamentException(PlayerNotInTournamentException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
-    }
 
     // Handler for InvalidEloValueException
     @ResponseStatus(HttpStatus.BAD_REQUEST)

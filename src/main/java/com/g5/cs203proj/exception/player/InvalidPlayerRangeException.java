@@ -1,13 +1,13 @@
-package com.g5.cs203proj.exception;
+package com.g5.cs203proj.exception.player;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class TournamentNotInRegistrationException extends RuntimeException{
+public class InvalidPlayerRangeException extends RuntimeException{
     private static final long serialVersionUID = 1L;
 
-    public TournamentNotInRegistrationException(String msg) {
+    public InvalidPlayerRangeException(String msg) {
         super(msg);
     }
 }

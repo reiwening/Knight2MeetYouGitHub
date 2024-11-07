@@ -9,7 +9,7 @@ import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.PlayerNotFoundException;
+import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.PlayerDetailsService;
 import com.g5.cs203proj.service.PlayerService;
@@ -128,7 +128,8 @@ public class PlayerController {
 
         Optional<Player> existingPlayer = playerService.findPlayerByUsername(username);
         if (!existingPlayer.isPresent()) {
-            throw new PlayerNotFoundException(username);
+            throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
+
         } 
         Player player = existingPlayer.get();
 
@@ -146,6 +147,7 @@ public class PlayerController {
             // check if username taken
             List<Player> allPlayers = playerService.getAllPlayers();
             for (Player p : allPlayers) {
+                if ( p.getUsername() == null ) { continue; }
                 if (p.getUsername().equals(newUsername)) {
                     throw new IllegalArgumentException(newUsername + " is taken already.");
                 }

@@ -19,6 +19,8 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
+import com.g5.cs203proj.exception.tournament.TournamentFullException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.repository.TournamentRepository;

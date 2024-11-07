@@ -13,6 +13,11 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.exception.match.InvalidMatchWinnerException;
+import com.g5.cs203proj.exception.match.MatchNotFoundException;
+import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
+import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
+
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,13 +135,15 @@ public class MatchController {
         Long winnerId = winner.getId();
         if (!isDraw) {
             if (winnerId != match.getPlayer1().getId() && winnerId != match.getPlayer2().getId()) 
-            throw new InvalidMatchWinnerException("Winner must be a player in this match.");
+            throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
+            // throw new InvalidMatchWinnerException("Winner must be a player in this match.");
         }
         if (isDraw) {
             matchService.processMatchResult(match, null, true);
         } else {
             Player managedPlayer = playerService.getPlayerById(winner.getId());
-            if (managedPlayer == null) throw new PlayerNotFoundException(winner.getId());
+            if (managedPlayer == null) throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
+
             matchService.processMatchResult(match, managedPlayer, false);
         }
     

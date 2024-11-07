@@ -15,7 +15,6 @@ import jakarta.validation.constraints.Size;
 
 public class PlayerDTO {
     
-    @NotNull(message = "ID cannot be null")
     private Long id;
 
     @NotNull(message="Username should not be null")
