@@ -3,8 +3,9 @@ package com.g5.cs203proj.service;
 import com.g5.cs203proj.enums.*;
 import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
-import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
+// import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
+import com.g5.cs203proj.exception.player.PlayerRangeException;
 import com.g5.cs203proj.exception.tournament.TournamentFullException;
 import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
 import com.g5.cs203proj.DTO.TournamentDTO;
@@ -350,14 +351,17 @@ public class TournamentServiceImpl implements TournamentService {
 //field validation methods
     private void playerRangeValidation(Tournament tournament, int minPlayers, int maxPlayers){
         if (minPlayers < 0 || maxPlayers < 0) {
-            throw new InvalidPlayerRangeException("Player count cannot be negative");
+            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, "Player count cannot be negative" );
+            // throw new InvalidPlayerRangeException("Player count cannot be negative");
         }
         if (minPlayers > maxPlayers) {
-            throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
+            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, "minPlayers cannot be greater than maxPlayers" );
+            // throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
         }
         int playerCount = tournament.getRegisteredPlayers().size();
         if (playerCount > maxPlayers) {
-            throw new InvalidPlayerRangeException(String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers));
+            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers) );
+            // throw new InvalidPlayerRangeException(String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers));
         }
     }
 

@@ -13,7 +13,6 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.exception.*;
-import com.g5.cs203proj.exception.match.InvalidMatchWinnerException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;

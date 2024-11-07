@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.g5.cs203proj.enums.*;
-import com.g5.cs203proj.exception.match.InvalidMatchWinnerException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
-import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
-import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
+// import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
+// import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
+import com.g5.cs203proj.exception.player.PlayerRangeException;
 // import com.g5.cs203proj.exception.to_be_deleted.PlayerNotFoundException;
 // import com.g5.cs203proj.exception.to_be_deleted.PlayerAlreadyInTournamentException;
 // import com.g5.cs203proj.exception.to_be_deleted.PlayerNotFoundException;
@@ -35,16 +35,6 @@ import com.g5.cs203proj.exception.tournament.TournamentNotInRegistrationExceptio
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
-
-    // @ResponseStatus(HttpStatus.NOT_FOUND)
-    // @ExceptionHandler(PlayerNotFoundException.class)
-    // public ResponseEntity<Map<String, Object>> handlePlayerNotFoundException(PlayerNotFoundException ex) {
-    //     // what happens if a PlayerNotFoundException is thrown
-    //     Map<String, Object> body = new HashMap<>();
-    //     body.put("error", "Player not found");
-    //     body.put("player id: ", ex.getMessage());
-    //     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    // }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -66,14 +56,6 @@ public class GlobalControllerExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
-
-    // @ExceptionHandler(UsernameNotFoundException.class)
-    // public ResponseEntity<Object> handleUsernameNotFound(UsernameNotFoundException ex){
-    //     Map<String, Object> body = new HashMap<>();
-    //     body.put("error: ","Username not found");
-    //     body.put("username: ", ex.getMessage());
-    //     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    // }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleForbiddenRequest(AccessDeniedException ex){
@@ -100,16 +82,7 @@ public class GlobalControllerExceptionHandler {
         body.put("error", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
-
-    // Handler for InvalidMatchWinnerException
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(InvalidMatchWinnerException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidMatchWinnerException(InvalidMatchWinnerException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }
-
+    
     
     //Tournament Exceptions
     // Handler for TournamentNotFoundException
@@ -120,8 +93,8 @@ public class GlobalControllerExceptionHandler {
         body.put("error", ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
-
-   // Generic handler for PlayerAvailabilityException
+    
+    // Generic handler for PlayerAvailabilityException
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(PlayerAvailabilityException.class)
     public ResponseEntity<Map<String, Object>> handlePlayerAvailabilityException(PlayerAvailabilityException ex) {
@@ -141,12 +114,35 @@ public class GlobalControllerExceptionHandler {
                 body.put("details", ex.getMessage());
             }
         }
-
+        
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
-
     
-    // Handler for PlayerAlreadyInTournamentException
+    @ExceptionHandler(PlayerRangeException.class)
+    public ResponseEntity<Map<String, Object>> handlePlayerRangeException(PlayerRangeException ex) {
+        Map<String, Object> body = new HashMap<>();
+        
+        switch (ex.getRangeErrorType()) {
+            case NOT_ENOUGH_PLAYERS -> body.put("error", "Not enough players in the tournament");
+            case TOO_MANY_PLAYERS -> body.put("error", "Too many players in the tournament");
+            case INVALID_RANGE -> body.put("error", "Invalid player range specified");
+        }
+        
+        body.put("details", ex.getMessage());
+        
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+    
+        // // Handler for InvalidMatchWinnerException
+        // @ResponseStatus(HttpStatus.NOT_FOUND)
+        // @ExceptionHandler(InvalidMatchWinnerException.class)
+        // public ResponseEntity<Map<String, Object>> handleInvalidMatchWinnerException(InvalidMatchWinnerException ex) {
+        //     Map<String, Object> body = new HashMap<>();
+        //     body.put("error", ex.getMessage());
+        //     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        // }
+    
+    // // Handler for PlayerAlreadyInTournamentException
     // @ResponseStatus(HttpStatus.CONFLICT)
     // @ExceptionHandler(NotEnoughPlayersException.class)
     // public ResponseEntity<Map<String, Object>> handleNotEnoughPlayersException(NotEnoughPlayersException ex) {
@@ -154,24 +150,14 @@ public class GlobalControllerExceptionHandler {
     //     body.put("error", ex.getMessage());
     //     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     // }
-
-    // Handler for PlayerAlreadyInTournamentException
-    // @ResponseStatus(HttpStatus.CONFLICT)
-    // @ExceptionHandler(PlayerAlreadyInTournamentException.class)
-    // public ResponseEntity<Map<String, Object>> handlePlayerAlreadyInTournamentException(PlayerAlreadyInTournamentException ex) {
-    //     Map<String, Object> body = new HashMap<>();
-    //     body.put("error", ex.getMessage());
-    //     // body.put("timestamp", LocalDateTime.now());
-    //     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
-    // }
     
-    // Handler for PlayerNotInTournamentException
-    // @ResponseStatus(HttpStatus.CONFLICT)
-    // @ExceptionHandler(PlayerNotInTournamentException.class)
-    // public ResponseEntity<Map<String, Object>> handlePlayerNotInTournamentException(PlayerNotInTournamentException ex) {
+    // Handler for InvalidPlayerRangeException
+    // @ResponseStatus(HttpStatus.BAD_REQUEST)
+    // @ExceptionHandler(InvalidPlayerRangeException.class)
+    // public ResponseEntity<Map<String, Object>> handleInvalidPlayerRangeException(InvalidPlayerRangeException ex) {
     //     Map<String, Object> body = new HashMap<>();
     //     body.put("error", ex.getMessage());
-    //     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    //     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     // }
 
     // Handler for PlayerAlreadyInTournamentException
@@ -223,14 +209,6 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    // Handler for InvalidPlayerRangeException
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(InvalidPlayerRangeException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidPlayerRangeException(InvalidPlayerRangeException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("error", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(DateTimeException.class)

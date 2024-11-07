@@ -23,8 +23,9 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
-import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
-import com.g5.cs203proj.exception.player.TooManyPlayersException;
+import com.g5.cs203proj.exception.player.PlayerRangeException;
+// import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
+// import com.g5.cs203proj.exception.player.TooManyPlayersException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
 import com.g5.cs203proj.service.MatchServiceImpl;
@@ -118,7 +119,7 @@ public class MatchServiceTest {
         when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(availablePlayers);
 
         // Act & Assert
-        assertThrows(NotEnoughPlayersException.class, () -> {
+        assertThrows(PlayerRangeException.class, () -> {
             matchService.assignRandomPlayers(1L);
         });
 
@@ -170,7 +171,7 @@ public class MatchServiceTest {
         when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
 
         // Act & Assert
-        assertThrows(TooManyPlayersException.class, () -> {
+        assertThrows(PlayerRangeException.class, () -> {
             matchService.createRoundRobinMatches(1L);
         });
     }

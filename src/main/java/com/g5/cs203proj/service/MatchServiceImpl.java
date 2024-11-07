@@ -13,15 +13,16 @@ import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.match.InvalidMatchWinnerException;
+// import com.g5.cs203proj.exception.match.InvalidMatchWinnerException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
-import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
-import com.g5.cs203proj.exception.player.TooManyPlayersException;
+import com.g5.cs203proj.exception.player.PlayerRangeException;
+// import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
+// import com.g5.cs203proj.exception.player.TooManyPlayersException;
 import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
 
 
@@ -94,7 +95,7 @@ public class MatchServiceImpl implements MatchService {
         List<Player> availablePlayers = playerService.getAvailablePlayersForTournament(tournamentIdOfMatch);
         int playerCount = availablePlayers.size();
         if ( playerCount < 2 ) {
-            throw new NotEnoughPlayersException(playerCount);
+            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.NOT_ENOUGH_PLAYERS, "Current player count is " + playerCount);
         }
         Collections.shuffle(availablePlayers);
         Player p1 = availablePlayers.get(0);
@@ -124,7 +125,8 @@ public class MatchServiceImpl implements MatchService {
         
         
         if (players.size() > 16) {
-            throw new TooManyPlayersException(players.size());
+            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
+            // throw new TooManyPlayersException(players.size());
         }
 
 

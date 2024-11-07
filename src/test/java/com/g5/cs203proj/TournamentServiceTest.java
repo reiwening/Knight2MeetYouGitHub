@@ -19,7 +19,8 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.*;
-import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
+import com.g5.cs203proj.exception.player.PlayerRangeException;
+// import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
 import com.g5.cs203proj.exception.tournament.TournamentFullException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
@@ -91,7 +92,7 @@ public class TournamentServiceTest {
         tournament.setMinPlayers(10);
         tournament.setMaxPlayers(5);
 
-        assertThrows(InvalidPlayerRangeException.class, () -> {
+        assertThrows(PlayerRangeException.class, () -> {
             tournamentService.createTournament(tournament);
         });
     }
