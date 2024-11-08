@@ -1,5 +1,6 @@
 package com.g5.cs203proj.controller;
 
+import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.exception.*;
@@ -20,13 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -38,6 +32,9 @@ public class TournamentController {
 
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private MatchService matchService;
 
     public TournamentController(TournamentService tournamentService, PlayerService playerService){
         this.tournamentService = tournamentService;
@@ -266,6 +263,13 @@ public class TournamentController {
         return tournamentService.getTournamentById(tournamentId);
     }
     
+    // test: later
+    // process round results for single elimination tournaments
+    @PostMapping("/tournament/{tournamentId}/process-single-elimination-round")
+    public List<MatchDTO> processSingleEliminationRound(@PathVariable Long tournamentId) {
+        List<Match> matches = tournamentService.processSingleEliminationRound(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
+    }
     
 }
 

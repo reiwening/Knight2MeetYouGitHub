@@ -33,6 +33,8 @@ public interface TournamentService {
     boolean addTestMatchToTournament(Long tournamentId, Match match);
     void sendMatchNotification(Long tournamentId, List<Match> matches);
         //uses sendNotification inside MatchService
+    List<Match> processSingleEliminationRound(Long tournamentId);
+    List<Player> getWinnersForCurrentRound(Long tournamentId, Long roundNumber); 
 
     // Tournament Settings
     Tournament setTournamentEloRange(Long tournamentId, int minElo, int maxElo);
