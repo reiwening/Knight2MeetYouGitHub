@@ -203,4 +203,9 @@ public class Player implements UserDetails {
         this.matchesAsPlayer2.add(match);
         return match;
     }
+
+    public boolean isAdmin() {
+        return this.getAuthorities().stream()
+        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+    }
 }

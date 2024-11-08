@@ -18,6 +18,7 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.TournamentService;
 import com.g5.cs203proj.service.MatchService;
+import com.g5.cs203proj.service.EmailService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,16 +29,18 @@ public class PlayerServiceImpl implements PlayerService {
     private PlayerRepository playerRepository;
     private TournamentService tournamentService;
     private MatchService matchService;
+    private EmailService emailService;
     private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before
                                                          // storing the password
                                                          // provided in the `SecurityConfig` Class
 
     // constructor
     public PlayerServiceImpl(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-            TournamentService tournamentService) {
+            TournamentService tournamentServic, EmailService emailService) {
         this.playerRepository = playerRepository;
         this.tournamentService = tournamentService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.emailService = emailService;
     }
 
     @Override
@@ -118,6 +121,15 @@ public class PlayerServiceImpl implements PlayerService {
             return null;
         } 
         playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
+
+        // send an email confirmation 
+        try {
+            emailService.sendRegisterNotification(playerToRegister);
+        } catch (Exception e ) {
+            // Log the error but don't stop the registration process
+            System.err.println("Failed to send email notification: " + e.getMessage());
+        }
+
         /* else we have to save to the DB */
         return savePlayer(playerToRegister);
     }

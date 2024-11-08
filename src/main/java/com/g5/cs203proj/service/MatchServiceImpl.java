@@ -61,6 +61,10 @@ public class MatchServiceImpl implements MatchService {
         // retrieve the match
         Match match = matchRepository.findById(matchId).orElseThrow(() -> new MatchNotFoundException(matchId));
 
+        if (match.getTournament() == null) {
+            throw new IllegalArgumentException("Match must be associated with a Tournament.");
+        }
+
         Long tournamentIdOfMatch = match.getTournament().getId();
 
         // get the list of all available players 
