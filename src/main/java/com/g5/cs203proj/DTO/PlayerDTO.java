@@ -7,37 +7,75 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+
 public class PlayerDTO {
     
     private Long id;
+
+    @NotNull(message="Username should not be null")
+    @Size(min = 5, max = 20, message = "Username should be between 5 and 20 characters")
     private String username;
+
+    @NotNull(message = "Password should not be null")
+    @Size(min = 8, message = "Password should be at least 8 characters")
     private String password;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
+    @NotNull(message="Email should not be null")
+    @Email(message = "Email should be valid")
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @PositiveOrZero(message = "Global Elo Rating cannot be negative")
     private Double globalEloRating;
+
     private Set<Long> tournamentRegisteredIds = new HashSet<>();
+
     private List<Long> matchHistoryIds = new ArrayList<>();
+
+    @NotNull(message="Authorities should not be null")
+    @Pattern(regexp = "ROLE_USER|ROLE_ADMIN", message = "Authorities must be either ROLE_USER or ROLE_ADMIN")
     private String authorities;
 
-    public PlayerDTO(Long id, String username, String password, Double globalEloRating, Set<Long> tournamentRegisteredIds,
-            List<Long> matchHistoryIds, String authorities) {
+   
+    
+
+
+    public PlayerDTO(Long id,
+            @NotNull(message = "Username should not be null") @Size(min = 5, max = 20, message = "Username should be between 5 and 20 characters") String username,
+            @NotNull(message = "Password should not be null") @Size(min = 8, message = "Password should be at least 8 characters") String password,
+            @NotNull(message = "Email should not be null") @Email(message = "Email should be valid") String email,
+            @PositiveOrZero(message = "Global Elo Rating cannot be negative") Double globalEloRating,
+            Set<Long> tournamentRegisteredIds, List<Long> matchHistoryIds,
+            @NotNull(message = "Authorities should not be null") @Pattern(regexp = "ROLE_USER|ROLE_ADMIN", message = "Authorities must be either ROLE_USER or ROLE_ADMIN") String authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.email = email;
         this.globalEloRating = globalEloRating;
         this.tournamentRegisteredIds = tournamentRegisteredIds;
         this.matchHistoryIds = matchHistoryIds;
         this.authorities = authorities;
     }
 
-
     public String getPassword() {
         return password;
     }
-
-
-    // public void setPassword(String password) {
-    //     this.password = password;
-    // }
-
 
     public PlayerDTO(){}
 

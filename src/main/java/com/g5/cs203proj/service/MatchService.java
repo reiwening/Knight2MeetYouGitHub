@@ -9,8 +9,6 @@ import com.g5.cs203proj.entity.Match;
 import java.util.HashMap;
 
 public interface MatchService {
-    // createMatch returns (long) id of the newly created match
-    // long createMatch();
 
     Match saveMatch(Match match);
     void deleteMatch(Long id);
@@ -18,6 +16,7 @@ public interface MatchService {
     
     Match assignRandomPlayers(Long MatchId);
     Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId);
+    List<Match> createRoundRobinMatches(Long tournamentId);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 
