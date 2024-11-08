@@ -60,10 +60,6 @@ public class Tournament {
 
     private LocalDateTime registrationCutOff;
 
-    // @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
-    // @JoinColumn(name = "admin_id") 
-    // private Admin admin;  
-
     // Constructors, getters, and setters
     public Tournament() {
     }
@@ -175,13 +171,5 @@ public class Tournament {
     public void setRegistrationCutOff(LocalDateTime registrationCutOff) {
         this.registrationCutOff = registrationCutOff;
     }
-
-    // public Admin getAdmin() {
-    //     return admin;
-    // }
-
-    // public void setAdmin(Admin admin) {
-    //     this.admin = admin;
-    // }
 
 }

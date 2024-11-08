@@ -18,7 +18,10 @@ import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
+import com.g5.cs203proj.exception.inputs.InvalidStatusException;
+import com.g5.cs203proj.exception.player.PlayerRangeException;
+import com.g5.cs203proj.exception.tournament.TournamentFullException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
@@ -56,7 +59,7 @@ public class TournamentServiceTest {
         tournament.setRegisteredPlayers(new HashSet<>());
         tournament.setTournamentMatchHistory(new ArrayList<>());
 
-        player = new Player("testPlayer", "password123", "ROLE_USER");
+        player = new Player("testPlayer", "password123", "testplayer@test.com", "ROLE_USER");
         player.setGlobalEloRating(1500);
 
         match = new Match();
@@ -89,7 +92,7 @@ public class TournamentServiceTest {
         tournament.setMinPlayers(10);
         tournament.setMaxPlayers(5);
 
-        assertThrows(InvalidPlayerRangeException.class, () -> {
+        assertThrows(PlayerRangeException.class, () -> {
             tournamentService.createTournament(tournament);
         });
     }
@@ -129,7 +132,7 @@ public class TournamentServiceTest {
     @Test
     void registerPlayer_TournamentFull() {
         tournament.setMaxPlayers(1);
-        tournament.getRegisteredPlayers().add(new Player());
+        tournament.getRegisteredPlayers().add(new Player("fullPlayer", "password123", "full@test.com", "ROLE_USER"));
         
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
@@ -215,7 +218,7 @@ public class TournamentServiceTest {
     @Test
     void startOrCancelTournament_Success_Start() {
         tournament.getRegisteredPlayers().add(player);
-        tournament.getRegisteredPlayers().add(new Player("player2", "password123", "ROLE_USER"));
+        tournament.getRegisteredPlayers().add(new Player("player2", "password123", "player2@test.com", "ROLE_USER"));
         
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);

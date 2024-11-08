@@ -1,13 +1,13 @@
-package com.g5.cs203proj.exception;
+package com.g5.cs203proj.exception.inputs;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class InvalidStyleException extends RuntimeException{
+public class InvalidEloValueException extends RuntimeException{
     private static final long serialVersionUID = 1L;
 
-    public InvalidStyleException(String msg) {
+    public InvalidEloValueException(String msg) {
         super(msg);
     }
 }

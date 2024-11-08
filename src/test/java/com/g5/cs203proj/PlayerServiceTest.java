@@ -18,7 +18,7 @@ import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.PlayerNotFoundException;
+import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.PlayerServiceImpl;
 import com.g5.cs203proj.service.TournamentService;
@@ -44,7 +44,7 @@ public class PlayerServiceTest {
 
     @BeforeEach
     void setUp() {
-        player = new Player("testUser", "password123", "ROLE_USER");
+        player = new Player("testUser", "password123", "testuser@test.com", "ROLE_USER");
         player.setGlobalEloRating(1500);
 
         tournament = new Tournament();
@@ -100,7 +100,7 @@ public class PlayerServiceTest {
 
     @Test
     void getAllAdmins_Success() {
-        Player adminPlayer = new Player("admin", "password123", "ROLE_ADMIN");
+        Player adminPlayer = new Player("admin", "password123", "admin@test.com", "ROLE_ADMIN");
         List<Player> players = Arrays.asList(player, adminPlayer);
         when(playerRepository.findAll()).thenReturn(players);
 
@@ -112,7 +112,7 @@ public class PlayerServiceTest {
 
     @Test
     void getAllPlayerUsers_Success() {
-        Player adminPlayer = new Player("admin", "password123", "ROLE_ADMIN");
+        Player adminPlayer = new Player("admin", "password123", "admin@test.com", "ROLE_ADMIN");
         List<Player> players = Arrays.asList(player, adminPlayer);
         when(playerRepository.findAll()).thenReturn(players);
 
@@ -146,7 +146,7 @@ public class PlayerServiceTest {
 
     @Test
     void registerPlayer_Success() {
-        Player newPlayer = new Player("newUser", "password123", "ROLE_USER");
+        Player newPlayer = new Player("newUser", "password123", "newuser@test.com", "ROLE_USER");
         when(playerRepository.findByUsername("newUser")).thenReturn(Optional.empty());
         when(bCryptPasswordEncoder.encode("password123")).thenReturn("hashedPassword");
         when(playerRepository.save(any(Player.class))).thenReturn(newPlayer);
@@ -181,7 +181,7 @@ public class PlayerServiceTest {
     void deletePlayer_NotFound() {
         when(playerRepository.findByUsername("nonexistent")).thenReturn(Optional.empty());
 
-        assertThrows(PlayerNotFoundException.class, () -> {
+        assertThrows(PlayerAvailabilityException.class, () -> {
             playerService.deletePlayer("nonexistent");
         });
     }

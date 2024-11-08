@@ -11,8 +11,7 @@ import com.g5.cs203proj.entity.Player;
 public class RestTemplateClient {
 
     private final RestTemplate template;
-
-    // every request made using this RestTemplate will include the following credentials in the header for authentication purposes 
+ 
     public RestTemplateClient(RestTemplateBuilder restTemplateBuilder) {
         this.template = restTemplateBuilder
                 .basicAuthentication("Player1", "Password1")

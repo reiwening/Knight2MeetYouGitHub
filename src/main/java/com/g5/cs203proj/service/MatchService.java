@@ -7,8 +7,6 @@ import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 
 public interface MatchService {
-    // createMatch returns (long) id of the newly created match
-    // long createMatch();
 
     Match saveMatch(Match match);
     void deleteMatch(Long id);

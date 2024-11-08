@@ -1,6 +1,8 @@
 package com.g5.cs203proj.service;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.PlayerNotFoundException;
+import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
@@ -38,7 +40,13 @@ public class PlayerServiceImpl implements PlayerService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    // override the methods for PlayerService interface
+    @Override
+    public void validateUserAccess(String username) {
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("Cannot modify data for Player " + username);
+        }
+    }
 
     @Override
     public Player savePlayer(Player player) {
@@ -130,7 +138,8 @@ public class PlayerServiceImpl implements PlayerService {
         return new PlayerDTO(
             player.getId(),
             player.getUsername(),
-            null, // make this for use to see non-null , password shdnt be seen too
+            "confidential", // make this for use to see non-null , password shdnt be seen too
+            player.getEmail(),
             player.getGlobalEloRating(),
             tournamentIds,
             matchIds,
@@ -147,7 +156,7 @@ public class PlayerServiceImpl implements PlayerService {
         player.setUsername(playerDTO.getUsername());
         player.setGlobalEloRating(playerDTO.getGlobalEloRating());
         player.setPassword(playerDTO.getPassword()); // Set the raw password, will be hashed in registerPlayer method
-
+        player.setEmail(playerDTO.getEmail());
     
         // Set authorities (e.g., ROLE_USER or ROLE_ADMIN)
         player.setAuthorities(playerDTO.getAuthorities());
@@ -192,7 +201,7 @@ public class PlayerServiceImpl implements PlayerService {
     public void deletePlayer(String username) {
         Optional<Player> p = findPlayerByUsername(username);
         if (!p.isPresent()) {
-            throw new PlayerNotFoundException(username);
+            throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
         }
         playerRepository.delete(p.get());
     }
