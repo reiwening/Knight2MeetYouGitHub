@@ -172,6 +172,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public List<Ranking> updateTournamentRankings(Long tournamentId, List<Match> matches){
         Tournament tournament = getTournamentById(tournamentId);
+        rankingService.updateRankings(tournament, matches);
         return tournament.getRankings();
     }
 
