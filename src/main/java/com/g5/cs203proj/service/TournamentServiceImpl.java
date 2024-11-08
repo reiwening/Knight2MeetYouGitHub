@@ -340,7 +340,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Player> getWinnersForCurrentRound(Long tournamentId, Long roundNumber) {
+    public List<Player> getWinnersForCurrentRound(Long tournamentId, int roundNumber) {
         // Get tournament and matches from current round
         Tournament tournament = tournamentRepository.findById(tournamentId)
             .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
@@ -348,8 +348,7 @@ public class TournamentServiceImpl implements TournamentService {
 
         // Determine the required number of winners for this round
         int totalPlayerSize = tournament.getRegisteredPlayers().size();
-        int roundNumberInt = roundNumber.intValue();
-        double winnerSizeForCurrentRoundDbl = totalPlayerSize / Math.pow(2, roundNumberInt);
+        double winnerSizeForCurrentRoundDbl = totalPlayerSize / Math.pow(2, roundNumber);
         int winnerSizeForCurrentRound = (int) winnerSizeForCurrentRoundDbl;
        
 
@@ -452,6 +451,14 @@ public class TournamentServiceImpl implements TournamentService {
     public Tournament setName(Long tournamentId, String newName) {
         Tournament tournament = getTournamentById(tournamentId);
         tournament.setName(newName);
+        return tournamentRepository.save(tournament);
+    }
+
+    // set round number
+    @Override
+    public Tournament setRoundNumber(Long tournamentId, int round) {
+        Tournament tournament = getTournamentById(tournamentId);
+        tournament.setRoundNumber(round);
         return tournamentRepository.save(tournament);
     }
 

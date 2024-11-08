@@ -116,11 +116,11 @@ public class TournamentDTO {
         this.registrationCutOff = registrationCutOff;
     }
 
-    public Long getRoundNumber() {
+    public int getRoundNumber() {
         return roundNumber;
     }
 
-    public void setRoundNumber(Long round) {
+    public void setRoundNumber(int round) {
         this.roundNumber = round;
     }
 
@@ -128,7 +128,7 @@ public class TournamentDTO {
     private int minElo;
     private int maxElo;
     private LocalDateTime registrationCutOff;
-    private Long roundNumber;
+    private int roundNumber;
 
     // Default Constructor
     public TournamentDTO() {}

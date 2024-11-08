@@ -263,7 +263,7 @@ public class TournamentController {
         return tournamentService.getTournamentById(tournamentId);
     }
     
-    // test: later
+    // test: ok
     // process round results for single elimination tournaments
     @PostMapping("/tournament/{tournamentId}/process-single-elimination-round")
     public List<MatchDTO> processSingleEliminationRound(@PathVariable Long tournamentId) {
@@ -271,5 +271,13 @@ public class TournamentController {
         return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
     }
     
+
+    //test: ok (matt 13/10/24)
+    // Update the tournament round
+    @PutMapping("/tournaments/{id}/roundNumber")
+    public ResponseEntity<TournamentDTO> setTournamentRoundNumber(@PathVariable Long id, @RequestParam int round) {
+        Tournament updatedTournament = tournamentService.setRoundNumber(id, round);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
+    }
 }
 

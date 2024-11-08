@@ -34,7 +34,7 @@ public interface TournamentService {
     void sendMatchNotification(Long tournamentId, List<Match> matches);
         //uses sendNotification inside MatchService
     List<Match> processSingleEliminationRound(Long tournamentId);
-    List<Player> getWinnersForCurrentRound(Long tournamentId, Long roundNumber); 
+    List<Player> getWinnersForCurrentRound(Long tournamentId, int roundNumber); 
 
     // Tournament Settings
     Tournament setTournamentEloRange(Long tournamentId, int minElo, int maxElo);
@@ -44,6 +44,7 @@ public interface TournamentService {
     Tournament setTournamentRegistrationCutOff(Long tournamentId, LocalDateTime registrationCutOff);
     Tournament setAdmin(Long tournamentId, Admin newAdmin);
     Tournament setName(Long tournamentId, String newName);
+    Tournament setRoundNumber(Long tournamentId, int round);
 
     // Conversion Methods
     TournamentDTO convertToDTO(Tournament tournament);
