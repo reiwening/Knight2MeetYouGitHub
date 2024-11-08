@@ -160,15 +160,21 @@ public class MatchController {
                          .collect(Collectors.toList());
     }
     
-
-
-
     // get check-in status of both players
     @GetMapping("/matches/{id}/getcheckinstatus")
     public HashMap<String, Boolean> getCheckInStatus(@PathVariable Long id) {
         Match m = getMatch(id);
 
         return matchService.viewCheckedInStatus(m);
+    }
+
+    /**
+     * Create round-robin matches for a specified tournament.
+     */
+    @PostMapping("/tournament/{tournamentId}/round-robin-matches")
+    public List<MatchDTO> createRoundRobinMatches(@PathVariable Long tournamentId) {
+        List<Match> matches = matchService.createRoundRobinMatches(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
     }
     
 }

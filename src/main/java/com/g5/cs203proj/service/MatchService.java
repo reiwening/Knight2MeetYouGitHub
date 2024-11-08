@@ -6,8 +6,6 @@ import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 
-import java.util.HashMap;
-
 public interface MatchService {
     // createMatch returns (long) id of the newly created match
     // long createMatch();
@@ -33,4 +31,5 @@ public interface MatchService {
     MatchDTO convertToDTO(Match match);
     Match convertToEntity(MatchDTO matchDTO);
 
+    List<Match> createRoundRobinMatches(Long tournamentId);
 }
