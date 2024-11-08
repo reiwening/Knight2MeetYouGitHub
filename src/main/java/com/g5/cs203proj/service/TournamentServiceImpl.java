@@ -257,7 +257,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     //if we store the matches in the most recent round, we can just iterate through that instead of having to pass in matches
-    public void sendMatchNotification(Long tournamentId) {
+    public void sendMatchNotification(Long tournamentId, List<Match> matches) {
         Tournament tournament = getTournamentById(tournamentId);
         /*
         for (Match match : matches){

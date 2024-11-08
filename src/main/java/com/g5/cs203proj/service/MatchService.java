@@ -32,4 +32,5 @@ public interface MatchService {
     Match convertToEntity(MatchDTO matchDTO);
 
     List<Match> createRoundRobinMatches(Long tournamentId);
+    List<Match> createSingleEliminationMatches(Long tournamentId);
 }
