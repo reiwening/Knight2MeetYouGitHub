@@ -52,21 +52,21 @@ public class EmailService {
     
         if (player.isAdmin()) {
             content = String.format(
-                "<p>Greetings %s,</p>" +
-                "<p>Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.</p>" +
-                "<p>You are signing up as an <strong>ADMIN</strong>.</p>" +
-                "<p><a href='%s'>Click here to verify your account</a></p>" +
-                "<p>Best,<br>The Knight2MeetYou Team</p>",
+                "Greetings %s,\n\n" +
+                "Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.\n" +
+                "You are signing up as an ADMIN.\n\n" +
+                "Click here to verify your account: %s" +
+                "\n\nBest,\nThe Knight2MeetYou Team",
                 player.getUsername(),
                 link  // Fourth parameter for the link
             );
         } else {
             content = String.format(
-                "<p>Greetings %s, Grandmaster-in-the-Making!</p>" +
-                "<p>Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.</p>" +
-                "<p>Start by registering for tournaments. We’re excited to see you make your mark on the board.</p>" +
-                "<p><a href='%s'>Click here to verify your account</a></p>" +
-                "<p>Best,<br>The Knight2MeetYou Team</p>",
+                "Greetings %s, Grandmaster-in-the-Making!\n\n" +
+                "Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.\n" +
+                "Start by registering for tournaments. We’re excited to see you make your mark on the board.\n\n" +
+                "Click here to verify your account: %s" +
+                "\n\nBest,\nThe Knight2MeetYou Team",
                 player.getUsername(),
                 link  // Fourth parameter for the link
             );
