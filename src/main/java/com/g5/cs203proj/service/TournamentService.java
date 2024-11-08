@@ -24,6 +24,7 @@ public interface TournamentService {
     // Player Management
     Tournament registerPlayer(Long playerId, Long tournamentId);
     Tournament removePlayer(Long playerId, Long tournamentId);
+    boolean isUserAllowedToDeletePlayer(Long playerId, String authenticatedUsername);
     Set<Player> getRegisteredPlayers(Long tournamentId);
 
 //match management

@@ -5,11 +5,13 @@ import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
+import com.g5.cs203proj.service.*;
 import com.g5.cs203proj.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -144,6 +146,29 @@ public class TournamentController {
     //remove player from a tournament
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
     public ResponseEntity<TournamentDTO> removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
+        // Debug logging to check the current username
+        // System.out.println("Current authenticated user: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        
+        //ADDED ONLY PLAYER CAN ADD ITSELF TO A TOURNAMENT
+        String username = playerService.getPlayerById(playerId).getUsername();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        // Check if authentication is null or not authenticated
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            throw new AccessDeniedException("You need authorisation to leave a tournament.");
+        }
+        
+        String authenticatedUsername = authentication.getName();  // The logged-in username
+
+        // Check if the authenticated user is an ADMIN
+        boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+        // Check if the authenticated user is requesting their own data
+        if (!isAdmin && !authenticatedUsername.equals(username)) {
+            throw new AccessDeniedException("You can only remove yourself from a tournament.");
+        }
+        
         Tournament updatedTournament = tournamentService.removePlayer(playerId, tournamentId);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }

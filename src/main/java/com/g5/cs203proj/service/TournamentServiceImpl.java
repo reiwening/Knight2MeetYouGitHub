@@ -172,6 +172,14 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    public boolean isUserAllowedToDeletePlayer(Long playerId, String authenticatedUsername) {
+        // Logic to check if the username matches the playerId
+        Player player = playerRepository.findById(playerId)
+            .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+        return player.getUsername().equals(authenticatedUsername); // assuming the Player entity has a username field
+    }
+
+    @Override
     public Set<Player> getRegisteredPlayers(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
         return tournament.getRegisteredPlayers();
