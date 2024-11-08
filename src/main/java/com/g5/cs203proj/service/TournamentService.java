@@ -29,8 +29,9 @@ public interface TournamentService {
 
 //match management
     void scheduleMatches(Long tournamentId);
-    List<Match> getTournamentMatchHistory(Long tournamentId);
-    void sendMatchNotification(Long tournamentId);
+    List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId);
+    boolean addTestMatchToTournament(Long tournamentId, Match match);
+    void sendMatchNotification(Long tournamentId, List<Match> matches);
         //uses sendNotification inside MatchService
 
     // Tournament Settings

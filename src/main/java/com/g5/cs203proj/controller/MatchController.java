@@ -162,5 +162,14 @@ public class MatchController {
     
 
 
+
+    // get check-in status of both players
+    @GetMapping("/matches/{id}/getcheckinstatus")
+    public HashMap<String, Boolean> getCheckInStatus(@PathVariable Long id) {
+        Match m = getMatch(id);
+
+        return matchService.viewCheckedInStatus(m);
+    }
+    
 }
 

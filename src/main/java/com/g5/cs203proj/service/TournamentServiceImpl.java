@@ -5,6 +5,10 @@ import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
+
+import jakarta.validation.OverridesAttribute;
+
+import org.hibernate.mapping.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -193,9 +197,63 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Match> getTournamentMatchHistory(Long tournamentId) {
+    public List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId) {
+        // Extract matches for a tournament
         Tournament tournament = getTournamentById(tournamentId);
-        return tournament.getTournamentMatchHistory();
+        List<Match> matches = tournament.getTournamentMatchHistory();
+        
+        // Add each match's info to a list of all matches' info
+        List<ArrayList<String>> detailedMatchInfo = new ArrayList<ArrayList<String>>();
+        ArrayList<String> matchInfo = new ArrayList<String>();
+        for (Match m : matches) {
+            // Combine each match's info into 1 ArrayList
+            String matchId = "" + m.getMatchId();
+
+            Player p1 = m.getPlayer1();
+            String p1Name = null;
+            if (p1 != null) {
+                p1Name = p1.getUsername();
+            }
+
+            Player p2 = m.getPlayer2();
+            String p2Name = null;
+            if (p2 != null) {
+                p2Name = p2.getUsername();
+            }
+
+            Player winner = m.getWinner();
+            String winnerName = null;
+            if (winner != null) {
+                winnerName = winner.getUsername();
+            }
+
+            String eloChange = "" + m.getEloChange();
+            String isDraw = "" + m.getDraw();
+
+            matchInfo.add(matchId);
+            matchInfo.add(p1Name);
+            matchInfo.add(p2Name);
+            matchInfo.add(winnerName);
+            matchInfo.add(eloChange);
+            matchInfo.add(isDraw);
+            detailedMatchInfo.add(matchInfo);
+        }
+
+        return detailedMatchInfo;
+    }
+
+    @Override
+    public boolean addTestMatchToTournament(Long tournamentId, Match match) {
+        Tournament t = getTournamentById(tournamentId);
+        
+        // attach this tournament to the match added
+        match.setTournament(t);
+        matchRepository.save(match);
+
+        // add match to tournament matches
+        t.addTestMatch(match);
+        tournamentRepository.save(t);
+        return true;
     }
 
     //if we store the matches in the most recent round, we can just iterate through that instead of having to pass in matches

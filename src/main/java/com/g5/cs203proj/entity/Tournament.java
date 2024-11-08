@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 
@@ -29,6 +30,7 @@ public class Tournament {
     @Column(name="tournament_name")
     private String name;
     
+    @JsonManagedReference
     @OneToMany
     @JoinColumn(name = "tournament_id")  // Foreign key in the Match table
     private List<Match> tournamentMatchHistory;
@@ -98,8 +100,12 @@ public class Tournament {
         return tournamentMatchHistory;
     }
 
-    public void setTournamentMatchHistory(List<Match> matchHistory) {
-        this.tournamentMatchHistory = matchHistory;
+    public void addTestMatch(Match m) {
+        this.tournamentMatchHistory.add(m);
+    }
+
+    public void setTournamentMatchHistory(List<Match> tournamentMatchHistory) {
+        this.tournamentMatchHistory = tournamentMatchHistory;
     }
 
     public String getTournamentStatus() {

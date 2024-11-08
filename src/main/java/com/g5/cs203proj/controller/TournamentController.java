@@ -20,6 +20,15 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
 
 @RestController
 public class TournamentController {
@@ -240,5 +249,23 @@ public class TournamentController {
         Tournament updatedTournament = tournamentService.setName(id, newName);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
+
+    //test: done
+    // Get all matches in a tournaments with players, winner, elo change
+    @GetMapping("/tournaments/{tournamentId}/matches")
+    public List<ArrayList<String>> getTournamentMatches(@PathVariable Long tournamentId) {
+        return tournamentService.getTournamentMatchHistory(tournamentId);
+    }
+
+    //test: working but persists test match twice for some reason
+    // Add a test match to a tournament
+    @PostMapping("/tournaments/{tournamentId}/matches")
+    public Tournament testPostMatch(@PathVariable Long tournamentId, @RequestBody Match match) {
+        //TODO: process POST request
+        tournamentService.addTestMatchToTournament(tournamentId, match);
+        return tournamentService.getTournamentById(tournamentId);
+    }
+    
+    
 }
 

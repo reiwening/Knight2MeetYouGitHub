@@ -24,6 +24,7 @@ public class Match {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
@@ -52,6 +53,15 @@ public class Match {
     // Default constructor
     public Match() {
 
+    }
+
+    // for testing get matches of a tournament
+    public Match(Long id, Player player1, Player player2) {
+        this.id = id;
+        this.player1 = player1;
+        this.player2 = player2;
+        this.winner = winner;
+        this.eloChange = eloChange;
     }
 
     // Other constructors, getters, setters, etc.
