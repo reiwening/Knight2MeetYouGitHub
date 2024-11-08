@@ -56,6 +56,8 @@ public class Player implements UserDetails {
 
     private double globalEloRating;
 
+    private boolean enabled;
+
     @ManyToMany 
     @JsonIgnore
     @JoinTable(
@@ -88,12 +90,13 @@ public class Player implements UserDetails {
         this.authorities = authorities;
     }
 
-    public Player(String username, String password, String email, String authorities, double globalEloRating) {
+    public Player(String username, String password, String email, String authorities, double globalEloRating, boolean enabled) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.authorities = authorities;
         this.globalEloRating = globalEloRating;
+        this.enabled = enabled;
     }
 
     public String getEmail() {
@@ -158,6 +161,15 @@ public class Player implements UserDetails {
         this.password = password;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {
@@ -176,12 +188,7 @@ public class Player implements UserDetails {
         return true;
     }
 
-    @Override
-    @JsonIgnore
-    public boolean isEnabled() {
-        return true;
-    }
-    
+
     public Set<Tournament> getTournamentRegistered() {
         return tournamentRegistered;
     }

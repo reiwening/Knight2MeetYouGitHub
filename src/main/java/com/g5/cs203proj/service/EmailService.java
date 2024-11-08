@@ -46,43 +46,35 @@ public class EmailService {
         );
     }
 
-    public void sendRegisterNotification(Player player) {
-
-
-        // Send email to admin
+    public void sendRegisterNotification(Player player, String token) {
+        String link = "http://localhost:8080/auth/verify?token=" + token;
+        String content;
+    
         if (player.isAdmin()) {
-            
-            sendEmail(
-                player.getEmail(),
-                "Welcome to Knight2MeetYou!",
-                String.format(
-                    "Greetings %s,\n\n" +
-                    "Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.\n" +
-                    "You are signing up as an ADMIN.\n\n" +
-            
-                    "Best,\n" +
-                    "The Knight2MeetYou Team",
-                    player.getUsername())
+            content = String.format(
+                "<p>Greetings %s,</p>" +
+                "<p>Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.</p>" +
+                "<p>You are signing up as an <strong>ADMIN</strong>.</p>" +
+                "<p><a href='%s'>Click here to verify your account</a></p>" +
+                "<p>Best,<br>The Knight2MeetYou Team</p>",
+                player.getUsername(),
+                link  // Fourth parameter for the link
             );
-
         } else {
-
-            sendEmail(
-                player.getEmail(),
-                "Welcome to Knight2MeetYou!",
-                String.format(
-                    "Greetings %s, Grandmaster-in-the-Making!\n\n" + 
-                    "Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.\n" +
-                    "Start by registering for tournaments.\n" +
-                    "We're excited to see you make your mark on the board.\n\n" +
-                    "See you in the game!\n\n" +
-                    "Best,\n" +
-                    "The Knight2MeetYou Team",
-                    player.getUsername())
+            content = String.format(
+                "<p>Greetings %s, Grandmaster-in-the-Making!</p>" +
+                "<p>Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.</p>" +
+                "<p>Start by registering for tournaments. We’re excited to see you make your mark on the board.</p>" +
+                "<p><a href='%s'>Click here to verify your account</a></p>" +
+                "<p>Best,<br>The Knight2MeetYou Team</p>",
+                player.getUsername(),
+                link  // Fourth parameter for the link
             );
-
         }
+    
+        sendEmail(player.getEmail(), "Welcome to Knight2MeetYou!", content);
     }
+    
 
     private void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
