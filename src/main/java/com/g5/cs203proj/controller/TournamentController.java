@@ -116,7 +116,7 @@ public class TournamentController {
         return new ResponseEntity<>(rankings, HttpStatus.OK);
     }
 
-    // test: ok (matt 13/10/24)
+    // test: ok (solo 8/11/24)
     // Register a player to a tournament
     @PostMapping("/tournaments/{tournamentId}/players")
     public ResponseEntity<TournamentDTO> registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
@@ -151,7 +151,7 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (matt 13/10/24)
+    //test: ok (solo 8/11/24)
     //remove player from a tournament
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
     public ResponseEntity<TournamentDTO> removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
