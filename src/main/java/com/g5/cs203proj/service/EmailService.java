@@ -26,7 +26,7 @@ public class EmailService {
                 "You have been matched for a chess match.\n" +
                 "It's game time and get ready to slay your tournament with %s.\n" +
                 "Now go get ready to kill it, badass!\n\n" +
-                "Good luck!",
+                "Good luck!", 
                 player1.getUsername(),
                 player2.getUsername())
         );
