@@ -32,6 +32,8 @@ public class TournamentServiceImpl implements TournamentService {
     private PlayerRepository playerRepository;
     @Autowired
     private MatchRepository matchRepository;
+    @Autowired
+    private RankingService rankingService;
 
 //Contructors
     public TournamentServiceImpl(){};
@@ -62,8 +64,7 @@ public class TournamentServiceImpl implements TournamentService {
     // Update a tournament
     @Override
     public Tournament updateTournament(Long tournamentId, Tournament updatedTournament) {
-        Tournament existingTournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament existingTournament = getTournamentById(tournamentId);
 
         String status = updatedTournament.getTournamentStatus().toUpperCase();
         String style = updatedTournament.getTournamentStyle().toUpperCase();
@@ -105,8 +106,7 @@ public class TournamentServiceImpl implements TournamentService {
     // Delete a tournament
     @Override
     public void deleteTournament(Long tournamentId) {
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament tournament = getTournamentById(tournamentId);
         tournamentRepository.delete(tournament);
     }
 
@@ -131,19 +131,51 @@ public class TournamentServiceImpl implements TournamentService {
     public Tournament startOrCancelTournament(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
         if (tournament.getRegisteredPlayers().size() >= tournament.getMinPlayers()) {
-            tournament.setTournamentStatus("In Progress");
+            tournament.setTournamentStatus(Statuses.IN_PROGRESS.getDisplayName());
+            //Prepare rankings for the tournament (for round robin and random, the rest idk)
+            Set<Player> players = tournament.getRegisteredPlayers();
+            List<Ranking> ranking = new ArrayList<>(players.size());
+            if (tournament.getTournamentStyle().equals(Styles.ROUND_ROBIN.getDisplayName())){
+                for (Player player : players){
+                    ranking.add(new RoundRobinRanking(tournament, player));
+                }
+            }
+            else if (tournament.getTournamentStyle().equals(Styles.RANDOM.getDisplayName())){
+                for (Player player : players){
+                    ranking.add(new RandomRanking(tournament, player));
+                }
+            }
+            tournament.setRankings(ranking);
+
         } else {
-            tournament.setTournamentStatus("Cancelled");
+            tournament.setTournamentStatus(Statuses.CANCELLED.getDisplayName());
         }
         return tournamentRepository.save(tournament);
     }
 
     // Get tournament rankings
     @Override
-    public Map<Long, Integer> getTournamentRankings(Long tournamentId) {
+    public List<Ranking> getTournamentRankings(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
         return tournament.getRankings();
     }
+
+    /*
+     * updates tournament rankings based on the most recent round of matches. rankingService handles
+     * different tournament styles, and updates in tournament
+     * @param: tournamentId: id of tournament
+     * @param: matches: list of matches in the most recent round
+     * @return: the updated and sorted list of rankings, and the tournament object is updated 
+     *          with the ranking. Handles same points(round robin) or placement(random) by having 
+     *          same rank
+     */
+    @Override
+    public List<Ranking> updateTournamentRankings(Long tournamentId, List<Match> matches){
+        Tournament tournament = getTournamentById(tournamentId);
+        return tournament.getRankings();
+    }
+
+
 
     // Player management
     // Register a player to a tournament

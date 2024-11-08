@@ -222,8 +222,8 @@ public class TournamentController {
      * Get tournament rankings by ID
      */
     @GetMapping("/tournaments/{id}/rankings")
-    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
-        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
+    public ResponseEntity<List<Ranking>> getTournamentRankings(@PathVariable Long id) {
+        List<Ranking> rankings = tournamentService.getTournamentRankings(id);
         return new ResponseEntity<>(rankings, HttpStatus.OK);
     }
 }
