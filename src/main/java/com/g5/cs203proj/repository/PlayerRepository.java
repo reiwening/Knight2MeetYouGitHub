@@ -13,16 +13,17 @@ import java.util.Optional;
 public interface PlayerRepository extends JpaRepository<Player, Long> {
     // define a derived query to find user by username
     Optional<Player> findByUsername(String username);
-
+    
     // Find all players signed up for a specific tournament and not in an ongoing match
     @Query("SELECT p FROM Player p " +
-           "JOIN p.tournamentRegistered t " +
-           "WHERE t.id = :tournamentId " + // this filters players to only those who have signed up for the specific tournament identified by tournamentId
-           "AND NOT EXISTS (" +
-           "  SELECT m FROM Match m WHERE " +
-           "  (m.player1 = p OR m.player2 = p) " +
-           // "  AND m.matchStatus = 'IN_PROGRESS'" + // checks if either player 1 or player 2 is in a match that is ON_GOING
-           ")")
+            "JOIN p.tournamentRegistered t " +
+            "WHERE t.id = :tournamentId " + // this filters players to only those who have signed up for the specific tournament identified by tournamentId
+            "AND NOT EXISTS (" +
+            "  SELECT m FROM Match m " +
+            "  WHERE (m.player1 = p OR m.player2 = p) " +
+            "  AND m.tournament.id = :tournamentId " + // Ensure the match is related to the current tournament.
+            "  AND m.matchStatus = 'IN_PROGRESS' " +  // Filter to only consider ongoing matches.
+            ")")
     List<Player> findAllByTournamentIdAndNotInOngoingMatch(@Param("tournamentId") Long tournamentId);
-    
+
 }
