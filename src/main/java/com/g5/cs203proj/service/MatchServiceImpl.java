@@ -21,9 +21,11 @@ import com.g5.cs203proj.service.TournamentService;
 
 import jakarta.validation.OverridesAttribute;
 
-import com.g5.cs203proj.exception.NotEnoughPlayersException;
-import com.g5.cs203proj.exception.player.PlayerRangeException;
-import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
+import com.g5.cs203proj.exception.global.*;
+import com.g5.cs203proj.exception.inputs.*;
+import com.g5.cs203proj.exception.match.*;
+import com.g5.cs203proj.exception.player.*;
+import com.g5.cs203proj.exception.tournament.*;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -207,6 +209,8 @@ public class MatchServiceImpl implements MatchService {
         checkInStatuses.put(p2, p2Status);
 
         return checkInStatuses;
+    }
+    
     public boolean bothPlayersCheckedIn(Match match) {
         return match.getStatusP1() && match.getStatusP2();
     }

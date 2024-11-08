@@ -6,7 +6,11 @@ import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
 import com.g5.cs203proj.service.*;
-import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.exception.global.*;
+import com.g5.cs203proj.exception.inputs.*;
+import com.g5.cs203proj.exception.match.*;
+import com.g5.cs203proj.exception.player.*;
+import com.g5.cs203proj.exception.tournament.*;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -278,25 +282,6 @@ public class TournamentController {
         //TODO: process POST request
         tournamentService.addTestMatchToTournament(tournamentId, match);
         return tournamentService.getTournamentById(tournamentId);
-    }
-    
-    
-    /*
-     * Start or cancel a tournament based on registration cutoff
-     */
-    @PutMapping("/tournaments/{id}/start-or-cancel")
-    public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
-        Tournament tournament = tournamentService.startOrCancelTournament(id);
-        return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
-    }
-
-    /*
-     * Get tournament rankings by ID
-     */
-    @GetMapping("/tournaments/{id}/rankings")
-    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
-        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
-        return new ResponseEntity<>(rankings, HttpStatus.OK);
     }
 }
 
