@@ -1,16 +1,13 @@
 package com.g5.cs203proj.controller;
 
+import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 // import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
 import com.g5.cs203proj.service.*;
-import com.g5.cs203proj.exception.global.*;
-import com.g5.cs203proj.exception.inputs.*;
-import com.g5.cs203proj.exception.match.*;
-import com.g5.cs203proj.exception.player.*;
-import com.g5.cs203proj.exception.tournament.*;
+import com.g5.cs203proj.exception.*;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -46,6 +36,9 @@ public class TournamentController {
 
     @Autowired
     private PlayerService playerService;
+
+    @Autowired
+    private MatchService matchService;
 
     public TournamentController(TournamentService tournamentService, PlayerService playerService){
         this.tournamentService = tournamentService;
@@ -116,24 +109,24 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentDTOs, HttpStatus.OK);
     }
 
-//havent test yet
-// Start or cancel a tournament based on registration cutoff
+    /*
+     * Start or cancel a tournament based on registration cutoff
+     */
     @PutMapping("/tournaments/{id}/start-or-cancel")
     public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
         Tournament tournament = tournamentService.startOrCancelTournament(id);
         return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
     }
 
-    //havent tested
-    // Get tournament rankings by ID
+    /*
+     * Get tournament rankings by ID
+     */
     @GetMapping("/tournaments/{id}/rankings")
     public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
         Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
         return new ResponseEntity<>(rankings, HttpStatus.OK);
     }
 
-    // test: ok (solo 8/11/24)
-    // Register a player to a tournament
     /**
      * Register a player to a tournament.
      * Only the authenticated user can register themselves.
@@ -169,9 +162,6 @@ public class TournamentController {
 
     //test: ok (solo 8/11/24)
     //remove player from a tournament
-    /**
-     * Remove a player from a tournament.
-     */
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
     public ResponseEntity<TournamentDTO> removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
         // Debug logging to check the current username
@@ -275,13 +265,32 @@ public class TournamentController {
         return tournamentService.getTournamentMatchHistory(tournamentId);
     }
 
-    //test: working but persists test match twice for some reason
-    // Add a test match to a tournament
-    @PostMapping("/tournaments/{tournamentId}/matches")
-    public Tournament testPostMatch(@PathVariable Long tournamentId, @RequestBody Match match) {
-        //TODO: process POST request
-        tournamentService.addTestMatchToTournament(tournamentId, match);
-        return tournamentService.getTournamentById(tournamentId);
+    // //test: working but persists test match twice for some reason
+    // // Add a test match to a tournament
+    // @PostMapping("/tournaments/{tournamentId}/matches")
+    // public Tournament testPostMatch(@PathVariable Long tournamentId, @RequestBody Match match) {
+    //     //TODO: process POST request
+    //     tournamentService.addTestMatchToTournament(tournamentId, match);
+    //     return tournamentService.getTournamentById(tournamentId);
+    // }
+    
+    // test: ok
+    // process round results for single elimination tournaments
+    @PostMapping("/tournament/{tournamentId}/process-single-elimination-round")
+    public List<MatchDTO> processSingleEliminationRound(@PathVariable Long tournamentId) {
+        List<Match> matches = tournamentService.processSingleEliminationRound(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
     }
+    
+
+    //test: ok (matt 13/10/24)
+    // Update the tournament round
+    @PutMapping("/tournaments/{id}/roundNumber")
+    public ResponseEntity<TournamentDTO> setTournamentRoundNumber(@PathVariable Long id, @RequestParam int round) {
+        Tournament updatedTournament = tournamentService.setRoundNumber(id, round);
+        return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
+    }
+
+    
 }
 

@@ -80,14 +80,6 @@ public class MatchController {
         return savedMatchDTO;
     }
 
-    /**
-     * Create round-robin matches for a specified tournament.
-     */
-    @PostMapping("/tournament/{tournamentId}/round-robin-matches")
-    public List<MatchDTO> createRoundRobinMatches(@PathVariable Long tournamentId) {
-        List<Match> matches = matchService.createRoundRobinMatches(tournamentId);
-        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
-    }
 
     /**
      * Delete a specific match from a tournament.
@@ -174,13 +166,31 @@ public class MatchController {
                          .map(matchService::convertToDTO)
                          .collect(Collectors.toList());
     }
-
-
+    
     // get check-in status of both players
     @GetMapping("/matches/{id}/getcheckinstatus")
     public HashMap<String, Boolean> getCheckInStatus(@PathVariable Long id) {
-        Match m = matchService.findMatchById(id);
-        return matchService.viewCheckedInStatus(m);
+        MatchDTO matchDTO = getMatch(id);
+        Match match = matchService.convertToEntity(matchDTO);
+        return matchService.viewCheckedInStatus(match);
+    }
+
+    /**
+     * Create round-robin matches for a specified tournament.
+     */
+    @PostMapping("/tournament/{tournamentId}/round-robin-matches")
+    public List<MatchDTO> createRoundRobinMatches(@PathVariable Long tournamentId) {
+        List<Match> matches = matchService.createRoundRobinMatches(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Create single elimination matches for a specified tournament.
+    */
+    @PostMapping("/tournament/{tournamentId}/single-elimination-matches")
+    public List<MatchDTO> createSingleEliminationMatches(@PathVariable Long tournamentId) {
+        List<Match> matches = matchService.createSingleEliminationMatches(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
     }
     
 }

@@ -2,7 +2,11 @@ package com.g5.cs203proj;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import org.mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -10,8 +14,6 @@ import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.g5.cs203proj.DTO.TournamentDTO;
@@ -25,6 +27,9 @@ import com.g5.cs203proj.exception.tournament.TournamentFullException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
+import com.g5.cs203proj.service.EmailService;
+import com.g5.cs203proj.service.MatchService;
+import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +44,12 @@ public class TournamentServiceTest {
 
     @InjectMocks
     private TournamentServiceImpl tournamentService;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private MatchService matchService;
+    @Mock
+    private PlayerService playerService;
 
     private Tournament tournament;
     private Player player;
@@ -46,6 +57,7 @@ public class TournamentServiceTest {
 
     @BeforeEach
     void setUp() {
+        // Setup Tournament object
         tournament = new Tournament();
         tournament.setId(1L);
         tournament.setName("Test Tournament");
@@ -58,12 +70,36 @@ public class TournamentServiceTest {
         tournament.setRegistrationCutOff(LocalDateTime.now().plusDays(7));
         tournament.setRegisteredPlayers(new HashSet<>());
         tournament.setTournamentMatchHistory(new ArrayList<>());
+        tournament.setRoundNumber(1);
 
+        // Setup Player object
         player = new Player("testPlayer", "password123", "testplayer@test.com", "ROLE_USER");
         player.setGlobalEloRating(1500);
 
         match = new Match();
         match.setMatchId(1L);
+        
+        // tournament.setTournamentMatchHistory(Arrays.asList(match2, match3));
+        
+        // // Mock the repository to return the correct tournament ID
+        // when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+
+        // // Mock dependencies
+        //     // Mocking methods from TournamentService
+        // when(tournamentService.processSingleEliminationRound(1L)).thenReturn(new ArrayList<Match>());
+        // when(tournamentService.getWinnersForCurrentRound(1L, anyInt())).thenReturn(Arrays.asList(player));
+        // when(tournament.getTournamentMatchHistory()).thenReturn(Arrays.asList(match1, match2)); // Mock the match history
+
+        //     // Mocking the winner of the match
+        // when(match1.getWinner()).thenReturn(player1);
+
+        //     // Mocking email service
+        // doNothing().when(emailService).sendMatchNotification(any(Match.class));
+
+        //     // Mocking playerService and matchService if they're used in your tests
+        //     // Example mocks:
+        // when(playerService.findPlayerByUsername(anyString())).thenReturn(Optional.of(player));
+        // when(matchService.findMatchById(anyLong())).thenReturn(match);
     }
 
     @Test
@@ -274,4 +310,97 @@ public class TournamentServiceTest {
         assertEquals(4, result.getMinPlayers());
         assertEquals(16, result.getMaxPlayers());
     }
+
+    // @Test
+    // void processSingleEliminationRound_Success() {
+    //     // Arrange
+    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        
+    //     // Stub to return a new match in the next round
+    //     when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+
+    //     // Act
+    //     List<Match> updatedMatches = tournamentService.processSingleEliminationRound(1L);
+
+    //     // Assert
+    //     assertNotNull(updatedMatches);
+    //     assertEquals(1, updatedMatches.size());
+    //     assertEquals("NOT_STARTED", updatedMatches.get(0).getMatchStatus()); // Ensure next round match status is correct
+
+    //         // Verify round number increment
+    //     assertEquals(2, tournament.getRoundNumber());
+
+    //         // Verify round increment and email notification
+    //     assertEquals(2, tournament.getRoundNumber());
+    //     verify(emailService, times(1)).sendMatchNotification(any(Match.class));
+    
+    // }
+
+
+    @Test
+    void processSingleEliminationRound_Success() {
+        // Arrange
+        // Create two semi-final matches with assigned winners
+        Player semiFinalWinner1 = new Player("semiFinalWinner1", "password123", "winner1@test.com", "ROLE_USER");
+        Player semiFinalWinner2 = new Player("semiFinalWinner2", "password123", "winner2@test.com", "ROLE_USER");
+        semiFinalWinner1.setGlobalEloRating(1600);
+        semiFinalWinner2.setGlobalEloRating(1700);
+
+        Match semiFinalMatch1 = new Match();
+        semiFinalMatch1.setMatchId(2L);
+        semiFinalMatch1.setMatchStatus("COMPLETED");
+        semiFinalMatch1.setWinner(semiFinalWinner1);
+
+        Match semiFinalMatch2 = new Match();
+        semiFinalMatch2.setMatchId(3L);
+        semiFinalMatch2.setMatchStatus("COMPLETED");
+        semiFinalMatch2.setWinner(semiFinalWinner2);
+
+        // Set up the tournament to include these semi-final matches
+        tournament.setTournamentMatchHistory(Arrays.asList(semiFinalMatch1, semiFinalMatch2));
+        tournament.setRoundNumber(1);
+
+        // Set up expected winners and repository mocks
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(tournamentService.getWinnersForCurrentRound(1L, 1)).thenReturn(Arrays.asList(player));
+
+        // Mock saving behavior of repositories
+        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+
+        // Act
+        List<Match> updatedMatches = tournamentService.processSingleEliminationRound(1L);
+
+        // Assert
+        assertNotNull(updatedMatches);
+        assertEquals(1, updatedMatches.size()); // Assuming one match in the next round
+        assertEquals("NOT_STARTED", updatedMatches.get(0).getMatchStatus()); // Check match status
+        assertEquals(player, updatedMatches.get(0).getPlayer1()); // Check player1 assignment
+
+        // Ensure round increment
+        assertEquals(2, tournament.getRoundNumber());
+
+        // Verify saves and email notifications
+        verify(tournamentRepository, times(2)).save(tournament); // Once for round update, once at the end
+        verify(emailService, times(1)).sendMatchNotification(any(Match.class));
+    }
+
+    // @Test
+    // void processSingleEliminationRound_NotEnoughWinners() {
+    //     
+    // }
+
+
+    // @Test
+    // void processSingleEliminationRound_OddNumberOfWinners() {
+    //     
+    // }
+
+
+    // @Test
+    // void processSingleEliminationRound_InsufficientMatches() {
+    
+    // }
+
 }

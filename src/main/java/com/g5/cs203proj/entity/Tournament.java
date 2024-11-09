@@ -62,11 +62,17 @@ public class Tournament {
 
     private LocalDateTime registrationCutOff;
 
+    private int roundNumber;
+
+    // @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
+    // @JoinColumn(name = "admin_id") 
+    // private Admin admin;  
+
     // Constructors, getters, and setters
     public Tournament() {
     }
 
-    public Tournament(String name, String tournamentStatus, String tournamentStyle, int maxPlayers, int minPlayers, int minElo, int maxElo, LocalDateTime registrationCutOff) {
+    public Tournament(String name, String tournamentStatus, String tournamentStyle, int maxPlayers, int minPlayers, int minElo, int maxElo, LocalDateTime registrationCutOff, int round) {
         this.name = name;
         this.tournamentStatus = tournamentStatus;
         this.tournamentStyle = tournamentStyle;
@@ -75,9 +81,18 @@ public class Tournament {
         this.minElo = minElo;
         this.maxElo = maxElo;
         this.registrationCutOff = registrationCutOff;
+        this.roundNumber = round;
     }
 
     // Getters and setters for all fields
+    public int getRoundNumber() {
+        return roundNumber;
+    }
+
+    public void setRoundNumber(int round) {
+        this.roundNumber = round;
+    }
+
     public Long getId() {
         return id;
     }

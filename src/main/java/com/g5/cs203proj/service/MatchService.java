@@ -6,8 +6,6 @@ import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 
-import java.util.HashMap;
-
 public interface MatchService {
 
     Match saveMatch(Match match);
@@ -17,6 +15,7 @@ public interface MatchService {
     Match assignRandomPlayers(Long MatchId);
     Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId);
     List<Match> createRoundRobinMatches(Long tournamentId);
+    List<Match> createSingleEliminationMatches(Long tournamentId);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 
@@ -32,4 +31,5 @@ public interface MatchService {
     MatchDTO convertToDTO(Match match);
     Match convertToEntity(MatchDTO matchDTO);
 
+    
 }
