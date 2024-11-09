@@ -39,6 +39,8 @@ public class TournamentServiceImpl implements TournamentService {
     private PlayerRepository playerRepository;
     @Autowired
     private MatchRepository matchRepository;
+    @Autowired
+    private EmailService emailService;
 
 //Contructors
     public TournamentServiceImpl(){};
@@ -288,8 +290,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public List<Match> processSingleEliminationRound(Long tournamentId) {
         // Get tournament and matches from current round
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-            .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament tournament = getTournamentById(tournamentId);
         List<Match> matches = tournament.getTournamentMatchHistory();
 
         // Get first match of next round
@@ -338,12 +339,12 @@ public class TournamentServiceImpl implements TournamentService {
             match.setMatchStatus("NOT_STARTED"); // Ensure the match is set to NOT_STARTED
             Match savedMatch = matchRepository.save(match);
 
-            // // Send email notifications for each match
-            // try {
-            //     emailService.sendMatchNotification(savedMatch);
-            // } catch (Exception e) {
-            //     System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
-            // }
+            // Send email notifications for each match
+            try {
+                emailService.sendMatchNotification(savedMatch);
+            } catch (Exception e) {
+                System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
+            }
         }
         
         // save tournament 
@@ -355,15 +356,12 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public List<Player> getWinnersForCurrentRound(Long tournamentId, int roundNumber) {
         // Get tournament and matches from current round
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-            .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament tournament = getTournamentById(tournamentId);
         List<Match> matches = tournament.getTournamentMatchHistory();
 
         // Determine the required number of winners for this round
         int totalPlayerSize = tournament.getRegisteredPlayers().size();
-        double winnerSizeForCurrentRoundDbl = totalPlayerSize / Math.pow(2, roundNumber);
-        int winnerSizeForCurrentRound = (int) winnerSizeForCurrentRoundDbl;
-       
+        int winnerSizeForCurrentRound = totalPlayerSize / (int) Math.pow(2, roundNumber);
 
         // Count wins of all players
         HashMap<Player, Long> allPlayerWins = new HashMap<>();

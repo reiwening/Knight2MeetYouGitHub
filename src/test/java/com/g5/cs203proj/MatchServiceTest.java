@@ -222,22 +222,6 @@ public class MatchServiceTest {
     }
 
     @Test
-    void createSingleEliminationMatches_TooManyPlayers() {
-        // Arrange
-        List<Player> players = new ArrayList<>();
-        for (int i = 0; i < 17; i++) { // Add 5 players to trigger the exception
-            players.add(new Player("player" + i, "password123", "player" + i + "@test.com", "ROLE_USER"));
-        }
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
-
-        // Act & Assert
-        assertThrows(PlayerRangeException.class, () -> {
-            matchService.createSingleEliminationMatches(1L);
-        });
-    }
-
-    @Test
     void processMatchResult_WinnerCase() {
         // Arrange
         Match match = new Match();

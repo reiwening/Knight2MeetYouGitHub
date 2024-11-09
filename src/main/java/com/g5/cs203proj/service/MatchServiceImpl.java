@@ -217,9 +217,9 @@ public class MatchServiceImpl implements MatchService {
         return match;
     }
 
+    @Override
     public List<Match> createRoundRobinMatches(Long tournamentId) {
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-            .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament tournament = tournamentService.getTournamentById(tournamentId);
         
         List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
         
@@ -258,15 +258,14 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<Match> createSingleEliminationMatches(Long tournamentId) {
         // Get tournament and players in it
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-            .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament tournament = tournamentService.getTournamentById(tournamentId);
         
         List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
 
-        if (players.size() > 16) {
-            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, 
-                "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
-        }
+        // if (players.size() > 16) {
+        //     throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, 
+        //         "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
+        // }
 
         List<Match> matches = new ArrayList<>();
         int totalPlayers = players.size();
@@ -290,8 +289,8 @@ public class MatchServiceImpl implements MatchService {
             }
         }
 
+        // create remaining matches without filling players
         matchesInRound = matchesInRound / 2;
-
         while (matchesInRound > 0) {     
             for (int i = 0; i < matchesInRound; i++) {
                 Match match = new Match();
