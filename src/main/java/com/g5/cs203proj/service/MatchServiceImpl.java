@@ -282,12 +282,12 @@ public class MatchServiceImpl implements MatchService {
             matches.add(match);
             Match savedMatch = matchRepository.save(match);
 
-            // // Send email notifications for each match
-            // try {
-            //     emailService.sendMatchNotification(savedMatch);
-            // } catch (Exception e) {
-            //     System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
-            // }
+            // Send email notifications for each match
+            try {
+                emailService.sendMatchNotification(savedMatch);
+            } catch (Exception e) {
+                System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
+            }
         }
 
         matchesInRound = matchesInRound / 2;
