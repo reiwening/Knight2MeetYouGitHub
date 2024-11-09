@@ -18,6 +18,7 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.service.TournamentService;
 import com.g5.cs203proj.service.MatchService;
+import com.g5.cs203proj.service.EmailService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,19 +26,23 @@ import java.util.stream.Collectors;
 @Service
 public class PlayerServiceImpl implements PlayerService {
 
+    private TokenService tokenService;
     private PlayerRepository playerRepository;
     private TournamentService tournamentService;
     private MatchService matchService;
+    private EmailService emailService;
     private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before
                                                          // storing the password
                                                          // provided in the `SecurityConfig` Class
 
     // constructor
     public PlayerServiceImpl(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-            TournamentService tournamentService) {
+            TournamentService tournamentServic, EmailService emailService, TokenService tokenService) {
         this.playerRepository = playerRepository;
         this.tournamentService = tournamentService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.emailService = emailService;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -118,6 +123,20 @@ public class PlayerServiceImpl implements PlayerService {
             return null;
         } 
         playerToRegister.setPassword(bCryptPasswordEncoder.encode(playerToRegister.getPassword())); // Hash password
+
+        Player savedPlayer = savePlayer(playerToRegister);
+
+        // generate verification token and save the token associated with the user
+        String token = tokenService.generateEmailVerificationToken(playerToRegister);
+        
+        // send an email confirmation 
+        try {
+            emailService.sendRegisterNotification(playerToRegister, token);
+        } catch (Exception e ) {
+            // Log the error but don't stop the registration process
+            System.err.println("Failed to send email notification: " + e.getMessage());
+        }
+
         /* else we have to save to the DB */
         return savePlayer(playerToRegister);
     }
@@ -143,7 +162,8 @@ public class PlayerServiceImpl implements PlayerService {
             player.getGlobalEloRating(),
             tournamentIds,
             matchIds,
-            player.getAuthorities().iterator().next().getAuthority() // Getting the authorities string
+            player.getAuthorities().iterator().next().getAuthority(), // Getting the authorities string
+            player.isEnabled()
         ); 
     }
 
@@ -157,6 +177,7 @@ public class PlayerServiceImpl implements PlayerService {
         player.setGlobalEloRating(playerDTO.getGlobalEloRating());
         player.setPassword(playerDTO.getPassword()); // Set the raw password, will be hashed in registerPlayer method
         player.setEmail(playerDTO.getEmail());
+        player.setEnabled(playerDTO.isEnabled());
     
         // Set authorities (e.g., ROLE_USER or ROLE_ADMIN)
         player.setAuthorities(playerDTO.getAuthorities());

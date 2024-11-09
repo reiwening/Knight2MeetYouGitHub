@@ -25,6 +25,10 @@ public class PlayerDTO {
 
     @NotNull(message = "Password should not be null")
     @Size(min = 8, message = "Password should be at least 8 characters")
+    @Pattern(
+        regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$",
+        message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character"
+    )
     private String password;
 
     public String getEmail() {
@@ -40,6 +44,8 @@ public class PlayerDTO {
     @Email(message = "Email should be valid")
     @Column(name = "email", nullable = false)
     private String email;
+
+    private boolean enabled;
 
     @PositiveOrZero(message = "Global Elo Rating cannot be negative")
     private Double globalEloRating;
@@ -62,7 +68,8 @@ public class PlayerDTO {
             @NotNull(message = "Email should not be null") @Email(message = "Email should be valid") String email,
             @PositiveOrZero(message = "Global Elo Rating cannot be negative") Double globalEloRating,
             Set<Long> tournamentRegisteredIds, List<Long> matchHistoryIds,
-            @NotNull(message = "Authorities should not be null") @Pattern(regexp = "ROLE_USER|ROLE_ADMIN", message = "Authorities must be either ROLE_USER or ROLE_ADMIN") String authorities) {
+            @NotNull(message = "Authorities should not be null") @Pattern(regexp = "ROLE_USER|ROLE_ADMIN", message = "Authorities must be either ROLE_USER or ROLE_ADMIN") String authorities,
+            boolean enabled) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -71,6 +78,15 @@ public class PlayerDTO {
         this.tournamentRegisteredIds = tournamentRegisteredIds;
         this.matchHistoryIds = matchHistoryIds;
         this.authorities = authorities;
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getPassword() {
