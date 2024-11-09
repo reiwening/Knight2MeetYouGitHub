@@ -2,8 +2,11 @@ package com.g5.cs203proj;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
@@ -106,4 +109,28 @@ public class SpringBootIntegrationTest {
         // Assert: Check if the response is 404 Not Found
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
     }    
+
+// @Test
+// public void createTournament_Success() throws URISyntaxException {
+//     // Set up TestRestTemplate with basic authentication
+//     TestRestTemplate adminRestTemplate = restTemplate.withBasicAuth("adminUsername", "adminPassword");
+
+//     URI uri = new URI("http://localhost:" + port + "/tournaments");
+
+//     // Create a TournamentDTO with required properties
+//     TournamentDTO tournamentDTO = new TournamentDTO();
+//     tournamentDTO.setName("New Tournament");
+//     tournamentDTO.setMinPlayers(2);
+//     tournamentDTO.setMaxPlayers(16);
+//     tournamentDTO.setTournamentStyle("Knockout");
+
+//     // Act: Send POST request to create tournament
+//     ResponseEntity<Tournament> response = adminRestTemplate.postForEntity(uri, tournamentDTO, Tournament.class);
+
+//     // Assert: Verify response status and data
+//     assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+//     assertNotNull(response.getBody());
+//     assertEquals("New Tournament", response.getBody().getName());
+// }
+
 }

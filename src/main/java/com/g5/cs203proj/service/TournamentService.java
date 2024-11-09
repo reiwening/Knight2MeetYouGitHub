@@ -5,7 +5,6 @@ import java.util.*;
 
 
 import com.g5.cs203proj.DTO.TournamentDTO;
-import com.g5.cs203proj.entity.Admin;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
@@ -42,7 +41,6 @@ public interface TournamentService {
     Tournament setTournamentStyle(Long tournamentId, String style);
     Tournament setTournamentPlayerRange(Long tournamentId, int minPlayers, int maxPlayers);
     Tournament setTournamentRegistrationCutOff(Long tournamentId, LocalDateTime registrationCutOff);
-    Tournament setAdmin(Long tournamentId, Admin newAdmin);
     Tournament setName(Long tournamentId, String newName);
     Tournament setRoundNumber(Long tournamentId, int round);
 

@@ -12,7 +12,7 @@ public interface PlayerService {
     // Player management 
     List<Player> getAllPlayers();
     Player getPlayerById(Long id);
-
+    void validateUserAccess(String username);
     Player savePlayer( Player player );
     Player updatePlayer(Long id, Player updatedPlayer);
     void deletePlayer(String username);

@@ -5,20 +5,51 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 
 public class TournamentDTO {
 
     private Long tournamentId;
+
+    @NotBlank(message = "Tournament name cannot be blank")
+    @Size(min = 3, max = 100, message = "Tournament name must be between 3 and 100 characters")
     private String name;
+
     private List<Long> tournamentMatchHistoryId = new ArrayList<>();  // Only include match IDs, not the full Match objects
 
+    @NotBlank(message = "Tournament status cannot be blank")
     private String tournamentStatus;
+
+    @NotBlank(message = "Tournament style cannot be blank")
     private String tournamentStyle = "random"; // random by default 
 
     private List<Long> registeredPlayersId = new ArrayList<>();
 
     private Map<Long, Integer> rankings;
+
+    @Positive(message = "Max players must be positive")
     private int maxPlayers;
+
+    @Positive(message = "Min players must be positive")
+    private int minPlayers;
+
+    private int minElo;
+
+    @Positive(message = "Max Elo rating must be positive")
+    private int maxElo;
+
+    private LocalDateTime registrationCutOff;
+
+    // Default Constructor
+    public TournamentDTO() {}
+
+
     
     public Long getTournamentId() {
         return tournamentId;

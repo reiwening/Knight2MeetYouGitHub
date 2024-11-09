@@ -33,10 +33,12 @@ public class Tournament {
     @JsonManagedReference
     @OneToMany
     @JoinColumn(name = "tournament_id")  // Foreign key in the Match table
-    private List<Match> tournamentMatchHistory;
+    private List<Match> tournamentMatchHistory = new ArrayList<>();
 
     private String tournamentStatus;
-    private String tournamentStyle = "random"; // random by default 
+
+    @Column(name="tournament_style")
+    private String tournamentStyle; // Can be "RANDOM" or "ROUND_ROBIN"
 
     @ManyToMany
     @JoinTable(
@@ -189,14 +191,6 @@ public class Tournament {
 
     public void setRegistrationCutOff(LocalDateTime registrationCutOff) {
         this.registrationCutOff = registrationCutOff;
-    }
-
-    public Admin getAdmin() {
-        return admin;
-    }
-
-    public void setAdmin(Admin admin) {
-        this.admin = admin;
     }
 
 }
