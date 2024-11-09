@@ -15,6 +15,7 @@ public interface MatchService {
     Match assignRandomPlayers(Long MatchId);
     Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId);
     List<Match> createRoundRobinMatches(Long tournamentId);
+    List<Match> createSingleEliminationMatches(Long tournamentId);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 
@@ -30,6 +31,5 @@ public interface MatchService {
     MatchDTO convertToDTO(Match match);
     Match convertToEntity(MatchDTO matchDTO);
 
-    List<Match> createRoundRobinMatches(Long tournamentId);
-    List<Match> createSingleEliminationMatches(Long tournamentId);
+    
 }

@@ -309,7 +309,7 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         // Get current round number and winners from all matches in current round
-        Long roundNumber = tournament.getRoundNumber();
+        int roundNumber = tournament.getRoundNumber();
         List<Player> winners = getWinnersForCurrentRound(tournamentId, roundNumber);
         // System.out.println("winners size: " + winners.size());
         roundNumber = roundNumber + 1;

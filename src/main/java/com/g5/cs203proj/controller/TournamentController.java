@@ -109,16 +109,18 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentDTOs, HttpStatus.OK);
     }
 
-//havent test yet
-// Start or cancel a tournament based on registration cutoff
+    /*
+     * Start or cancel a tournament based on registration cutoff
+     */
     @PutMapping("/tournaments/{id}/start-or-cancel")
     public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
         Tournament tournament = tournamentService.startOrCancelTournament(id);
         return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
     }
 
-    //havent tested
-    // Get tournament rankings by ID
+    /*
+     * Get tournament rankings by ID
+     */
     @GetMapping("/tournaments/{id}/rankings")
     public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
         Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
@@ -289,22 +291,6 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    /*
-     * Start or cancel a tournament based on registration cutoff
-     */
-    @PutMapping("/tournaments/{id}/start-or-cancel")
-    public ResponseEntity<TournamentDTO> startOrCancelTournament(@PathVariable Long id) {
-        Tournament tournament = tournamentService.startOrCancelTournament(id);
-        return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
-    }
-
-    /*
-     * Get tournament rankings by ID
-     */
-    @GetMapping("/tournaments/{id}/rankings")
-    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
-        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
-        return new ResponseEntity<>(rankings, HttpStatus.OK);
-    }
+    
 }
 

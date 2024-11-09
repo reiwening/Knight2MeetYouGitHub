@@ -45,6 +45,8 @@ public class TournamentDTO {
     private int maxElo;
 
     private LocalDateTime registrationCutOff;
+    
+    private int roundNumber;
 
     // Default Constructor
     public TournamentDTO() {}
@@ -155,11 +157,7 @@ public class TournamentDTO {
         this.roundNumber = round;
     }
 
-    private int minPlayers;
-    private int minElo;
-    private int maxElo;
-    private LocalDateTime registrationCutOff;
-    private int roundNumber;
+    
 
     // Default Constructor
     public TournamentDTO() {}

@@ -64,9 +64,9 @@ public class Tournament {
 
     private int roundNumber;
 
-    @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
-    @JoinColumn(name = "admin_id") 
-    private Admin admin;  
+    // @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
+    // @JoinColumn(name = "admin_id") 
+    // private Admin admin;  
 
     // Constructors, getters, and setters
     public Tournament() {
