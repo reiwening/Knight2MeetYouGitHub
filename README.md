@@ -14,6 +14,18 @@
 ### To run the spring project on windows, use : mvnw.cmd spring-boot:run OR .\mvnw spring-boot:run
 ### To run test in windows terminal, use: mvn test
 
+### To get SQL database, do the following
+1. Run WAMP
+2. Open SQL workbench
+3. Create a new connection (Right of "My SQL Connections")
+4. Set connection name to k2mu
+5. Press ok
+6. Click into it
+7. If prompted for a password, put in password1!
+8. Create new schema called k2mu and set it as the default schema
+9. Run with .\mvnw spring-boot:run
+10. Refresh schema and check that it has been populated with tables
+
 ### To get to the h2 database console, run the spring boot and type this in your browser : http://localhost:8080/h2-console
 
 #### JDBC URL : jdbc:h2:file:./data/testdb , username : username ,  password = password
