@@ -10,10 +10,10 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/*") // Enable CORS for all routes
+        registry.addMapping("/**") // Enable CORS for all routes
                 .allowedOrigins("http://localhost:3000") // React frontend URL
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("")
+                .allowedHeaders("*")
                 .allowCredentials(true);
     }
 }
