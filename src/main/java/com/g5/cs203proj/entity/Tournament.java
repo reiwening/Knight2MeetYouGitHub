@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 
@@ -29,6 +30,7 @@ public class Tournament {
     @Column(name="tournament_name")
     private String name;
     
+    @JsonManagedReference
     @OneToMany
     @JoinColumn(name = "tournament_id")  // Foreign key in the Match table
     private List<Match> tournamentMatchHistory = new ArrayList<>();
@@ -60,11 +62,17 @@ public class Tournament {
 
     private LocalDateTime registrationCutOff;
 
+    private int roundNumber;
+
+    // @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
+    // @JoinColumn(name = "admin_id") 
+    // private Admin admin;  
+
     // Constructors, getters, and setters
     public Tournament() {
     }
 
-    public Tournament(String name, String tournamentStatus, String tournamentStyle, int maxPlayers, int minPlayers, int minElo, int maxElo, LocalDateTime registrationCutOff) {
+    public Tournament(String name, String tournamentStatus, String tournamentStyle, int maxPlayers, int minPlayers, int minElo, int maxElo, LocalDateTime registrationCutOff, int round) {
         this.name = name;
         this.tournamentStatus = tournamentStatus;
         this.tournamentStyle = tournamentStyle;
@@ -73,9 +81,18 @@ public class Tournament {
         this.minElo = minElo;
         this.maxElo = maxElo;
         this.registrationCutOff = registrationCutOff;
+        this.roundNumber = round;
     }
 
     // Getters and setters for all fields
+    public int getRoundNumber() {
+        return roundNumber;
+    }
+
+    public void setRoundNumber(int round) {
+        this.roundNumber = round;
+    }
+
     public Long getId() {
         return id;
     }
@@ -96,8 +113,12 @@ public class Tournament {
         return tournamentMatchHistory;
     }
 
-    public void setTournamentMatchHistory(List<Match> matchHistory) {
-        this.tournamentMatchHistory = matchHistory;
+    public void addTestMatch(Match m) {
+        this.tournamentMatchHistory.add(m);
+    }
+
+    public void setTournamentMatchHistory(List<Match> tournamentMatchHistory) {
+        this.tournamentMatchHistory = tournamentMatchHistory;
     }
 
     public String getTournamentStatus() {

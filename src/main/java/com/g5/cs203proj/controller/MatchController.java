@@ -80,14 +80,6 @@ public class MatchController {
         return savedMatchDTO;
     }
 
-    /**
-     * Create round-robin matches for a specified tournament.
-     */
-    @PostMapping("/tournament/{tournamentId}/round-robin-matches")
-    public List<MatchDTO> createRoundRobinMatches(@PathVariable Long tournamentId) {
-        List<Match> matches = matchService.createRoundRobinMatches(tournamentId);
-        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
-    }
 
     /**
      * Delete a specific match from a tournament.
@@ -126,6 +118,7 @@ public class MatchController {
      */
     @PutMapping("/tournament/{tournamentId}/matches/{id}/updateresults")
     public MatchDTO updateMatchResults(
+        @PathVariable Long tournamentId,
         @PathVariable Long id, 
         @RequestParam boolean isDraw, 
         @RequestBody(required = false) Player winner) {
@@ -139,7 +132,13 @@ public class MatchController {
             throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
         }
         if (isDraw) {
+            // Process current match results
             matchService.processMatchResult(match, null, true);
+
+            // Call createMatchForTournament logic if it's a draw
+            MatchDTO newMatchDTO = createMatchForTournament(tournamentId);
+            Long newMatchId = newMatchDTO.getId();
+            matchService.reassignPlayersToMatch(id, newMatchId);
         } else {
             Player managedPlayer = playerService.getPlayerById(winnerId);
             if (managedPlayer == null) throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
@@ -167,6 +166,32 @@ public class MatchController {
                          .map(matchService::convertToDTO)
                          .collect(Collectors.toList());
     }
+    
+    // get check-in status of both players
+    @GetMapping("/matches/{id}/getcheckinstatus")
+    public HashMap<String, Boolean> getCheckInStatus(@PathVariable Long id) {
+        MatchDTO matchDTO = getMatch(id);
+        Match match = matchService.convertToEntity(matchDTO);
+        return matchService.viewCheckedInStatus(match);
+    }
 
+    /**
+     * Create round-robin matches for a specified tournament.
+     */
+    @PostMapping("/tournament/{tournamentId}/round-robin-matches")
+    public List<MatchDTO> createRoundRobinMatches(@PathVariable Long tournamentId) {
+        List<Match> matches = matchService.createRoundRobinMatches(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
+    }
+
+    /**
+     * Create single elimination matches for a specified tournament.
+    */
+    @PostMapping("/tournament/{tournamentId}/single-elimination-matches")
+    public List<MatchDTO> createSingleEliminationMatches(@PathVariable Long tournamentId) {
+        List<Match> matches = matchService.createSingleEliminationMatches(tournamentId);
+        return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
+    }
+    
 }
 

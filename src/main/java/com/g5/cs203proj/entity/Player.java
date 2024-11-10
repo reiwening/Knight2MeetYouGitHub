@@ -56,6 +56,8 @@ public class Player implements UserDetails {
 
     private double globalEloRating;
 
+    private boolean enabled;
+
     @ManyToMany 
     @JsonIgnore
     @JoinTable(
@@ -81,6 +83,14 @@ public class Player implements UserDetails {
 
     public Player() {}
 
+    // for testing get matches of a tournament
+    public Player(Long id, String username) {
+        this.id = id;
+        this.username = username;
+        // this.authorities =authorities;
+        // this.password = password;
+    }
+    
     public Player(String username, String password, String email, String authorities) {
         this.username = username;
         this.password = password;
@@ -88,12 +98,13 @@ public class Player implements UserDetails {
         this.authorities = authorities;
     }
 
-    public Player(String username, String password, String email, String authorities, double globalEloRating) {
+    public Player(String username, String password, String email, String authorities, double globalEloRating, boolean enabled) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.authorities = authorities;
         this.globalEloRating = globalEloRating;
+        this.enabled = enabled;
     }
 
     public String getEmail() {
@@ -158,6 +169,15 @@ public class Player implements UserDetails {
         this.password = password;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {
@@ -176,12 +196,7 @@ public class Player implements UserDetails {
         return true;
     }
 
-    @Override
-    @JsonIgnore
-    public boolean isEnabled() {
-        return true;
-    }
-    
+
     public Set<Tournament> getTournamentRegistered() {
         return tournamentRegistered;
     }
@@ -202,5 +217,10 @@ public class Player implements UserDetails {
     public Match addMatchesAsPlayer2(Match match) {
         this.matchesAsPlayer2.add(match);
         return match;
+    }
+
+    public boolean isAdmin() {
+        return this.getAuthorities().stream()
+        .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 }

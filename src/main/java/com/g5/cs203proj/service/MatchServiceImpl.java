@@ -2,6 +2,7 @@ package com.g5.cs203proj.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,18 +12,25 @@ import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.exception.match.MatchNotFoundException;
+import com.g5.cs203proj.exception.global.*;
+import com.g5.cs203proj.exception.inputs.*;
+import com.g5.cs203proj.exception.match.*;
+import com.g5.cs203proj.exception.player.*;
+import com.g5.cs203proj.exception.tournament.*;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
+
+import jakarta.validation.OverridesAttribute;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
 import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
 
 @Service
 public class MatchServiceImpl implements MatchService {
 
+    @Autowired
     private MatchRepository matchRepository;
 
     @Autowired
@@ -61,6 +69,10 @@ public class MatchServiceImpl implements MatchService {
         // retrieve the match
         Match match = matchRepository.findById(matchId).orElseThrow(() -> new MatchNotFoundException(matchId));
 
+        if (match.getTournament() == null) {
+            throw new IllegalArgumentException("Match must be associated with a Tournament.");
+        }
+
         Long tournamentIdOfMatch = match.getTournament().getId();
 
         // get the list of all available players 
@@ -94,43 +106,34 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public List<Match> createRoundRobinMatches(Long tournamentId) {
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-            .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+    public Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId) {
+            Match oldMatch = findMatchById(oldMatchId);
+            Match newMatch = findMatchById(newMatchId);
         
-        List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
-        
-        if (players.size() > 16) {
-            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, 
-                "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
-        }
+            Player p1 = oldMatch.getPlayer1();
+            Player p2 = oldMatch.getPlayer2();
+            newMatch.setPlayer1(p1);
+            newMatch.setPlayer2(p2);
+            matchRepository.save(newMatch);
 
-        List<Match> matches = new ArrayList<>();
-        int totalPlayers = players.size();
+            // then we need to add the players to match histories
+            p1.addMatchesAsPlayer1(newMatch);
+            p2.addMatchesAsPlayer2(newMatch);
+            playerService.savePlayer(p1);
+            playerService.savePlayer(p2);
 
-        for (int i = 0; i < totalPlayers; i++) {
-            for (int j = i + 1; j < totalPlayers; j++) {
-                Match match = new Match();
-                match.setPlayer1(players.get(i));
-                match.setPlayer2(players.get(j));
-                match.setTournament(tournament);
-                matches.add(match);
-                Match savedMatch = matchRepository.save(match);
-
-                // Send email notifications for each match
-                try {
-                    emailService.sendMatchNotification(savedMatch);
-                } catch (Exception e) {
-                    System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
-                }
-            }
-        }
-
-        tournament.getTournamentMatchHistory().addAll(matches);
-        tournamentRepository.save(tournament);
-
-        return matches;
+            return newMatch;
     }
+
+// @Override
+// public void assignPlayerToMatch(Match match, Player player) {
+//     if (match.getPlayer1() == null) {
+//         match.setPlayer1(player);
+//     } else if (match.getPlayer2() == null) {
+//         match.setPlayer2(player);
+//     }
+// }
+    
 
     @Override
     public void processMatchResult(Match match, Player winner, boolean isDraw) {
@@ -162,6 +165,21 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
+    public HashMap<String, Boolean> viewCheckedInStatus(Match match) {
+        HashMap<String, Boolean> checkInStatuses = new HashMap<>();
+
+        String p1 = match.getPlayer1().getUsername();
+        String p2 = match.getPlayer2().getUsername();
+
+        Boolean p1Status = match.getStatusP1();
+        Boolean p2Status = match.getStatusP2();
+
+        checkInStatuses.put(p1, p1Status);
+        checkInStatuses.put(p2, p2Status);
+
+        return checkInStatuses;
+    }
+    
     public boolean bothPlayersCheckedIn(Match match) {
         return match.getStatusP1() && match.getStatusP2();
     }
@@ -201,5 +219,95 @@ public class MatchServiceImpl implements MatchService {
         match.setOnlyEloChange(matchDTO.getEloChange());
     
         return match;
+    }
+
+    @Override
+    public List<Match> createRoundRobinMatches(Long tournamentId) {
+        Tournament tournament = tournamentService.getTournamentById(tournamentId);
+        
+        List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
+        
+        if (players.size() > 16) {
+            throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, 
+                "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
+        }
+
+        List<Match> matches = new ArrayList<>();
+        int totalPlayers = players.size();
+
+        for (int i = 0; i < totalPlayers; i++) {
+            for (int j = i + 1; j < totalPlayers; j++) {
+                Match match = new Match();
+                match.setPlayer1(players.get(i));
+                match.setPlayer2(players.get(j));
+                match.setTournament(tournament);
+                matches.add(match);
+                Match savedMatch = matchRepository.save(match);
+
+                // Send email notifications for each match
+                try {
+                    emailService.sendMatchNotification(savedMatch);
+                } catch (Exception e) {
+                    System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
+                }
+            }
+        }
+
+        tournament.getTournamentMatchHistory().addAll(matches);
+        tournamentRepository.save(tournament);
+
+        return matches;
+    }
+
+    @Override
+    public List<Match> createSingleEliminationMatches(Long tournamentId) {
+        // Get tournament and players in it
+        Tournament tournament = tournamentService.getTournamentById(tournamentId);
+        
+        List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
+
+        // if (players.size() > 16) {
+        //     throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, 
+        //         "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
+        // }
+
+        List<Match> matches = new ArrayList<>();
+        int totalPlayers = players.size();
+        int playerIdx = 0;
+        int matchesInRound = totalPlayers / 2;
+
+        // create match ups in first round
+        for (int i = 0; i < matchesInRound; i++) {
+            Match match = new Match();
+            match.setPlayer1(players.get(playerIdx++));
+            match.setPlayer2(players.get(playerIdx++));
+            match.setTournament(tournament);
+            matches.add(match);
+            Match savedMatch = matchRepository.save(match);
+
+            // Send email notifications for each match
+            try {
+                emailService.sendMatchNotification(savedMatch);
+            } catch (Exception e) {
+                System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
+            }
+        }
+
+        // create remaining matches without filling players
+        matchesInRound = matchesInRound / 2;
+        while (matchesInRound > 0) {     
+            for (int i = 0; i < matchesInRound; i++) {
+                Match match = new Match();
+                match.setTournament(tournament);
+                matches.add(match);
+                Match savedMatch = matchRepository.save(match);
+            }
+            matchesInRound = matchesInRound / 2;
+        }
+
+        tournament.getTournamentMatchHistory().addAll(matches);
+        tournamentRepository.save(tournament);
+
+        return matches;
     }
 }

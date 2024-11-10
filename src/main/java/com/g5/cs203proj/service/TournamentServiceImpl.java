@@ -15,12 +15,19 @@ import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
+
+import jakarta.validation.OverridesAttribute;
+
+import org.hibernate.id.IntegralDataTypeHolder;
+import org.hibernate.mapping.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.lang.Math;
+
 
 
 @Service
@@ -32,6 +39,8 @@ public class TournamentServiceImpl implements TournamentService {
     private PlayerRepository playerRepository;
     @Autowired
     private MatchRepository matchRepository;
+    @Autowired
+    private EmailService emailService;
 
 //Contructors
     public TournamentServiceImpl(){};
@@ -71,6 +80,7 @@ public class TournamentServiceImpl implements TournamentService {
         int maxPlayers = updatedTournament.getMaxPlayers();
         int minElo = updatedTournament.getMinElo();
         int maxElo = updatedTournament.getMaxElo();
+        int roundNumber = updatedTournament.getRoundNumber();
 
         //field validation
         eloRangeValidation(existingTournament, minElo, maxElo);
@@ -87,6 +97,7 @@ public class TournamentServiceImpl implements TournamentService {
         existingTournament.setMinElo(minElo);
         existingTournament.setMaxElo(maxElo);
         existingTournament.setRegistrationCutOff(updatedTournament.getRegistrationCutOff());
+        existingTournament.setRoundNumber(roundNumber);
 
         // Update registered players if needed
         if (updatedTournament.getRegisteredPlayers() != null) {
@@ -185,6 +196,14 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    public boolean isUserAllowedToDeletePlayer(Long playerId, String authenticatedUsername) {
+        // Logic to check if the username matches the playerId
+        Player player = playerRepository.findById(playerId)
+            .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+        return player.getUsername().equals(authenticatedUsername); // assuming the Player entity has a username field
+    }
+
+    @Override
     public Set<Player> getRegisteredPlayers(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
         return tournament.getRegisteredPlayers();
@@ -198,13 +217,67 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Match> getTournamentMatchHistory(Long tournamentId) {
+    public List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId) {
+        // Extract matches for a tournament
         Tournament tournament = getTournamentById(tournamentId);
-        return tournament.getTournamentMatchHistory();
+        List<Match> matches = tournament.getTournamentMatchHistory();
+        
+        // Add each match's info to a list of all matches' info
+        List<ArrayList<String>> detailedMatchInfo = new ArrayList<ArrayList<String>>();
+        ArrayList<String> matchInfo = new ArrayList<String>();
+        for (Match m : matches) {
+            // Combine each match's info into 1 ArrayList
+            String matchId = "" + m.getMatchId();
+
+            Player p1 = m.getPlayer1();
+            String p1Name = null;
+            if (p1 != null) {
+                p1Name = p1.getUsername();
+            }
+
+            Player p2 = m.getPlayer2();
+            String p2Name = null;
+            if (p2 != null) {
+                p2Name = p2.getUsername();
+            }
+
+            Player winner = m.getWinner();
+            String winnerName = null;
+            if (winner != null) {
+                winnerName = winner.getUsername();
+            }
+
+            String eloChange = "" + m.getEloChange();
+            String isDraw = "" + m.getDraw();
+
+            matchInfo.add(matchId);
+            matchInfo.add(p1Name);
+            matchInfo.add(p2Name);
+            matchInfo.add(winnerName);
+            matchInfo.add(eloChange);
+            matchInfo.add(isDraw);
+            detailedMatchInfo.add(matchInfo);
+        }
+
+        return detailedMatchInfo;
+    }
+
+    @Override
+    public boolean addTestMatchToTournament(Long tournamentId, Match match) {
+        Tournament t = getTournamentById(tournamentId);
+        
+        // attach this tournament to the match added
+        match.setTournament(t);
+        matchRepository.save(match);
+
+        // add match to tournament matches
+        t.addTestMatch(match);
+        tournamentRepository.save(t);
+        return true;
     }
 
     //if we store the matches in the most recent round, we can just iterate through that instead of having to pass in matches
-    public void sendMatchNotification(Long tournamentId) {
+    public void sendMatchNotification(Long tournamentId, List<Match> matches) {
         Tournament tournament = getTournamentById(tournamentId);
         /*
         for (Match match : matches){
@@ -212,6 +285,113 @@ public class TournamentServiceImpl implements TournamentService {
         }
         */
         
+    }
+    
+    @Override
+    public List<Match> processSingleEliminationRound(Long tournamentId) {
+        // Get tournament and matches from current round
+        Tournament tournament = getTournamentById(tournamentId);
+        List<Match> matches = tournament.getTournamentMatchHistory();
+
+        // Get first match of next round
+        int firstMatchOfNextRoundIdx = -1;
+        for (int i = 0; i < matches.size(); i++) {
+            Match m = matches.get(i);
+            if (m.getMatchStatus().equals("NOT_STARTED")) {
+                firstMatchOfNextRoundIdx = i;
+                break;
+            }
+        }
+        // System.out.println("first match of next round: " + firstMatchOfNextRoundIdx);
+        // System.out.println("matches size: " + matches.size());
+
+        if (firstMatchOfNextRoundIdx == -1) {
+            throw new IllegalStateException("No NOT_STARTED matches available for the next round");
+        }
+
+        // Get current round number and winners from all matches in current round
+        int roundNumber = tournament.getRoundNumber();
+        List<Player> winners = getWinnersForCurrentRound(tournamentId, roundNumber);
+        // System.out.println("winners size: " + winners.size());
+        roundNumber = roundNumber + 1;
+        tournament.setRoundNumber(roundNumber);
+        tournamentRepository.save(tournament);
+
+        // Validate enough winners to form the next round
+        if (winners.size() % 2 != 0) {
+            throw new IllegalStateException("Odd number of winners, unable to form pairs for the next round");
+        }
+
+        // Assign winners to matches in next round
+        int playerIdx = 0;
+        int playersInNextRound = winners.size();
+        int matchesInNextRound = playersInNextRound / 2;
+
+        for (int i = 0; i < matchesInNextRound; i++) {
+            int matchIdx = firstMatchOfNextRoundIdx + i;
+            if (matchIdx >= matches.size()) {
+                throw new IndexOutOfBoundsException("Not enough matches available for pairing in the next round");
+            }
+            
+            Match match = matches.get(matchIdx);
+            match.setPlayer1(winners.get(playerIdx++));
+            match.setPlayer2(winners.get(playerIdx++));
+            match.setMatchStatus("NOT_STARTED"); // Ensure the match is set to NOT_STARTED
+            Match savedMatch = matchRepository.save(match);
+
+            // Send email notifications for each match
+            try {
+                emailService.sendMatchNotification(savedMatch);
+            } catch (Exception e) {
+                System.err.println("Failed to send email notification for match: " + savedMatch.getMatchId() + " - " + e.getMessage());
+            }
+        }
+        
+        // save tournament 
+        tournamentRepository.save(tournament);
+
+        return matches;
+    }
+
+    @Override
+    public List<Player> getWinnersForCurrentRound(Long tournamentId, int roundNumber) {
+        // Get tournament and matches from current round
+        Tournament tournament = getTournamentById(tournamentId);
+        List<Match> matches = tournament.getTournamentMatchHistory();
+
+        // Determine the required number of winners for this round
+        int totalPlayerSize = tournament.getRegisteredPlayers().size();
+        int winnerSizeForCurrentRound = totalPlayerSize / (int) Math.pow(2, roundNumber);
+
+        // Count wins of all players
+        HashMap<Player, Long> allPlayerWins = new HashMap<>();
+        for (Match m : matches) {
+            Player winner = m.getWinner();
+            int numWins = 0;
+            if (winner != null) {
+                if (allPlayerWins.containsKey(winner)) {
+                    numWins = allPlayerWins.get(winner).intValue();
+                    numWins++;
+                    allPlayerWins.replace(winner, Long.valueOf(numWins));
+                } else {
+                    numWins = 1;
+                    allPlayerWins.put(winner, Long.valueOf(numWins));
+                }
+            }
+        }
+
+
+        // Convert the TreeMap entries to a list and sort by value
+        List<Map.Entry<Player, Long>> sortedByWins = new ArrayList<>(allPlayerWins.entrySet());
+        sortedByWins.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
+
+        // Extract the top winners for the current round
+        List<Player> winners = new ArrayList<>();
+        for (int i = 0; i < Math.min(winnerSizeForCurrentRound, sortedByWins.size()); i++) {
+            winners.add(sortedByWins.get(i).getKey());
+        }
+
+        return winners;
     }
 
 // Tournament settings methods
@@ -285,6 +465,14 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentRepository.save(tournament);
     }
 
+    // set round number
+    @Override
+    public Tournament setRoundNumber(Long tournamentId, int round) {
+        Tournament tournament = getTournamentById(tournamentId);
+        tournament.setRoundNumber(round);
+        return tournamentRepository.save(tournament);
+    }
+
 // Convert Entity to DTO
     @Override
     public TournamentDTO convertToDTO(Tournament tournament) {
@@ -298,6 +486,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDTO.setMinElo(tournament.getMinElo());
         tournamentDTO.setMaxElo(tournament.getMaxElo());
         tournamentDTO.setRegistrationCutOff(tournament.getRegistrationCutOff());
+        tournamentDTO.setRoundNumber(tournament.getRoundNumber());
 
         // Collect match IDs
         List<Long> matchIdsHistory = tournament.getTournamentMatchHistory().stream()
@@ -326,6 +515,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournament.setMinElo(tournamentDTO.getMinElo());
         tournament.setMaxElo(tournamentDTO.getMaxElo());
         tournament.setRegistrationCutOff(tournamentDTO.getRegistrationCutOff());
+        tournament.setRoundNumber(tournamentDTO.getRoundNumber());
 
         // Handle registeredPlayersIds
         if (tournamentDTO.getRegisteredPlayersId() != null) {

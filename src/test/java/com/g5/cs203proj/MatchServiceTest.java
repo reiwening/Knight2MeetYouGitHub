@@ -51,6 +51,9 @@ public class MatchServiceTest {
 
     private Player player1;
     private Player player2;
+    private Player player3;
+    private Player player4;
+
     private Tournament tournament;
     private Match match;
 
@@ -64,6 +67,12 @@ public class MatchServiceTest {
         
         player2 = new Player("player2", "password123", "player2@test.com", "ROLE_USER");
         player2.setGlobalEloRating(1500);
+
+        player3 = new Player("player3", "password123", "player3@test.com", "ROLE_USER");
+        player3.setGlobalEloRating(1500);
+        
+        player4 = new Player("player4", "password123", "player4@test.com", "ROLE_USER");
+        player4.setGlobalEloRating(1500);
         
         tournament = new Tournament();
         tournament.setId(1L);
@@ -72,6 +81,11 @@ public class MatchServiceTest {
         match.setMatchId(1L);
         match.setPlayer1(player1);
         match.setPlayer2(player2);
+
+        match = new Match();
+        match.setMatchId(2L);
+        match.setPlayer1(player3);
+        match.setPlayer2(player4);
         match.setTournament(tournament);
     }
 
@@ -176,6 +190,35 @@ public class MatchServiceTest {
         assertThrows(PlayerRangeException.class, () -> {
             matchService.createRoundRobinMatches(1L);
         });
+    }
+
+    @Test
+    void createSingleEliminationMatches_Success() {
+        // Arrange
+        List<Player> players = Arrays.asList(player1, player2, player3, player4);
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
+        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        List<Match> matches = matchService.createSingleEliminationMatches(1L);
+
+        // Assert
+        assertNotNull(matches);
+        assertEquals(3, matches.size(), "A single-elimination tournament with 4 players should create 3 matches, 2 semi-finals and 1 finals");
+
+        // Verify that each match is saved
+        verify(matchRepository, times(3)).save(any(Match.class));
+
+        // Verify that the tournament is saved with updated matches
+        verify(tournamentRepository).save(tournament);
+
+        // Verify email notifications were sent for each match
+        /*
+         * email notification should only be sent twice since creating the single elimination matches
+         * creates all the matches but only populates the first round with players
+         */
+        verify(emailService, times(2)).sendMatchNotification(any(Match.class));
     }
 
     @Test

@@ -13,7 +13,9 @@ public interface MatchService {
     Match findMatchById(Long id);
     
     Match assignRandomPlayers(Long MatchId);
+    Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId);
     List<Match> createRoundRobinMatches(Long tournamentId);
+    List<Match> createSingleEliminationMatches(Long tournamentId);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 
@@ -24,9 +26,10 @@ public interface MatchService {
     boolean sendMatchStartNotification();
 
     // View check-in status for both players for a match
-    boolean bothPlayersCheckedIn(Match match);
+    HashMap<String, Boolean> viewCheckedInStatus(Match match);
 
     MatchDTO convertToDTO(Match match);
     Match convertToEntity(MatchDTO matchDTO);
 
+    
 }
