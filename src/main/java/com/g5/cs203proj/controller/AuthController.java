@@ -31,7 +31,7 @@ public class AuthController {
                 Player player = verificationToken.getPlayer();
                 player.setEnabled(true); // Mark the user as enabled/verified
                 playerRepository.save(player);
-                return "Account verified! You can now log in.";
+                return "Account verified! Welcome on this journey with us in Knight2MeetYou.";
             }
         } catch (IllegalArgumentException e) {
             return "Invalid or expired token.";

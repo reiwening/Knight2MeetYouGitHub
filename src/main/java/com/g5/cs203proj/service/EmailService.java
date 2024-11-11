@@ -47,7 +47,7 @@ public class EmailService {
     }
 
     public void sendRegisterNotification(Player player, String token) {
-        String link = "http://localhost:8080/auth/verify?token=" + token;
+        String link = "http://www.matthewngg.com/auth/verify?token=" + token;
         String content;
     
         if (player.isAdmin()) {
