@@ -2,6 +2,9 @@
 
 “Knight 2 Meet You” envisions a seamless but enjoyable way to manage chess tournaments. In addition to the basic features (tournament CRUD & matchmaking, player registration etc), we have included additional novel features such as a Chess Chatbot, a Check-In system and an enhanced Password Security setup for account protection.
 
+We have created a FrontEnd website to display and demonstrate various features as part of this RESTful API.
+[FrontEnd Repository Link](https://github.com/shiv-iyer/CS203-Project)
+
 ## Features and Design
 - User Interface design: we are creating a FrontEnd website to display the basic information necessary for our application (Tournaments, User information). It is built using React JS.
 - Database design: we have implemented persistency and created a database with entities. Included are GET, POST, and PUT operations for our relevant entities: Player, Matches, and Tournament.
