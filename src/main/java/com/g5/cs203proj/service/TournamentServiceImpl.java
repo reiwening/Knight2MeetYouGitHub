@@ -188,7 +188,6 @@ public class TournamentServiceImpl implements TournamentService {
 
         if (!tournament.getRegisteredPlayers().contains(player)) {
             throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_IN_TOURNAMENT);
-
         }
 
         tournament.getRegisteredPlayers().remove(player);
