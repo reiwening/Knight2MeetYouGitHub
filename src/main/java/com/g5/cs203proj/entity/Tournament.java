@@ -3,10 +3,13 @@ package com.g5.cs203proj.entity;
 import java.util.*;
 
 import java.time.LocalDateTime;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,7 +35,7 @@ public class Tournament {
     
     @JsonManagedReference
     @OneToMany
-    @JoinColumn(name = "tournament_id")  // Foreign key in the Match table
+    //@JoinColumn(name = "tournament_id")  // Foreign key in the Match table
     private List<Match> tournamentMatchHistory = new ArrayList<>();
 
     private String tournamentStatus;
@@ -48,11 +51,14 @@ public class Tournament {
     private Set<Player> registeredPlayers = new HashSet<>();
 
     
-    @ElementCollection // Use @ElementCollection to store a Map in the database
-    @CollectionTable(name = "tournament_rankings", joinColumns = @JoinColumn(name = "tournament_id"))
-    @MapKeyColumn(name = "player_id")
-    @Column(name = "rank")
-    private Map<Long, Integer> rankings;
+    // @ElementCollection // Use @ElementCollection to store a Map in the database
+    // @CollectionTable(name = "tournament_rankings", joinColumns = @JoinColumn(name = "tournament_id"))
+    // @MapKeyColumn(name = "player_id")
+    // @Column(name = "rank")
+    // private Map<Long, Integer> rankings;
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Ranking> rankings;
 
     private int maxPlayers;
     private int minPlayers;
@@ -145,11 +151,11 @@ public class Tournament {
         this.registeredPlayers = registeredPlayers;
     }
 
-    public Map<Long, Integer> getRankings() {
+    public List<Ranking> getRankings() {
         return rankings;
     }
 
-    public void setRankings(Map<Long, Integer> rankings) {
+    public void setRankings(List<Ranking> rankings) {
         this.rankings = rankings;
     }
 

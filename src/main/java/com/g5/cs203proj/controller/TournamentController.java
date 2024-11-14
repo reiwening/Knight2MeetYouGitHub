@@ -118,15 +118,6 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
     }
 
-    /*
-     * Get tournament rankings by ID
-     */
-    @GetMapping("/tournaments/{id}/rankings")
-    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
-        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
-        return new ResponseEntity<>(rankings, HttpStatus.OK);
-    }
-
     /**
      * Register a player to a tournament.
      * Only the authenticated user can register themselves.
@@ -280,6 +271,14 @@ public class TournamentController {
     public List<MatchDTO> processSingleEliminationRound(@PathVariable Long tournamentId) {
         List<Match> matches = tournamentService.processSingleEliminationRound(tournamentId);
         return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
+    }
+    /*
+     * Get tournament rankings by ID
+     */
+    @GetMapping("/tournaments/{id}/rankings")
+    public ResponseEntity<List<Ranking>> getTournamentRankings(@PathVariable Long id) {
+        List<Ranking> rankings = tournamentService.getTournamentRankings(id);
+        return new ResponseEntity<>(rankings, HttpStatus.OK);
     }
     
 
