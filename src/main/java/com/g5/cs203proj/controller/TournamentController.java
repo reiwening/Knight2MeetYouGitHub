@@ -3,18 +3,15 @@ package com.g5.cs203proj.controller;
 import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
-// import com.g5.cs203proj.exception.*;
 import com.g5.cs203proj.service.PlayerService;
 import com.g5.cs203proj.service.TournamentService;
-import com.g5.cs203proj.service.*;
-import com.g5.cs203proj.exception.*;
+import com.g5.cs203proj.service.MatchService;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -118,15 +115,6 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(tournament), HttpStatus.OK);
     }
 
-    /*
-     * Get tournament rankings by ID
-     */
-    @GetMapping("/tournaments/{id}/rankings")
-    public ResponseEntity<Map<Long, Integer>> getTournamentRankings(@PathVariable Long id) {
-        Map<Long, Integer> rankings = tournamentService.getTournamentRankings(id);
-        return new ResponseEntity<>(rankings, HttpStatus.OK);
-    }
-
     /**
      * Register a player to a tournament.
      * Only the authenticated user can register themselves.
@@ -160,7 +148,6 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: ok (solo 8/11/24)
     //remove player from a tournament
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
     public ResponseEntity<TournamentDTO> removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
@@ -258,39 +245,34 @@ public class TournamentController {
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //test: done
+
     // Get all matches in a tournaments with players, winner, elo change
     @GetMapping("/tournaments/{tournamentId}/matches")
     public List<ArrayList<String>> getTournamentMatches(@PathVariable Long tournamentId) {
         return tournamentService.getTournamentMatchHistory(tournamentId);
     }
 
-    // //test: working but persists test match twice for some reason
-    // // Add a test match to a tournament
-    // @PostMapping("/tournaments/{tournamentId}/matches")
-    // public Tournament testPostMatch(@PathVariable Long tournamentId, @RequestBody Match match) {
-    //     //TODO: process POST request
-    //     tournamentService.addTestMatchToTournament(tournamentId, match);
-    //     return tournamentService.getTournamentById(tournamentId);
-    // }
-    
-    // test: ok
+
     // process round results for single elimination tournaments
     @PostMapping("/tournament/{tournamentId}/process-single-elimination-round")
     public List<MatchDTO> processSingleEliminationRound(@PathVariable Long tournamentId) {
         List<Match> matches = tournamentService.processSingleEliminationRound(tournamentId);
         return matches.stream().map(matchService::convertToDTO).collect(Collectors.toList());
     }
+    /*
+     * Get tournament rankings by ID
+     */
+    @GetMapping("/tournaments/{id}/rankings")
+    public ResponseEntity<List<Ranking>> getTournamentRankings(@PathVariable Long id) {
+        List<Ranking> rankings = tournamentService.getTournamentRankings(id);
+        return new ResponseEntity<>(rankings, HttpStatus.OK);
+    }
     
-
-    //test: ok (matt 13/10/24)
     // Update the tournament round
     @PutMapping("/tournaments/{id}/roundNumber")
     public ResponseEntity<TournamentDTO> setTournamentRoundNumber(@PathVariable Long id, @RequestParam int round) {
         Tournament updatedTournament = tournamentService.setRoundNumber(id, round);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
-
-    
 }
 
