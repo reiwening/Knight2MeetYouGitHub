@@ -232,6 +232,12 @@ public class MatchServiceImpl implements MatchService {
             .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
         
         List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
+
+        // if (players.size() > 16) {
+        //     throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, 
+        //         "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
+        // }
+
         List<Match> matches = new ArrayList<>();
         int totalPlayers = players.size();
         int playerIdx = 0;
@@ -268,4 +274,22 @@ public class MatchServiceImpl implements MatchService {
 
         return matches;
     }
+
+    @Override
+    public boolean isPowerOfTwo(int numPlayers) {
+        if (numPlayers <= 0) {
+            return false;
+        }
+        
+        while (numPlayers > 1) {
+            // If numPlayers is not divisible by 2, it's not a power of 2
+            if (numPlayers % 2 != 0) {
+                return false;
+            }
+            numPlayers /= 2;
+        }
+        
+        return true;
+    }
+    
 }

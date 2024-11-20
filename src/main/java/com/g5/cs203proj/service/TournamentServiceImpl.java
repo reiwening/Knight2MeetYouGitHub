@@ -10,8 +10,7 @@ import com.g5.cs203proj.exception.match.MatchNotFoundException;
 // import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
-import com.g5.cs203proj.exception.tournament.TournamentFullException;
-import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
+import com.g5.cs203proj.exception.tournament.*;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
@@ -186,10 +185,12 @@ public class TournamentServiceImpl implements TournamentService {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND));
 
+        if (!tournament.getTournamentStatus().equals("REGISTRATION")) {
+            throw new NotRegistrationPeriodException("Cannot leave tournament. Tournament is " + tournament.getTournamentStatus() + ".");
+        }
 
         if (!tournament.getRegisteredPlayers().contains(player)) {
             throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_IN_TOURNAMENT);
-
         }
 
         tournament.getRegisteredPlayers().remove(player);

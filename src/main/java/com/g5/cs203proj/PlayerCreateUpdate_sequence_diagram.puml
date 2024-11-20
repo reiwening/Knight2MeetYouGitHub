@@ -1,0 +1,56 @@
+@startuml
+actor "Admin" as Client
+participant "MatchController" as MC
+participant "MatchService" as MS
+participant "TournamentService" as TournamentService
+participant "TournamentRepository" as TournamentRepository
+participant "Tournament" as Tournament
+participant "MatchRepository" as MR
+
+Client -> MC: getAllMatchesForATournament(tournamentId)
+activate MC
+
+MC -> TournamentService: getTournamentById(tournamentId)
+activate TournamentService
+TournamentService -> TournamentRepository: fetch tournament by ID
+activate TournamentRepository
+TournamentRepository --> TournamentService: return tournament
+deactivate TournamentRepository
+deactivate TournamentService
+
+alt If tournament has no matches
+    MC --> Client: return empty list
+else If tournament has matches
+    MC -> Tournament: tournament.getTournamentMatchHistory()
+    MC -> MC: Convert matches to stream
+    MC -> MS: Loop through matches and convertToDTO(match)
+    activate MS
+    MS --> MC: return list of MatchDTOs
+    deactivate MS
+end
+
+MC --> Client: return List<MatchDTO>
+deactivate MC
+
+
+
+
+
+Client -> MC: deleteMatch(matchId)
+activate MC
+
+MC -> MS: deleteMatch(matchId)
+activate MS
+
+MS -> MR: delete(match)
+activate MR
+MR --> MS: match deleted
+deactivate MR
+
+MS --> MC: return success message
+deactivate MS
+
+MC --> Client: return success message
+deactivate MC
+
+@enduml
