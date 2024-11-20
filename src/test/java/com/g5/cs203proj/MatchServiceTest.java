@@ -53,9 +53,10 @@ public class MatchServiceTest {
     private Player player2;
     private Player player3;
     private Player player4;
-
+    
     private Tournament tournament;
     private Match match;
+    private Match match2;
 
     @BeforeEach
     void setUp() {
@@ -81,12 +82,13 @@ public class MatchServiceTest {
         match.setMatchId(1L);
         match.setPlayer1(player1);
         match.setPlayer2(player2);
-
-        match = new Match();
-        match.setMatchId(2L);
-        match.setPlayer1(player3);
-        match.setPlayer2(player4);
         match.setTournament(tournament);
+
+        match2 = new Match();
+        match2.setMatchId(2L);
+        match2.setPlayer1(player3);
+        match2.setPlayer2(player4);
+        match2.setTournament(tournament);
     }
 
     @Test
@@ -183,7 +185,7 @@ public class MatchServiceTest {
         for (int i = 0; i < 17; i++) {
             players.add(new Player("player" + i, "password123", "player" + i + "@test.com", "ROLE_USER"));
         }
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+
         when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
 
         // Act & Assert
@@ -195,10 +197,10 @@ public class MatchServiceTest {
     @Test
     void createSingleEliminationMatches_Success() {
         // Arrange
-        List<Player> players = Arrays.asList(player1, player2, player3, player4);
+        List<Player> players = Arrays.asList(player1, player2);
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
-        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(matchRepository.save(any(Match.class))).thenReturn(match);
 
         // Act
         List<Match> matches = matchService.createSingleEliminationMatches(1L);
@@ -219,6 +221,34 @@ public class MatchServiceTest {
          * creates all the matches but only populates the first round with players
          */
         verify(emailService, times(2)).sendMatchNotification(any(Match.class));
+    }
+
+    @Test
+    void createSingleEliminationMatches_NotPowerOf2() {
+        // Arrange
+        List<Player> players = Arrays.asList(player1, player2, player3);
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
+        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        List<Match> matches = matchService.createSingleEliminationMatches(1L);
+
+        // Assert
+        assertNotNull(matches);
+        assertEquals(2, matches.size(), "A single-elimination tournament with 3 players should create 2 matches at most if error not thrown.");
+
+        // Verify that each match is saved
+        verify(matchRepository, times(2)).save(any(Match.class));
+
+        // Verify that the tournament is saved with updated matches
+        verify(tournamentRepository).save(tournament);
+
+        // Verify email notifications were sent for each match
+        /*
+         * email notification should not be sent since number of players is not a power of 2
+         */
+        verify(emailService, times(0)).sendMatchNotification(any(Match.class));
     }
 
     @Test
