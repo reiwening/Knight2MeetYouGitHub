@@ -44,12 +44,18 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public Match saveMatch(Match match) {
+        if (match == null) {
+            throw new IllegalArgumentException("Match cannot be null");
+        }
         return matchRepository.save(match);
     }
 
     @Override
     public void deleteMatch(Long id) {
-        matchRepository.delete(findMatchById(id));
+        Match match = findMatchById(id);
+        if (match != null) {
+            matchRepository.delete(match);
+        }
     }
 
     @Override
@@ -98,9 +104,18 @@ public class MatchServiceImpl implements MatchService {
     public Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId) {
         Match oldMatch = findMatchById(oldMatchId);
         Match newMatch = findMatchById(newMatchId);
+
+        if (oldMatch == null || newMatch == null) {
+            throw new MatchNotFoundException(oldMatch == null ? oldMatchId : newMatchId);
+        }
     
         Player p1 = oldMatch.getPlayer1();
         Player p2 = oldMatch.getPlayer2();
+        
+        if (p1 == null || p2 == null) {
+            throw new IllegalStateException("Source match must have both players assigned");
+        }
+
         newMatch.setPlayer1(p1);
         newMatch.setPlayer2(p2);
         matchRepository.save(newMatch);
@@ -115,6 +130,10 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public void processMatchResult(Match match, Player winner, boolean isDraw) {
+        if (match == null) {
+            throw new IllegalArgumentException("Match cannot be null");
+        }
+
         match.setMatchStatus("COMPLETED");
         match.setDraw(isDraw);
 
@@ -129,11 +148,17 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public List<Match> getMatchesForTournament(Tournament tournament) {
+        if (tournament == null) {
+            throw new IllegalArgumentException("Tournament cannot be null");
+        }
         return tournament.getTournamentMatchHistory();
     }
 
     @Override
     public List<Match> getMatchesForPlayer(Player player) {
+        if (player == null) {
+            throw new IllegalArgumentException("Player cannot be null");
+        }
         List<Match> matches = new ArrayList<>();
         matches.addAll(player.getMatchesAsPlayer1());
         matches.addAll(player.getMatchesAsPlayer2());
@@ -147,6 +172,10 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public HashMap<String, Boolean> viewCheckedInStatus(Match match) {
+        if (match == null || match.getPlayer1() == null || match.getPlayer2() == null) {
+            throw new IllegalArgumentException("Match and both players must be non-null");
+        }
+
         HashMap<String, Boolean> checkInStatuses = new HashMap<>();
         checkInStatuses.put(match.getPlayer1().getUsername(), match.getStatusP1());
         checkInStatuses.put(match.getPlayer2().getUsername(), match.getStatusP2());
@@ -154,11 +183,18 @@ public class MatchServiceImpl implements MatchService {
     }
     
     public boolean bothPlayersCheckedIn(Match match) {
+        if (match == null) {
+            throw new IllegalArgumentException("Match cannot be null");
+        }
         return match.getStatusP1() && match.getStatusP2();
     }
 
     @Override
     public MatchDTO convertToDTO(Match match) {
+        if (match == null) {
+            throw new IllegalArgumentException("Match cannot be null");
+        }
+
         MatchDTO matchDTO = new MatchDTO();
         matchDTO.setId(match.getMatchId());
         matchDTO.setPlayer1Id(match.getPlayer1() != null ? match.getPlayer1().getId() : null);
@@ -175,6 +211,10 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public Match convertToEntity(MatchDTO matchDTO) {
+        if (matchDTO == null) {
+            throw new IllegalArgumentException("MatchDTO cannot be null");
+        }
+
         Match match = new Match();
         match.setPlayer1(playerService.getPlayerById(matchDTO.getPlayer1Id()));
         match.setPlayer2(playerService.getPlayerById(matchDTO.getPlayer2Id()));
@@ -232,21 +272,21 @@ public class MatchServiceImpl implements MatchService {
             .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
         
         List<Player> players = playerService.getAvailablePlayersForTournament(tournamentId);
-
-        // if (players.size() > 16) {
-        //     throw new PlayerRangeException(PlayerRangeException.RangeErrorType.TOO_MANY_PLAYERS, 
-        //         "The tournament currently has " + players.size() + " players. The maximum allowed for a round-robin format is 16.");
-        // }
-
         List<Match> matches = new ArrayList<>();
-        int totalPlayers = players.size();
-        int playerIdx = 0;
-        int matchesInRound = totalPlayers / 2;
 
-        for (int i = 0; i < matchesInRound; i++) {
+        if (players.isEmpty()) {
+            return matches;
+        }
+
+        // Create first round matches
+        int totalPlayers = players.size();
+        int firstRoundMatches = totalPlayers / 2;
+
+        // Create first round matches with assigned players
+        for (int i = 0; i < firstRoundMatches; i++) {
             Match match = new Match();
-            match.setPlayer1(players.get(playerIdx++));
-            match.setPlayer2(players.get(playerIdx++));
+            match.setPlayer1(players.get(i * 2));
+            match.setPlayer2(players.get(i * 2 + 1));
             match.setTournament(tournament);
             Match savedMatch = matchRepository.save(match);
             matches.add(savedMatch);
@@ -258,15 +298,24 @@ public class MatchServiceImpl implements MatchService {
             }
         }
 
-        matchesInRound = matchesInRound / 2;
-        while (matchesInRound > 0) {     
-            for (int i = 0; i < matchesInRound; i++) {
+        // If there's an odd number of players, create a bye match for the last player
+        if (totalPlayers % 2 != 0 && totalPlayers > 2) {
+            Match byeMatch = new Match();
+            byeMatch.setPlayer1(players.get(totalPlayers - 1));
+            byeMatch.setTournament(tournament);
+            Match savedMatch = matchRepository.save(byeMatch);
+            matches.add(savedMatch);
+        }
+
+        // Create subsequent round matches (without players assigned yet)
+        int remainingMatches = firstRoundMatches / 2;
+        while (remainingMatches > 0) {
+            for (int i = 0; i < remainingMatches; i++) {
                 Match match = new Match();
                 match.setTournament(tournament);
-                Match savedMatch = matchRepository.save(match);
-                matches.add(savedMatch);
+                matches.add(matchRepository.save(match));
             }
-            matchesInRound = matchesInRound / 2;
+            remainingMatches = remainingMatches / 2;
         }
 
         tournament.getTournamentMatchHistory().addAll(matches);
@@ -282,7 +331,6 @@ public class MatchServiceImpl implements MatchService {
         }
         
         while (numPlayers > 1) {
-            // If numPlayers is not divisible by 2, it's not a power of 2
             if (numPlayers % 2 != 0) {
                 return false;
             }
@@ -291,5 +339,4 @@ public class MatchServiceImpl implements MatchService {
         
         return true;
     }
-    
 }
