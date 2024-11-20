@@ -44,10 +44,11 @@ public class TournamentServiceImpl implements TournamentService {
 
 //Contructors
     public TournamentServiceImpl(){};
-    public TournamentServiceImpl(TournamentRepository tournamentRepository, PlayerRepository playerRepository, MatchRepository matchRepository){
+    public TournamentServiceImpl(TournamentRepository tournamentRepository, PlayerRepository playerRepository, MatchRepository matchRepository, EmailService emailService){
         this.tournamentRepository = tournamentRepository;
         this.playerRepository = playerRepository;
         this.matchRepository = matchRepository;
+        this.emailService = emailService;
     }
 
 
