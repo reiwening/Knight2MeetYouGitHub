@@ -1,58 +1,58 @@
 package com.g5.cs203proj.entity;
 
-// import jakarta.persistence.DiscriminatorColumn;
-// import jakarta.persistence.DiscriminatorType;
-// import jakarta.persistence.Entity;
-// import jakarta.persistence.GeneratedValue;
-// import jakarta.persistence.GenerationType;
-// import jakarta.persistence.Inheritance;
-// import jakarta.persistence.InheritanceType;
-// import jakarta.persistence.ManyToOne;
-
 import jakarta.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "ranking_type", discriminatorType = DiscriminatorType.STRING)
-public class Ranking {
+@DiscriminatorColumn(name = "ranking_type")
+public abstract class Ranking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    protected Long id;
+    
     @ManyToOne
-    private Tournament tournament;
-
+    protected Player player;
+    
     @ManyToOne
-    private Player player;
+    protected Tournament tournament;
+    
+    protected int rank;
 
-    private int rank; // Rank in the tournament
-
-
-    public Ranking(Tournament tournament, Player player) {
+    // Default constructor
+    protected Ranking() {
+        rank = 1;
+    }
+    
+    // Constructor with player and tournament
+    protected Ranking(Tournament tournament, Player player) {
         this.tournament = tournament;
         this.player = player;
-        rank = 1; //default every player to rank 1 at the start
+        rank = 1;
     }
 
-    public Long getId() {
-        return id;
+    // Common methods
+    public Player getPlayer() {
+        return player;
     }
 
     public Tournament getTournament() {
         return tournament;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public int getRank() {
+    public Integer getRank() {
         return rank;
     }
 
-    public void setRank(int rank) {
+    public void setRank(Integer rank) {
         this.rank = rank;
     }
-    
-}
 
+    public Long getId() {
+        return id;
+    }
+
+    // Abstract methods that child classes must implement
+    public abstract void addWin();
+    public abstract void addLoss();
+    public abstract String toString();
+}

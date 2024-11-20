@@ -4,29 +4,36 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("Random")
-public class RandomRanking extends Ranking{
-    private StringBuilder matchHistory; // Match history string for Random tournaments
+@DiscriminatorValue("RANDOM")
+public class RandomRanking extends Ranking {
+    private StringBuilder matchHistory;
 
-    public RandomRanking(Tournament tournament, Player player ){
-        super(tournament, player);
+    public RandomRanking() {
+        super();
         matchHistory = new StringBuilder();
     }
-
-    public String getMatchHistory(){
-        return matchHistory.toString();
-    }
-
-    public void addWin(){
-        matchHistory.append("W");
-    }
-    public void addLoss(){
-        matchHistory.append("L");
+    
+    public RandomRanking(Tournament tournament, Player player) {
+        super(tournament, player);
+        this.matchHistory = new StringBuilder();
     }
 
     @Override
-    public String toString(){
-        return getPlayer().getUsername() + "[" +matchHistory.toString() + "]";
+    public void addWin() {
+        matchHistory.append("W");
     }
 
+    @Override
+    public void addLoss() {
+        matchHistory.append("L");
+    }
+
+    public String getMatchHistory() {
+        return matchHistory.toString();
+    }
+
+    @Override
+    public String toString() {
+        return getPlayer().getUsername() + "[" + matchHistory.toString() + "]";
+    }
 }

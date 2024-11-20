@@ -20,6 +20,8 @@ import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.enums.Statuses;
+import com.g5.cs203proj.enums.Styles;
 import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
 import com.g5.cs203proj.exception.inputs.InvalidStatusException;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
@@ -197,10 +199,10 @@ public class TournamentServiceTest {
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 
-        Tournament result = tournamentService.setTournamentStatus(1L, "IN PROGRESS");
+        Tournament result = tournamentService.setTournamentStatus(1L, Statuses.IN_PROGRESS.getDisplayName());
 
         assertNotNull(result);
-        assertEquals("IN PROGRESS", result.getTournamentStatus());
+        assertEquals(Statuses.IN_PROGRESS.getDisplayName(), result.getTournamentStatus());
     }
 
     @Test
@@ -262,7 +264,7 @@ public class TournamentServiceTest {
         Tournament result = tournamentService.startOrCancelTournament(1L);
 
         assertNotNull(result);
-        assertEquals("In Progress", result.getTournamentStatus());
+        assertEquals(Statuses.IN_PROGRESS.getDisplayName(), result.getTournamentStatus());
     }
 
     @Test
@@ -273,7 +275,7 @@ public class TournamentServiceTest {
         Tournament result = tournamentService.startOrCancelTournament(1L);
 
         assertNotNull(result);
-        assertEquals("Cancelled", result.getTournamentStatus());
+        assertEquals(Statuses.CANCELLED.getDisplayName(), result.getTournamentStatus());
     }
 
     @Test
@@ -341,6 +343,9 @@ public class TournamentServiceTest {
     @Test
     void processSingleEliminationRound_Success() {
         // Arrange
+        // Add this before setting up matches
+        tournament.setTournamentStyle(Styles.RANDOM.getDisplayName());
+        tournament.setRoundNumber(1);
         // Create two semi-final matches with assigned winners
         Player semiFinalWinner1 = new Player("semiFinalWinner1", "password123", "winner1@test.com", "ROLE_USER");
         Player semiFinalWinner2 = new Player("semiFinalWinner2", "password123", "winner2@test.com", "ROLE_USER");
@@ -357,13 +362,20 @@ public class TournamentServiceTest {
         semiFinalMatch2.setMatchStatus("COMPLETED");
         semiFinalMatch2.setWinner(semiFinalWinner2);
 
+        Match finalMatch = new Match();
+        finalMatch.setMatchId(4L);
+        finalMatch.setMatchStatus("NOT_STARTED");
+        finalMatch.setPlayer1(semiFinalWinner1);  // Winner of first semifinal
+        finalMatch.setPlayer2(semiFinalWinner2);  // Winner of second semifinal
+        finalMatch.setTournament(tournament);
+
         // Set up the tournament to include these semi-final matches
-        tournament.setTournamentMatchHistory(Arrays.asList(semiFinalMatch1, semiFinalMatch2));
+        tournament.setTournamentMatchHistory(Arrays.asList(semiFinalMatch1, semiFinalMatch2, finalMatch));
         tournament.setRoundNumber(1);
 
         // Set up expected winners and repository mocks
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(tournamentService.getWinnersForCurrentRound(1L, 1)).thenReturn(Arrays.asList(player));
+        //when(tournamentService.getWinnersForCurrentRound(1L, 1)).thenReturn(Arrays.asList(player));
 
         // Mock saving behavior of repositories
         when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));

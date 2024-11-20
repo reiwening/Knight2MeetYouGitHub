@@ -4,7 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("RoundRobin")
+@DiscriminatorValue("ROUND_ROBIN")
 public class RoundRobinRanking extends Ranking{
     //points gained from winning
     private static final int WIN_POINTS = 3;
@@ -15,6 +15,14 @@ public class RoundRobinRanking extends Ranking{
     private int losses; // Losses for Round Robin
     private int ties; // Ties for Round Robin
     private int points; // Points for Round Robin (Wins * 3 + Ties * 1)
+
+    public RoundRobinRanking(){
+        super();
+        wins = 0;
+        losses = 0;
+        ties = 0;
+        points = 0;
+    }
 
     public RoundRobinRanking(Tournament tournament, Player player ){
         super(tournament, player);

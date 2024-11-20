@@ -20,7 +20,7 @@ public interface TournamentService {
     List<Tournament> getAllRegisterableTournaments();
     Tournament startOrCancelTournament(Long tournamentId);
     List<Ranking> getTournamentRankings(Long tournamentId);
-    List<Ranking> updateTournamentRankings(Long tournamentId, List<Match> matches);
+    void updateTournamentRankings(Tournament tournament, Match match);
 
     // Player Management
     Tournament registerPlayer(Long playerId, Long tournamentId);

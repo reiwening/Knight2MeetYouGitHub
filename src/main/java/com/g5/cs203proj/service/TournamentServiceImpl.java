@@ -40,6 +40,7 @@ public class TournamentServiceImpl implements TournamentService {
     private MatchRepository matchRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
     private RankingService rankingService;
 
 //Contructors
@@ -65,7 +66,10 @@ public class TournamentServiceImpl implements TournamentService {
         //make sure casing is correct
         tournament.setTournamentStatus(status);
         tournament.setTournamentStyle(style);
-        return tournamentRepository.save(tournament);
+
+        Tournament savedTournament = tournamentRepository.save(tournament);
+        System.out.println("Tournament saved with ID: " + savedTournament.getId());
+        return savedTournament;
     }
 
     // Update a tournament
@@ -170,19 +174,17 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     /*
-     * updates tournament rankings based on the most recent round of matches. rankingService handles
-     * different tournament styles, and updates in tournament
-     * @param: tournamentId: id of tournament
-     * @param: matches: list of matches in the most recent round
-     * @return: the updated and sorted list of rankings, and the tournament object is updated 
-     *          with the ranking. Handles same points(round robin) or placement(random) by having 
-     *          same rank
+     * Called whenever a match is completed to update tournament rankings. rankingService handles
+     * different tournament styles, and returns updated ranking objects and correct order to be updated in tournament
+     * @param: tournament: tournament object to be updated
+     * @param: match: match object which affects rankings
      */
     @Override
-    public List<Ranking> updateTournamentRankings(Long tournamentId, List<Match> matches){
-        Tournament tournament = getTournamentById(tournamentId);
-        rankingService.updateRankings(tournament, matches);
-        return tournament.getRankings();
+    public void updateTournamentRankings(Tournament tournament, Match match){
+        List<Ranking> newRankings = rankingService.updateRankings(tournament, match);
+        //update and save tournament rankings
+        tournament.setRankings(newRankings);
+        tournamentRepository.save(tournament);
     }
 
 
@@ -192,6 +194,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Tournament registerPlayer(Long playerId, Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
+        System.out.println("Found tournament for registration: " + tournament.getId());
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND));
 
@@ -348,7 +351,6 @@ public class TournamentServiceImpl implements TournamentService {
         // System.out.println("winners size: " + winners.size());
         roundNumber = roundNumber + 1;
         tournament.setRoundNumber(roundNumber);
-        tournamentRepository.save(tournament);
 
         // Validate enough winners to form the next round
         if (winners.size() % 2 != 0) {
@@ -482,13 +484,6 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentRepository.save(tournament);
     }
 
-    // Set Admin
-    // @Override
-    // public Tournament setAdmin(Long tournamentId, Admin newAdmin) {
-    //     Tournament tournament = getTournamentById(tournamentId);
-    //     tournament.setAdmin(newAdmin);
-    //     return tournamentRepository.save(tournament);
-    // }
 
     // Set Name
     @Override

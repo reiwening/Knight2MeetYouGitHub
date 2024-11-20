@@ -129,7 +129,7 @@ public class MatchController {
         Long winnerId = winner.getId();
         if (!isDraw) {
             if (winnerId != match.getPlayer1().getId() && winnerId != match.getPlayer2().getId()) 
-            throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
+                throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
         }
         if (isDraw) {
             // Process current match results

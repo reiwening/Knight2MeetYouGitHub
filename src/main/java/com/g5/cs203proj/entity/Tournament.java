@@ -5,9 +5,7 @@ import java.util.*;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -16,13 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.g5.cs203proj.entity.Match;
-import com.g5.cs203proj.entity.Player;
+
 
 @Entity
 public class Tournament {
@@ -34,7 +29,7 @@ public class Tournament {
     private String name;
     
     @JsonManagedReference
-    @OneToMany
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     //@JoinColumn(name = "tournament_id")  // Foreign key in the Match table
     private List<Match> tournamentMatchHistory = new ArrayList<>();
 
@@ -57,7 +52,7 @@ public class Tournament {
     // @Column(name = "rank")
     // private Map<Long, Integer> rankings;
 
-    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Ranking> rankings;
 
     private int maxPlayers;
@@ -69,10 +64,6 @@ public class Tournament {
     private LocalDateTime registrationCutOff;
 
     private int roundNumber;
-
-    // @ManyToOne  // ManyToOne because one admin can oversee many tournaments, but one tournament can have only one admin
-    // @JoinColumn(name = "admin_id") 
-    // private Admin admin;  
 
     // Constructors, getters, and setters
     public Tournament() {
