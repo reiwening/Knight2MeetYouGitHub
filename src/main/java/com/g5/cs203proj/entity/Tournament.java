@@ -45,13 +45,6 @@ public class Tournament {
         inverseJoinColumns = @JoinColumn(name = "player_id"))
     private Set<Player> registeredPlayers = new HashSet<>();
 
-    
-    // @ElementCollection // Use @ElementCollection to store a Map in the database
-    // @CollectionTable(name = "tournament_rankings", joinColumns = @JoinColumn(name = "tournament_id"))
-    // @MapKeyColumn(name = "player_id")
-    // @Column(name = "rank")
-    // private Map<Long, Integer> rankings;
-
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Ranking> rankings;
 

@@ -1,5 +1,4 @@
 package com.g5.cs203proj.exception.tournament;
-import org.springframework.data.relational.core.sql.Not;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

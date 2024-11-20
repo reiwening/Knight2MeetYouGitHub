@@ -29,11 +29,8 @@ public interface TournamentService {
     Set<Player> getRegisteredPlayers(Long tournamentId);
 
 //match management
-    void scheduleMatches(Long tournamentId);
     List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId);
     boolean addTestMatchToTournament(Long tournamentId, Match match);
-    void sendMatchNotification(Long tournamentId, List<Match> matches);
-        //uses sendNotification inside MatchService
     List<Match> processSingleEliminationRound(Long tournamentId);
     List<Player> getWinnersForCurrentRound(Long tournamentId, int roundNumber); 
 

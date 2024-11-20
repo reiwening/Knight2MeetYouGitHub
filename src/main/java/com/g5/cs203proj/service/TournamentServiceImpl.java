@@ -1,24 +1,17 @@
 package com.g5.cs203proj.service;
 
 import com.g5.cs203proj.enums.*;
-import com.g5.cs203proj.exception.player.*;
 import com.g5.cs203proj.exception.tournament.*;
 import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
 import com.g5.cs203proj.exception.inputs.InvalidStatusException;
 import com.g5.cs203proj.exception.inputs.InvalidStyleException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
-// import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
-import com.g5.cs203proj.exception.tournament.*;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
 
-import jakarta.validation.OverridesAttribute;
-
-import org.hibernate.id.IntegralDataTypeHolder;
-import org.hibernate.mapping.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -140,6 +133,13 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentRepository.findByTournamentStatus("registration");
     }
 
+    /*
+     * Starts a tournament if it has enough players (In_PROGRESS), otherwise cancels it (CANCELLED). 
+     * Also initializes rankings for the tournament based on the type
+     * This ensures the rankings are always of the correct type and it is not changed anywhere else
+     * @param: tournamentId: id of the tournament to start or cancel
+     * @return: the updated tournament
+    */
     @Override
     public Tournament startOrCancelTournament(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
@@ -201,7 +201,6 @@ public class TournamentServiceImpl implements TournamentService {
 
         if (tournament.getRegisteredPlayers().contains(player)) {
             throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.ALREADY_IN_TOURNAMENT);
-            // throw new PlayerAlreadyInTournamentException(playerId, tournamentId);
         }
 
         if (tournament.getRegisteredPlayers().size() >= tournament.getMaxPlayers()) {
@@ -246,11 +245,6 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
 // Match management
-
-    @Override
-    public void scheduleMatches(Long tournamentId) {
-        //not sure how to implement
-    }
 
     @Override
     public List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId) {
@@ -311,17 +305,6 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentRepository.save(t);
         return true;
     }
-
-    //if we store the matches in the most recent round, we can just iterate through that instead of having to pass in matches
-    public void sendMatchNotification(Long tournamentId, List<Match> matches) {
-        Tournament tournament = getTournamentById(tournamentId);
-        /*
-        for (Match match : matches){
-            match.matchService.sendNotification();
-        }
-        */
-        
-    }
     
     @Override
     public List<Match> processSingleEliminationRound(Long tournamentId) {
@@ -351,6 +334,7 @@ public class TournamentServiceImpl implements TournamentService {
         // System.out.println("winners size: " + winners.size());
         roundNumber = roundNumber + 1;
         tournament.setRoundNumber(roundNumber);
+        tournamentRepository.save(tournament);
 
         // Validate enough winners to form the next round
         if (winners.size() % 2 != 0) {
@@ -574,16 +558,13 @@ public class TournamentServiceImpl implements TournamentService {
     private void playerRangeValidation(Tournament tournament, int minPlayers, int maxPlayers){
         if (minPlayers < 0 || maxPlayers < 0) {
             throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, "Player count cannot be negative" );
-            // throw new InvalidPlayerRangeException("Player count cannot be negative");
         }
         if (minPlayers > maxPlayers) {
             throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, "minPlayers cannot be greater than maxPlayers" );
-            // throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
         }
         int playerCount = tournament.getRegisteredPlayers().size();
         if (playerCount > maxPlayers) {
             throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers) );
-            // throw new InvalidPlayerRangeException(String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers));
         }
     }
 
