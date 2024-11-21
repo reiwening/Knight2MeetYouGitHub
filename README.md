@@ -15,14 +15,11 @@ We have created a FrontEnd website to display and demonstrate various features a
 ## Others
 
 ### To run the spring project on windows, use : mvnw.cmd spring-boot:run OR .\mvnw spring-boot:run
-### To run test in windows terminal, use: mvn test
 
 ### To get to the h2 database console, run the spring boot and type this in your browser : http://localhost:8080/h2-console
 
-#### JDBC URL : jdbc:h2:file:./data/testdb , username : username ,  password = password
+### JDBC URL : jdbc:h2:file:./data/testdb , username : username ,  password = password
 
-### To run the test files, use : mvn clean test
-mvnw test -Dtest=MatchServiceTest,
-mvnw test -Dtest=SpringBootIntegrationTest
+### To run the test, use : mvn verify
 
 ### To see our Knight2MeetYouAPI, type this in your browser : http://localhost:8080/swagger-ui/index.html
