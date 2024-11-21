@@ -56,8 +56,8 @@ public class TournamentServiceImpl implements TournamentService {
         styleValidation(style);
         String status = tournament.getTournamentStatus().toUpperCase();
         statusValidation(status);
-        //safe to create
-        //make sure casing is correct
+        // safe to create
+        // make sure casing is correct
         tournament.setTournamentStatus(status);
         tournament.setTournamentStyle(style);
 
@@ -313,7 +313,7 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = getTournamentById(tournamentId);
         List<Match> matches = tournament.getTournamentMatchHistory();
 
-        // Get first match of next round
+        // Get index of the first match of next round
         int firstMatchOfNextRoundIdx = -1;
         for (int i = 0; i < matches.size(); i++) {
             Match m = matches.get(i);

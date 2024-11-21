@@ -47,55 +47,22 @@ public class Match {
     public Match() {
 
     }
-
-    // for testing get matches of a tournament
+    
+    // Other constructors, getters, setters, etc.
     public Match(Long id, Player player1, Player player2) {
         this.id = id;
         this.player1 = player1;
         this.player2 = player2;
-        this.winner = winner;
-        this.eloChange = eloChange;
     }
 
-    // Other constructors, getters, setters, etc.
-    public Match(Player player1, Player player2) {
-        // this.id = id;
-        this.tournament = null;
-        this.player1 = player1;
-        this.player2 = player2;
-        this.statusP1 = false;
-        this.statusP2 = false;
-        this.winner = null;
-        this.isDraw = false;  // Initialize as not a draw
-        this.eloChange = null;
-    }
-
-    public Match(Tournament tournament) {
-        // this.id = id;
+    public Match(Tournament tournament) {  
         this.tournament = tournament;
-        this.player1 = null;
-        this.player2 = null;
-
-        this.statusP1 = false;
-        this.statusP2 = false;
-
-        this.winner = null;
-        this.isDraw = false;  // Initialize as not a draw
-        this.eloChange = null;
     }
 
     public Match(Tournament tournament, Player player1, Player player2) {
-        // this.id = id;
         this.tournament = tournament;
         this.player1 = player1;
         this.player2 = player2;
-
-        this.statusP1 = false;
-        this.statusP2 = false;
-
-        this.winner = null;
-        this.isDraw = false;  // Initialize as not a draw
-        this.eloChange = null;
     }
 
 
@@ -117,12 +84,10 @@ public class Match {
     }
 
     public void setStatusP1(boolean status) {
-        // System.out.println("Player 1 Status: Checked-In");
         this.statusP1 = status;
     }
 
     public void setStatusP2(boolean status) {
-        // System.out.println("Player 2 Status: Checked-In");
         this.statusP2 = status;
     }
 
@@ -134,7 +99,6 @@ public class Match {
         this.isDraw = isDraw;
     }
 
-    // 27/6/24: method invoked on player class for now, dk if using PlayerController
     public void setEloChange(Player winner) {
         double kFactor = 32.0;
         double ratingP1 = player1.getGlobalEloRating();

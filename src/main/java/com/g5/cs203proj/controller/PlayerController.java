@@ -108,6 +108,7 @@ public class PlayerController {
             throw new IllegalArgumentException("No fields to update");
         }
     }
+
     private void updateUsername(String newUsername, Player player) {
         if (newUsername == null || newUsername.trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be null or empty");
@@ -128,7 +129,7 @@ public class PlayerController {
      */
     @PutMapping("/players")
     public PlayerDTO updatePlayerAttributes(@RequestParam String username, @RequestBody Map<String, String> updateFields) {
-
+        // check if user has the correct authentication
         playerService.validateUserAccess(username);
 
         Player player = playerService.findPlayerByUsername(username)
@@ -137,6 +138,7 @@ public class PlayerController {
         // Null check and prevent empty updates
         checkNullAndEmptyFields(updateFields);
         
+        // prevent update of Elo rating
         if (updateFields.containsKey("globalEloRating")) {
             throw new IllegalArgumentException("Haha, clever move! But modifying your own Elo rating? Dream on, my friend...");
         }

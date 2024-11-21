@@ -121,11 +121,7 @@ public class TournamentController {
      */
     @PostMapping("/tournaments/{tournamentId}/players")
     public ResponseEntity<TournamentDTO> registerPlayer(@PathVariable Long tournamentId, @RequestParam Long playerId) {
-
-        //ADDED ONLY PLAYER CAN ADD ITSELF TO A TOURNAMENT
-
         String username = playerService.getPlayerById(playerId).getUsername();
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         // Check if authentication is null or not authenticated
@@ -143,18 +139,13 @@ public class TournamentController {
         String authenticatedUsername = authentication.getName();  // The logged-in username
         playerService.validateUserAccess(authenticatedUsername);
 
-        //
         Tournament updatedTournament = tournamentService.registerPlayer(playerId, tournamentId);
         return new ResponseEntity<>(tournamentService.convertToDTO(updatedTournament), HttpStatus.OK);
     }
 
-    //remove player from a tournament
+    // remove player from a tournament
     @DeleteMapping("/tournaments/{tournamentId}/players/{playerId}")
     public ResponseEntity<TournamentDTO> removePlayer(@PathVariable Long tournamentId, @PathVariable Long playerId) {
-        // Debug logging to check the current username
-        // System.out.println("Current authenticated user: " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        
-        //ADDED ONLY PLAYER CAN ADD ITSELF TO A TOURNAMENT
         String username = playerService.getPlayerById(playerId).getUsername();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         

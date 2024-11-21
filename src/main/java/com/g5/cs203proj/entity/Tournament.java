@@ -30,7 +30,6 @@ public class Tournament {
     
     @JsonManagedReference
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@JoinColumn(name = "tournament_id")  // Foreign key in the Match table
     private List<Match> tournamentMatchHistory = new ArrayList<>();
 
     private String tournamentStatus;
