@@ -22,9 +22,7 @@ public class PlayerServiceImpl implements PlayerService {
     private TournamentService tournamentService;
     private MatchService matchService;
     private EmailService emailService;
-    private BCryptPasswordEncoder bCryptPasswordEncoder; // this is a service layer to handle password encoding before
-                                                         // storing the password
-                                                         // provided in the `SecurityConfig` Class
+    private BCryptPasswordEncoder bCryptPasswordEncoder; 
 
     // constructor
     public PlayerServiceImpl(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
@@ -51,7 +49,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     public Optional<Player> findPlayerByUsername(String username) {
-        return playerRepository.findByUsername(username); // Repository method to find player by username
+        return playerRepository.findByUsername(username); 
 
     }
 
@@ -91,7 +89,7 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public void setPlayerGlobalEloRating(Player player, double newRating) {
         player.setGlobalEloRating(newRating);
-        playerRepository.save(player); // Save the player with the updated Elo rating
+        playerRepository.save(player); 
     }
 
     @Override
@@ -124,11 +122,9 @@ public class PlayerServiceImpl implements PlayerService {
         try {
             emailService.sendRegisterNotification(playerToRegister, token);
         } catch (Exception e ) {
-            // Log the error but don't stop the registration process
             System.err.println("Failed to send email notification: " + e.getMessage());
         }
 
-        /* else we have to save to the DB */
         return savePlayer(playerToRegister);
     }
 
@@ -144,7 +140,6 @@ public class PlayerServiceImpl implements PlayerService {
             .map(Match::getMatchId)
             .collect(Collectors.toList());
 
-        // Include the authorities field in the DTO mapping
         return new PlayerDTO(
             player.getId(),
             player.getUsername(),
@@ -153,7 +148,7 @@ public class PlayerServiceImpl implements PlayerService {
             player.getGlobalEloRating(),
             tournamentIds,
             matchIds,
-            player.getAuthorities().iterator().next().getAuthority(), // Getting the authorities string
+            player.getAuthorities().iterator().next().getAuthority(), 
             player.isEnabled()
         ); 
     }
@@ -170,23 +165,22 @@ public class PlayerServiceImpl implements PlayerService {
         player.setEmail(playerDTO.getEmail());
         player.setEnabled(playerDTO.isEnabled());
     
-        // Set authorities (e.g., ROLE_USER or ROLE_ADMIN)
         player.setAuthorities(playerDTO.getAuthorities());
 
         // get Match History based on match history ids 
         List<Long> matchIds = playerDTO.getMatchHistoryIds();
         List<Match> matchHistory = matchIds.stream()
                                             .map(id -> matchService.findMatchById(id))
-                                            .filter(Objects::nonNull)  // Remove nulls in case of missing matches
+                                            .filter(Objects::nonNull)  
                                             .collect(Collectors.toList());
         player.setMatchHistory(matchHistory);
 
 
-        // get TournamentReg 
+        // get TournamentRegistered
         Set<Long> tournamentIds = playerDTO.getTournamentRegisteredIds();
         Set<Tournament> tournaments = tournamentIds.stream()
             .map(id -> tournamentService.getTournamentById(id))
-            .filter(Objects::nonNull)  // Remove nulls in case of missing tournaments
+            .filter(Objects::nonNull)  
             .collect(Collectors.toSet());
         player.setTournamentRegistered(tournaments);
         
@@ -194,10 +188,6 @@ public class PlayerServiceImpl implements PlayerService {
         return player;
     }
     
-
-
-
-    //////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public Set<Tournament> getTournamentRegistered(Player player) {

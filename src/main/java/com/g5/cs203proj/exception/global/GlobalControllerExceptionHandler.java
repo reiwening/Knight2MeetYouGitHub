@@ -35,17 +35,17 @@ public class GlobalControllerExceptionHandler {
     public ResponseEntity<Object> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         Map<String, Object> body = new HashMap<>();
 
-        // More user-friendly and clear message
-        String parameterName = ex.getName(); // This gives the name of the parameter that caused the error
+        
+        String parameterName = ex.getName(); 
         String expectedType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown";
         String actualValue = ex.getValue() != null ? ex.getValue().toString() : "null";
 
-        // Custom message with specific information
+       
         body.put("message",
                 String.format("Invalid input for parameter '%s': expected a value of type '%s', but received '%s'.",
                         parameterName, expectedType, actualValue));
 
-        // Keep the original error message for more technical debugging purposes
+       
         body.put("error", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
@@ -67,7 +67,7 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-//match exceptions
+
     // Handler for MatchNotFoundException
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(MatchNotFoundException.class)
@@ -77,8 +77,6 @@ public class GlobalControllerExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
     
-    
-//Tournament Exceptions
     // Handler for TournamentNotFoundException
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(TournamentNotFoundException.class)
