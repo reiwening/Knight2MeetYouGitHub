@@ -11,7 +11,7 @@ import com.g5.cs203proj.entity.Ranking;
 import com.g5.cs203proj.entity.Tournament;
 
 public interface TournamentService {
-//Tournament cycle
+    //Tournament cycle
     Tournament createTournament(Tournament tournament);
     Tournament updateTournament(Long tournamentId, Tournament updatedTournament);
     void deleteTournament(Long tournamentId);
@@ -28,7 +28,7 @@ public interface TournamentService {
     boolean isUserAllowedToDeletePlayer(Long playerId, String authenticatedUsername);
     Set<Player> getRegisteredPlayers(Long tournamentId);
 
-//match management
+    //match management
     List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId);
     boolean addTestMatchToTournament(Long tournamentId, Match match);
     List<Match> processSingleEliminationRound(Long tournamentId);

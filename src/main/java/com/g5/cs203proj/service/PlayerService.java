@@ -19,7 +19,7 @@ public interface PlayerService {
     Player registerPlayer(Player playerToRegister );
     List<Player> getAllAdmins() ;
     List<Player> getAllPlayerUsers();
-    int getPlayerTournamentRankings(Player player, Tournament tournament); // see parameters  / consider a Map<Player, Integer>
+    int getPlayerTournamentRankings(Player player, Tournament tournament); 
 
     double getPlayerGlobalEloRating(Player player);
     void setPlayerGlobalEloRating(Player player, double change);
@@ -36,9 +36,5 @@ public interface PlayerService {
     Player convertToEntity(PlayerDTO playerDTO);
     PlayerDTO convertToPlayerDTO(Player player) ;
 
-    // List<Match> getMatchesAsPlayer1(Player player);
-    // List<Match> getMatchesAsPlayer2(Player player);
-    // Match addMatchToPlayerHistory(Player player, Match match);
-    // boolean registerPlayerForTournament(String username, Long tournamentId) ;
-    
+
 }

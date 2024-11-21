@@ -7,9 +7,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.*;
 
@@ -17,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mail.SimpleMailMessage;
 
 import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
@@ -25,6 +22,7 @@ import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
+import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.TournamentRepository;
 import com.g5.cs203proj.service.MatchServiceImpl;
@@ -38,11 +36,11 @@ public class MatchServiceTest {
     @Mock
     private MatchRepository matchRepository;
     @Mock
+    private TournamentRepository tournamentRepository;
+    @Mock
     private PlayerService playerService;
     @Mock
     private TournamentService tournamentService;
-    @Mock
-    private TournamentRepository tournamentRepository;
     @Mock
     private EmailService emailService;
 
@@ -60,23 +58,25 @@ public class MatchServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        
-        // Initialize test data
         player1 = new Player("player1", "password123", "player1@test.com", "ROLE_USER");
         player1.setGlobalEloRating(1500);
+        player1.setId(1L);
         
         player2 = new Player("player2", "password123", "player2@test.com", "ROLE_USER");
         player2.setGlobalEloRating(1500);
+        player2.setId(2L);
 
         player3 = new Player("player3", "password123", "player3@test.com", "ROLE_USER");
         player3.setGlobalEloRating(1500);
+        player3.setId(3L);
         
         player4 = new Player("player4", "password123", "player4@test.com", "ROLE_USER");
         player4.setGlobalEloRating(1500);
+        player4.setId(4L);
         
         tournament = new Tournament();
         tournament.setId(1L);
+        tournament.setTournamentMatchHistory(new ArrayList<>());
         
         match = new Match();
         match.setMatchId(1L);
@@ -92,176 +92,110 @@ public class MatchServiceTest {
     }
 
     @Test
-    void assignRandomPlayers_twoPlayers_ReturnMatch() {
-        // Arrange
-        Match match = new Match();
-        Tournament tournament = new Tournament();
-        tournament.setId(1L);
-        match.setTournament(tournament);
-        Player p1 = new Player("testPlayer1", "password123", "test1@test.com", "ROLE_USER");
-        Player p2 = new Player("testPlayer2", "password123", "test2@test.com", "ROLE_USER");
-        
-        List<Player> availablePlayers = new ArrayList<>(List.of(p1,p2));
-
-        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
-        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(availablePlayers);
-
-        // Act
-        Match result = matchService.assignRandomPlayers(1L);
-
-        // Assert
-        assertNotNull(result);
-        assertTrue(
-            (p1.equals(result.getPlayer1()) && p2.equals(result.getPlayer2())) ||
-            (p2.equals(result.getPlayer1()) && p1.equals(result.getPlayer2()))
-        );
-
-        verify(matchRepository, times(1)).findById(1L);
-        verify(playerService, times(1)).getAvailablePlayersForTournament(1L);
-        verify(matchRepository, times(1)).save(match);
-        verify(playerService, times(1)).savePlayer(p1);
-        verify(playerService, times(1)).savePlayer(p2);
-    }
-
-    @Test
-    void assignRandomPlayers_NotEnoughPlayers_ThrowEx() {
-        // Arrange
-        Match match = new Match();
-        Tournament tournament = new Tournament();
-        tournament.setId(1L);
-        match.setTournament(tournament);
-
-        List<Player> availablePlayers = new ArrayList<>();
-
-        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
-        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(availablePlayers);
-
-        // Act & Assert
-        assertThrows(PlayerRangeException.class, () -> {
-            matchService.assignRandomPlayers(1L);
-        });
-
-        verify(matchRepository, times(1)).findById(1L);
-        verify(playerService, times(1)).getAvailablePlayersForTournament(1L);
-        verify(matchRepository, times(0)).save(any(Match.class)); 
-    }
-
-    @Test
-    void assignRandomPlayers_MatchNotFound_ThrowEx() {
-        // Arrange
-        when(matchRepository.findById(1L)).thenReturn(Optional.empty());
-        
-        // Act & Assert
-        assertThrows(MatchNotFoundException.class, () -> {
-            matchService.assignRandomPlayers(1L);
-        });
-
-        verify(matchRepository, times(1)).findById(1L);
-        verify(playerService, times(0)).getAvailablePlayersForTournament(anyLong());
-        verify(matchRepository, times(0)).save(any(Match.class));
-    }
-
-    @Test
-    void createRoundRobinMatches_Success() {
-        // Arrange
-        List<Player> players = Arrays.asList(player1, player2);
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
+    void saveMatch_Success() {
         when(matchRepository.save(any(Match.class))).thenReturn(match);
-
-        // Act
-        List<Match> matches = matchService.createRoundRobinMatches(1L);
-
-        // Assert
-        assertNotNull(matches);
-        assertEquals(1, matches.size());
-        verify(tournamentRepository).save(tournament);
+        Match savedMatch = matchService.saveMatch(match);
+        assertNotNull(savedMatch);
+        assertEquals(match.getMatchId(), savedMatch.getMatchId());
+        verify(matchRepository).save(match);
     }
 
     @Test
-    void createRoundRobinMatches_TooManyPlayers() {
-        // Arrange
-        List<Player> players = new ArrayList<>();
-        for (int i = 0; i < 17; i++) {
-            players.add(new Player("player" + i, "password123", "player" + i + "@test.com", "ROLE_USER"));
-        }
-
-        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
-
-        // Act & Assert
-        assertThrows(PlayerRangeException.class, () -> {
-            matchService.createRoundRobinMatches(1L);
-        });
+    void saveMatch_NullMatch() {
+        assertThrows(IllegalArgumentException.class, () -> matchService.saveMatch(null));
     }
 
-    // @Test
-    // void createSingleEliminationMatches_Success() {
-    //     // Arrange
-    //     List<Player> players = Arrays.asList(player1, player2);
-    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-    //     when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
-    //     when(matchRepository.save(any(Match.class))).thenReturn(match);
+    @Test
+    void deleteMatch_Success() {
+        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+        matchService.deleteMatch(1L);
+        verify(matchRepository).delete(match);
+    }
 
-    //     // Act
-    //     List<Match> matches = matchService.createSingleEliminationMatches(1L);
+    @Test
+    void deleteMatch_NotFound() {
+        when(matchRepository.findById(999L)).thenReturn(Optional.empty());
+        matchService.deleteMatch(999L);
+        verify(matchRepository, never()).delete(any(Match.class));
+    }
 
-    //     // Assert
-    //     assertNotNull(matches);
-    //     assertEquals(3, matches.size(), "A single-elimination tournament with 4 players should create 3 matches, 2 semi-finals and 1 finals");
+    @Test
+    void findMatchById_Success() {
+        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+        Match foundMatch = matchService.findMatchById(1L);
+        assertNotNull(foundMatch);
+        assertEquals(match.getMatchId(), foundMatch.getMatchId());
+    }
 
-    //     // Verify that each match is saved
-    //     verify(matchRepository, times(3)).save(any(Match.class));
+    @Test
+    void findMatchById_NotFound() {
+        when(matchRepository.findById(999L)).thenReturn(Optional.empty());
+        Match foundMatch = matchService.findMatchById(999L);
+        assertNull(foundMatch);
+    }
 
-    //     // Verify that the tournament is saved with updated matches
-    //     verify(tournamentRepository).save(tournament);
+    @Test
+    void assignRandomPlayers_Success() {
+        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+        when(playerService.getAvailablePlayersForTournament(anyLong()))
+            .thenReturn(Arrays.asList(player1, player2, player3, player4));
+        when(matchRepository.save(any(Match.class))).thenReturn(match);
+        when(playerService.savePlayer(any(Player.class))).thenReturn(player1);
 
-    //     // Verify email notifications were sent for each match
-    //     /*
-    //      * email notification should only be sent twice since creating the single elimination matches
-    //      * creates all the matches but only populates the first round with players
-    //      */
-    //     verify(emailService, times(2)).sendMatchNotification(any(Match.class));
-    // }
+        Match result = matchService.assignRandomPlayers(1L);
+        assertNotNull(result);
+        assertNotNull(result.getPlayer1());
+        assertNotNull(result.getPlayer2());
+        verify(emailService).sendMatchNotification(any(Match.class));
+    }
 
-    // @Test
-    // void createSingleEliminationMatches_NotPowerOf2() {
-    //     // Arrange
-    //     List<Player> players = Arrays.asList(player1, player2, player3);
-    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-    //     when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
-    //     when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    @Test
+    void assignRandomPlayers_MatchNotFound() {
+        when(matchRepository.findById(999L)).thenThrow(new MatchNotFoundException(999L));
+        assertThrows(MatchNotFoundException.class, () -> matchService.assignRandomPlayers(999L));
+    }
 
-    //     // Act
-    //     List<Match> matches = matchService.createSingleEliminationMatches(1L);
+    @Test
+    void assignRandomPlayers_NotEnoughPlayers() {
+        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+        when(playerService.getAvailablePlayersForTournament(anyLong()))
+            .thenReturn(Collections.singletonList(player1));
+        
+        assertThrows(PlayerRangeException.class, () -> matchService.assignRandomPlayers(1L));
+    }
 
-    //     // Assert
-    //     assertNotNull(matches);
-    //     assertEquals(2, matches.size(), "A single-elimination tournament with 3 players should create 2 matches at most if error not thrown.");
+    @Test
+    void reassignPlayersToMatch_Success() {
+        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+        when(matchRepository.findById(2L)).thenReturn(Optional.of(match2));
+        when(matchRepository.save(any(Match.class))).thenReturn(match2);
+        when(playerService.savePlayer(any(Player.class))).thenReturn(player1);
 
-    //     // Verify that each match is saved
-    //     verify(matchRepository, times(2)).save(any(Match.class));
+        Match reassignedMatch = matchService.reassignPlayersToMatch(1L, 2L);
+        
+        assertNotNull(reassignedMatch);
+        assertEquals(match.getPlayer1(), reassignedMatch.getPlayer1());
+        assertEquals(match.getPlayer2(), reassignedMatch.getPlayer2());
+        verify(matchRepository).save(any(Match.class));
+        verify(playerService, times(2)).savePlayer(any(Player.class));
+    }
 
-    //     // Verify that the tournament is saved with updated matches
-    //     verify(tournamentRepository).save(tournament);
+    @Test
+    void reassignPlayersToMatch_OldMatchNotFound() {
+        when(matchRepository.findById(999L)).thenReturn(Optional.empty());
+        assertThrows(MatchNotFoundException.class, () -> matchService.reassignPlayersToMatch(999L, 2L));
+    }
 
-    //     // Verify email notifications were sent for each match
-    //     /*
-    //      * email notification should not be sent since number of players is not a power of 2
-    //      */
-    //     verify(emailService, times(0)).sendMatchNotification(any(Match.class));
-    // }
+    @Test
+    void reassignPlayersToMatch_NewMatchNotFound() {
+        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
+        when(matchRepository.findById(999L)).thenReturn(Optional.empty());
+        assertThrows(MatchNotFoundException.class, () -> matchService.reassignPlayersToMatch(1L, 999L));
+    }
 
     @Test
     void processMatchResult_WinnerCase() {
-        // Arrange
-        Match match = new Match();
-        match.setPlayer1(player1);
-        match.setPlayer2(player2);
-
-        // Act
         matchService.processMatchResult(match, player1, false);
-
-        // Assert
         assertEquals("COMPLETED", match.getMatchStatus());
         assertEquals(player1, match.getWinner());
         assertFalse(match.getDraw());
@@ -269,162 +203,203 @@ public class MatchServiceTest {
 
     @Test
     void processMatchResult_DrawCase() {
-        // Arrange
-        Match match = new Match();
-        match.setPlayer1(player1);
-        match.setPlayer2(player2);
-
-        // Act
         matchService.processMatchResult(match, null, true);
-
-        // Assert
         assertEquals("COMPLETED", match.getMatchStatus());
         assertNull(match.getWinner());
         assertTrue(match.getDraw());
     }
 
     @Test
-    void bothPlayersCheckedIn_BothCheckedIn() {
-        // Arrange
-        match.setStatusP1(true);
-        match.setStatusP2(true);
-
-        // Act & Assert
-        assertTrue(matchService.bothPlayersCheckedIn(match));
+    void processMatchResult_NullMatch() {
+        assertThrows(IllegalArgumentException.class, () -> matchService.processMatchResult(null, player1, false));
     }
 
     @Test
-    void bothPlayersCheckedIn_OnePlayerNotCheckedIn() {
-        // Arrange
+    void getMatchesForTournament_Success() {
+        List<Match> matches = Arrays.asList(match, match2);
+        tournament.setTournamentMatchHistory(matches);
+        
+        List<Match> result = matchService.getMatchesForTournament(tournament);
+        
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(match));
+        assertTrue(result.contains(match2));
+    }
+
+    @Test
+    void getMatchesForTournament_NullTournament() {
+        assertThrows(IllegalArgumentException.class, () -> matchService.getMatchesForTournament(null));
+    }
+
+    @Test
+    void getMatchesForPlayer_Success() {
+        player1.addMatchesAsPlayer1(match);
+        player1.addMatchesAsPlayer2(match2);
+
+        List<Match> result = matchService.getMatchesForPlayer(player1);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(match));
+        assertTrue(result.contains(match2));
+    }
+
+    @Test
+    void getMatchesForPlayer_NullPlayer() {
+        assertThrows(IllegalArgumentException.class, () -> matchService.getMatchesForPlayer(null));
+    }
+
+    @Test
+    void viewCheckedInStatus_Success() {
         match.setStatusP1(true);
         match.setStatusP2(false);
 
-        // Act & Assert
-        assertFalse(matchService.bothPlayersCheckedIn(match));
+        HashMap<String, Boolean> status = matchService.viewCheckedInStatus(match);
+
+        assertNotNull(status);
+        assertEquals(2, status.size());
+        assertTrue(status.get(player1.getUsername()));
+        assertFalse(status.get(player2.getUsername()));
+    }
+
+    @Test
+    void viewCheckedInStatus_NullMatch() {
+        assertThrows(IllegalArgumentException.class, () -> matchService.viewCheckedInStatus(null));
+    }
+
+    @Test
+    void createRoundRobinMatches_Success() {
+        List<Player> players = Arrays.asList(player1, player2, player3);
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
+        when(matchRepository.save(any(Match.class))).thenReturn(match);
+
+        List<Match> matches = matchService.createRoundRobinMatches(1L);
+
+        assertNotNull(matches);
+        assertEquals(3, matches.size(), "3 players should create 3 matches in round-robin");
+        verify(tournamentRepository).save(tournament);
+        verify(matchRepository, times(3)).save(any(Match.class));
+    }
+
+    @Test
+    void createRoundRobinMatches_TournamentNotFound() {
+        when(tournamentRepository.findById(999L)).thenReturn(Optional.empty());
+        assertThrows(TournamentNotFoundException.class, () -> matchService.createRoundRobinMatches(999L));
+    }
+
+    @Test
+    void createSingleEliminationMatches_Success() {
+        List<Player> players = Arrays.asList(player1, player2, player3, player4);
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
+        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> {
+            Match m = invocation.getArgument(0);
+            m.setMatchId((long) (tournament.getTournamentMatchHistory().size() + 1));
+            return m;
+        });
+
+        List<Match> matches = matchService.createSingleEliminationMatches(1L);
+
+        assertNotNull(matches);
+        assertEquals(3, matches.size(), "4 players should create 3 matches in single elimination");
+        verify(tournamentRepository).save(tournament);
+        verify(matchRepository, times(3)).save(any(Match.class));
+    }
+
+    @Test
+    void createSingleEliminationMatches_TournamentNotFound() {
+        when(tournamentRepository.findById(999L)).thenReturn(Optional.empty());
+        assertThrows(TournamentNotFoundException.class, () -> matchService.createSingleEliminationMatches(999L));
+    }
+
+    @Test
+    void createSingleEliminationMatches_NoPlayers() {
+        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(Collections.emptyList());
+
+        List<Match> matches = matchService.createSingleEliminationMatches(1L);
+        assertTrue(matches.isEmpty());
     }
 
     @Test
     void convertToDTO_Success() {
-        // Arrange
-        match.setMatchStatus("PENDING");
-        match.setDraw(false);
         match.setWinner(player1);
+        match.setDraw(false);
+        match.setMatchStatus("COMPLETED");
+        match.setOnlyEloChange(15.0);
 
-        // Act
         MatchDTO dto = matchService.convertToDTO(match);
 
-        // Assert
+        assertNotNull(dto);
         assertEquals(match.getMatchId(), dto.getId());
-        assertEquals(player1.getId(), dto.getPlayer1Id());
-        assertEquals(player2.getId(), dto.getPlayer2Id());
-        assertEquals(tournament.getId(), dto.getTournamentId());
-        assertEquals(match.getMatchStatus(), dto.getMatchStatus());
+        assertEquals(match.getPlayer1().getId(), dto.getPlayer1Id());
+        assertEquals(match.getPlayer2().getId(), dto.getPlayer2Id());
+        assertEquals(match.getTournament().getId(), dto.getTournamentId());
+        assertEquals(match.getStatusP1(), dto.isStatusP1());
+        assertEquals(match.getStatusP2(), dto.isStatusP2());
+        assertEquals(match.getWinner().getId(), dto.getWinnerId());
         assertEquals(match.getDraw(), dto.isDraw());
-        assertEquals(player1.getId(), dto.getWinnerId());
+        assertEquals(match.getMatchStatus(), dto.getMatchStatus());
+        assertEquals(match.getEloChange(), dto.getEloChange());
+    }
+
+    @Test
+    void convertToDTO_NullMatch() {
+        assertThrows(IllegalArgumentException.class, () -> matchService.convertToDTO(null));
     }
 
     @Test
     void convertToEntity_Success() {
-        // Arrange
         MatchDTO dto = new MatchDTO();
         dto.setId(1L);
         dto.setPlayer1Id(1L);
         dto.setPlayer2Id(2L);
         dto.setTournamentId(1L);
-        dto.setMatchStatus("PENDING");
-        dto.setDraw(false);
+        dto.setStatusP1(true);
+        dto.setStatusP2(false);
         dto.setWinnerId(1L);
+        dto.setDraw(false);
+        dto.setMatchStatus("COMPLETED");
+        dto.setEloChange(15.0);
 
         when(playerService.getPlayerById(1L)).thenReturn(player1);
         when(playerService.getPlayerById(2L)).thenReturn(player2);
         when(tournamentService.getTournamentById(1L)).thenReturn(tournament);
 
-        // Act
-        Match result = matchService.convertToEntity(dto);
+        Match entity = matchService.convertToEntity(dto);
 
-        // Assert
-        assertEquals(player1, result.getPlayer1());
-        assertEquals(player2, result.getPlayer2());
-        assertEquals(tournament, result.getTournament());
-        assertEquals(dto.getMatchStatus(), result.getMatchStatus());
-        assertEquals(dto.isDraw(), result.getDraw());
+        assertNotNull(entity);
+        assertEquals(player1, entity.getPlayer1());
+        assertEquals(player2, entity.getPlayer2());
+        assertEquals(tournament, entity.getTournament());
+        assertTrue(entity.getStatusP1());
+        assertFalse(entity.getStatusP2());
+        assertEquals(player1, entity.getWinner());
+        assertFalse(entity.getDraw());
+        assertEquals("COMPLETED", entity.getMatchStatus());
+        assertEquals(15.0, entity.getEloChange());
     }
 
     @Test
-    void saveMatch_Success() {
-        // Arrange
-        when(matchRepository.save(match)).thenReturn(match);
-
-        // Act
-        Match savedMatch = matchService.saveMatch(match);
-
-        // Assert
-        assertNotNull(savedMatch);
-        verify(matchRepository).save(match);
+    void convertToEntity_NullDTO() {
+        assertThrows(IllegalArgumentException.class, () -> matchService.convertToEntity(null));
     }
 
     @Test
-    void deleteMatch_Success() {
-        // Arrange
-        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
-
-        // Act
-        matchService.deleteMatch(1L);
-
-        // Assert
-        verify(matchRepository).delete(match);
+    void isPowerOfTwo_Success() {
+        assertTrue(matchService.isPowerOfTwo(2));
+        assertTrue(matchService.isPowerOfTwo(4));
+        assertTrue(matchService.isPowerOfTwo(8));
+        assertTrue(matchService.isPowerOfTwo(16));
     }
 
     @Test
-    void findMatchById_Success() {
-        // Arrange
-        when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
-
-        // Act
-        Match foundMatch = matchService.findMatchById(1L);
-
-        // Assert
-        assertNotNull(foundMatch);
-        assertEquals(match, foundMatch);
+    void isPowerOfTwo_Failure() {
+        assertFalse(matchService.isPowerOfTwo(0));
+        assertFalse(matchService.isPowerOfTwo(3));
+        assertFalse(matchService.isPowerOfTwo(5));
+        assertFalse(matchService.isPowerOfTwo(7));
     }
-
-    @Test
-    void findMatchById_NotFound() {
-        // Arrange
-        when(matchRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act
-        Match foundMatch = matchService.findMatchById(1L);
-
-        // Assert
-        assertNull(foundMatch);
-    }
-
-//     @Test
-// public void testEmailNotificationOnMatchCreation() {
-//     // Arrange: Create two players and add them to a list of available players
-//     Player player1 = new Player("playerOne", "password123", "playerOne@example.com", "ROLE_USER");
-//     player1.setId(1L);
-//     Player player2 = new Player("playerTwo", "password123", "playerTwo@example.com", "ROLE_USER");
-//     player2.setId(2L);
-
-//     List<Player> availablePlayers = new ArrayList<>(List.of(player1, player2));
-//     when(playerService.getAvailablePlayersForTournament(anyLong())).thenReturn(availablePlayers);
-
-//     // Arrange: Create a match and mock its retrieval and saving
-//     Match match = new Match();
-//     match.setMatchId(1L);
-//     match.setTournament(new Tournament());  // Only if the tournament is needed within the method
-//     when(matchRepository.findById(1L)).thenReturn(Optional.of(match));
-//     when(matchRepository.save(any(Match.class))).thenReturn(match);
-
-//     // Act: Use assignRandomPlayers to assign players and trigger the email notification
-//     matchService.assignRandomPlayers(match.getMatchId());
-
-//     // Assert: Verify that the emailService.sendMatchNotification was called
-//     verify(emailService, times(1)).sendMatchNotification(match);
-// }
-
-
-   
 }

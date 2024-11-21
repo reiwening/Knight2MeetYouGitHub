@@ -47,35 +47,34 @@ public class EmailService {
     }
 
     public void sendRegisterNotification(Player player, String token) {
-        String link = "http://localhost:8080/auth/verify?token=" + token;
+        String link = "http://www.matthewngg.com/auth/verify?token=" + token;
         String content;
     
         if (player.isAdmin()) {
             content = String.format(
                 "Greetings %s,\n\n" +
-                "Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.\n" +
+                "Welcome to Knight2MeetYou! We're thrilled to have you join our community of passionate chess players from around the region.\n" +
                 "You are signing up as an ADMIN.\n\n" +
-                "Click here to verify your account: %s" +
-                "\n\nBest,\nThe Knight2MeetYou Team",
+                "To complete your registration, please click here: %s\n\n" +
+                "Best,\nThe Knight2MeetYou Team",
                 player.getUsername(),
-                link  // Fourth parameter for the link
+                link
             );
         } else {
             content = String.format(
                 "Greetings %s, Grandmaster-in-the-Making!\n\n" +
-                "Welcome to Knight2MeetYou! We’re thrilled to have you join our community of passionate chess players from around the region.\n" +
-                "Start by registering for tournaments. We’re excited to see you make your mark on the board.\n\n" +
-                "Click here to verify your account: %s" +
-                "\n\nBest,\nThe Knight2MeetYou Team",
+                "Welcome to Knight2MeetYou! We're thrilled to have you join our community of passionate chess players from around the region.\n" +
+                "Start by registering for tournaments. We're excited to see you make your mark on the board.\n\n" +
+                "To complete your registration, please click here: %s\n\n" +
+                "Best,\nThe Knight2MeetYou Team",
                 player.getUsername(),
-                link  // Fourth parameter for the link
+                link
             );
         }
     
         sendEmail(player.getEmail(), "Welcome to Knight2MeetYou!", content);
     }
     
-
     private void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

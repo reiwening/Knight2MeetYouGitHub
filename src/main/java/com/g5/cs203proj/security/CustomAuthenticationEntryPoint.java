@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import jakarta.servlet.http.HttpServletRequest;  // Update this import
-import jakarta.servlet.http.HttpServletResponse;  // Update this import
+import jakarta.servlet.http.HttpServletRequest;  
+import jakarta.servlet.http.HttpServletResponse; 
 import org.springframework.security.core.AuthenticationException;
 import jakarta.servlet.ServletException;
 import org.springframework.http.MediaType;

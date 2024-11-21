@@ -20,15 +20,14 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, 
                        AccessDeniedException accessDeniedException) throws IOException {
 
-        // Set the response status
+      
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-        // Create a custom response body
         Map<String, Object> body = new HashMap<>();
         body.put("error", "You are not authorised for this.");
         body.put("details", accessDeniedException.getMessage());
 
-        // Convert the response body to JSON and write it to the response
+        
         ObjectMapper mapper = new ObjectMapper();
         response.getOutputStream().println(mapper.writeValueAsString(body));
     }

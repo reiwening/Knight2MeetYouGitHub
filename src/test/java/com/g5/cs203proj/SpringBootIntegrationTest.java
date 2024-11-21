@@ -1,136 +1,184 @@
 package com.g5.cs203proj;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
-
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.core.ParameterizedTypeReference;
 
-import com.g5.cs203proj.DTO.TournamentDTO;
-import com.g5.cs203proj.entity.Tournament;
-import com.g5.cs203proj.repository.TournamentRepository;
+import com.g5.cs203proj.DTO.*;
+import com.g5.cs203proj.entity.*;
+import com.g5.cs203proj.repository.*;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations = "classpath:application.properties")
 public class SpringBootIntegrationTest {
 
     @LocalServerPort
     private int port;
-    private final String baseUrl = "http://localhost:";
-
-    @Autowired
-    private TestRestTemplate restTemplate;
 
     @Autowired
     private TournamentRepository tournamentRepository;
 
     @Autowired
+    private PlayerRepository playerRepository;
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
     private BCryptPasswordEncoder encoder;
 
-    @AfterEach
-    void tearDown() {
-        tournamentRepository.deleteAll();
-    }
+    private Tournament tournament;
+    private Player adminPlayer;
+    private Player regularPlayer;
+    private Match match;
 
+    private TestRestTemplate restTemplate;
+    private TestRestTemplate adminTemplate;
+    private TestRestTemplate userTemplate;
+    private String baseUrl;
 
-    @Test
-    public void getAllTournaments_Success() throws Exception {
-        // Arrange
-        Tournament tournament1 = new Tournament();
-        tournament1.setName("Chess Tournament 1");
-        tournament1.setMinPlayers(2);
-        tournament1.setMaxPlayers(10);
-        tournament1.setTournamentStyle("Round Robin");
-        
-        Tournament tournament2 = new Tournament();
-        tournament2.setName("Chess Tournament 2");
-        tournament2.setMinPlayers(4);
-        tournament2.setMaxPlayers(8);
-        tournament2.setTournamentStyle("Swiss");
+    @BeforeEach
+    void setUp() {
+        baseUrl = "http://localhost:" + port;
 
-        tournamentRepository.saveAll(List.of(tournament1, tournament2));
+        // Create admin user
+        adminPlayer = new Player("admin_user", encoder.encode("admin123456"), "admin@test.com", "ROLE_ADMIN");
+        adminPlayer.setGlobalEloRating(1500);
+        adminPlayer.setEnabled(true);
+        adminPlayer = playerRepository.save(adminPlayer);
 
-        URI uri = new URI(baseUrl + port + "/tournaments");
+        // Create regular user
+        regularPlayer = new Player("regular_user", encoder.encode("user12345678"), "user@test.com", "ROLE_USER");
+        regularPlayer.setGlobalEloRating(1500);
+        regularPlayer.setEnabled(true);
+        regularPlayer = playerRepository.save(regularPlayer);
 
-        // Act
-        ResponseEntity<TournamentDTO[]> result = restTemplate.getForEntity(uri, TournamentDTO[].class);
-
-        // Assert
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertNotNull(result.getBody());
-        assertEquals(2, result.getBody().length);
-        assertEquals("Chess Tournament 1", result.getBody()[0].getName());
-        assertEquals("Chess Tournament 2", result.getBody()[1].getName());
-    }
-
-    @Test
-    public void getTournamentById_Success() throws Exception {
-        // Arrange
-        Tournament tournament = new Tournament();
-        tournament.setName("Chess Tournament");
+        // Create test tournament
+        tournament = new Tournament();
+        tournament.setName("Test Tournament");
+        tournament.setTournamentStatus("REGISTRATION");
+        tournament.setTournamentStyle("ROUND ROBIN");
         tournament.setMinPlayers(2);
-        tournament.setMaxPlayers(10);
-        tournament.setTournamentStyle("Round Robin");
+        tournament.setMaxPlayers(8);
+        tournament.setMinElo(1000);
+        tournament.setMaxElo(2000);
+        tournament.setRegistrationCutOff(LocalDateTime.now().plusDays(7));
+        tournament.setRegisteredPlayers(new HashSet<>());
+        tournament.setTournamentMatchHistory(new ArrayList<>());
+        tournament.setRankings(new ArrayList<>());
+        tournament = tournamentRepository.save(tournament);
 
-        Long tournamentId = tournamentRepository.save(tournament).getId();
-        URI uri = new URI( baseUrl + port + "/tournaments/" + tournamentId);
+        // Create test match
+        match = new Match();
+        match.setTournament(tournament);
+        match.setMatchStatus("NOT_STARTED");
+        match = matchRepository.save(match);
 
-        // Act: Perform the GET request
-        ResponseEntity<TournamentDTO> result = restTemplate.getForEntity(uri, TournamentDTO.class);
+        // Configure message converter with all supported media types
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setSupportedMediaTypes(Arrays.asList(
+            MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_OCTET_STREAM,
+            MediaType.TEXT_PLAIN,
+            MediaType.ALL
+        ));
 
-        // Assert: Check if the response is correct
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertNotNull(result.getBody());
-        assertEquals("Chess Tournament", result.getBody().getName());
-        assertEquals(2, result.getBody().getMinPlayers());
-        assertEquals(10, result.getBody().getMaxPlayers());
+        // Set up rest templates with proper headers
+        RestTemplateBuilder builder = new RestTemplateBuilder()
+            .rootUri(baseUrl)
+            .messageConverters(converter)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+
+        restTemplate = new TestRestTemplate(builder);
+        adminTemplate = new TestRestTemplate(builder, "admin_user", "admin123456");
+        userTemplate = new TestRestTemplate(builder, "regular_user", "user12345678");
     }
 
+    @AfterEach
+    @Transactional
+    void tearDown() {
+        try {
+            // Delete matches first
+            matchRepository.deleteAll();
+            matchRepository.flush();
+
+            // Then delete tournament
+            if (tournament != null) {
+                tournamentRepository.deleteById(tournament.getId());
+                tournamentRepository.flush();
+            }
+
+            // Finally delete players
+            playerRepository.deleteAll();
+            playerRepository.flush();
+        } catch (Exception e) {
+            System.err.println("Error in tearDown: " + e.getMessage());
+        }
+    }
 
     @Test
-    public void getTournamentById_Failure() throws Exception {
-        // Arrange
-        URI uri = new URI( baseUrl + port + "/tournaments/1" );
-        // Act
-        ResponseEntity<TournamentDTO> result = restTemplate.getForEntity(uri, TournamentDTO.class); 
-        // Assert: Check if the response is 404 Not Found
+    void getAllTournaments_Success() {
+        ResponseEntity<TournamentDTO[]> result = restTemplate.getForEntity("/tournaments", TournamentDTO[].class);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertEquals(1, result.getBody().length);
+    }
+
+    @Test
+    void getTournamentById_Success() {
+        ResponseEntity<TournamentDTO> result = restTemplate.getForEntity("/tournaments/{id}", TournamentDTO.class, tournament.getId());
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertEquals(tournament.getName(), result.getBody().getName());
+    }
+
+    @Test
+    void getTournamentById_NotFound() {
+        ResponseEntity<TournamentDTO> result = restTemplate.getForEntity("/tournaments/{id}", TournamentDTO.class, 999L);
+
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-    }    
+    }
 
-// @Test
-// public void createTournament_Success() throws URISyntaxException {
-//     // Set up TestRestTemplate with basic authentication
-//     TestRestTemplate adminRestTemplate = restTemplate.withBasicAuth("adminUsername", "adminPassword");
+    @Test
+    void registerPlayerToTournament_Success() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        
+        HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
-//     URI uri = new URI("http://localhost:" + port + "/tournaments");
+        String url = String.format("/tournaments/%d/players?playerId=%d", tournament.getId(), regularPlayer.getId());
 
-//     // Create a TournamentDTO with required properties
-//     TournamentDTO tournamentDTO = new TournamentDTO();
-//     tournamentDTO.setName("New Tournament");
-//     tournamentDTO.setMinPlayers(2);
-//     tournamentDTO.setMaxPlayers(16);
-//     tournamentDTO.setTournamentStyle("Knockout");
+        ResponseEntity<TournamentDTO> result = userTemplate.exchange(
+            url,
+            HttpMethod.POST,
+            entity,
+            TournamentDTO.class
+        );
 
-//     // Act: Send POST request to create tournament
-//     ResponseEntity<Tournament> response = adminRestTemplate.postForEntity(uri, tournamentDTO, Tournament.class);
-
-//     // Assert: Verify response status and data
-//     assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-//     assertNotNull(response.getBody());
-//     assertEquals("New Tournament", response.getBody().getName());
-// }
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertTrue(result.getBody().getRegisteredPlayersId().contains(regularPlayer.getId()));
+    }
 
 }

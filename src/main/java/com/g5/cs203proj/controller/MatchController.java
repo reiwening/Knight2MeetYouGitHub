@@ -144,7 +144,7 @@ public class MatchController {
         }
     
         matchService.saveMatch(match);
-        return matchService.convertToDTO(match);  // Return MatchDTO instead of Match
+        return matchService.convertToDTO(match);  
     }
 
 

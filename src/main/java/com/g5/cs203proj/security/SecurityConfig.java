@@ -36,8 +36,6 @@ public class SecurityConfig {
     @Autowired
     public SecurityConfig(PlayerDetailsService playerSvc){
         this.playerDetailsService = playerSvc;
-// this.accessDeniedHandler = accessDeniedHandler;
-// this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean 
@@ -59,23 +57,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authz) -> authz 
-                .requestMatchers(HttpMethod.GET, "/players/admins").hasRole("ADMIN") // spring convention is "ADMIN" , not "ROLE_ADMIN"
+                .requestMatchers(HttpMethod.GET, "/players/admins").hasRole("ADMIN") 
                 .requestMatchers(HttpMethod.GET, "/players/users").hasRole("ADMIN") 
                 .requestMatchers(HttpMethod.GET, "/players/{username}").authenticated()
                 .requestMatchers(HttpMethod.PUT, "/players").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/players/{username}").authenticated()
-
-                // .requestMatchers(HttpMethod.PUT, "/tournaments/{id}").hasRole("ADMIN") 
                 .requestMatchers(HttpMethod.POST, "/tournaments").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/tournaments/{id}").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.POST, "/tournaments{tournamentId}/players").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.DELETE, "/tournaments/{tournamentId}/players/{playerId}").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.DELETE, "/tournaments/{tournamentId}/players/{playerId}").authenticated()
-
                 .requestMatchers(HttpMethod.PUT, "/tournaments/{id}/**").hasRole("ADMIN")
-
-
-                // .requestMatchers(HttpMethod.PUT, "/tournaments/{id}").hasRole("ADMIN") 
                 .requestMatchers("/h2-console/**").permitAll()  // Allow H2 console access
                 .anyRequest().permitAll()
             )
@@ -85,7 +74,7 @@ public class SecurityConfig {
             )
         .httpBasic(Customizer.withDefaults())
         .csrf(csrf -> csrf.disable())
-        .headers(headers -> headers.frameOptions().sameOrigin())  // Allow frames from the same origin for H2 console
+        .headers(headers -> headers.frameOptions().sameOrigin())  
         .authenticationProvider(authenticationProvider());
 
         return http.build();
@@ -93,7 +82,7 @@ public class SecurityConfig {
 
    
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() { // use the default no-argument constructor that helps to generate a random salt and hash password
+    public BCryptPasswordEncoder bCryptPasswordEncoder() { 
         return new BCryptPasswordEncoder();
     }
        
