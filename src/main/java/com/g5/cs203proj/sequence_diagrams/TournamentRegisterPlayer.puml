@@ -1,0 +1,75 @@
+@startuml
+skinparam SequenceMessageFontSize 20
+
+actor "Player" as Player
+participant "TournamentController" as TournamentController
+participant "TournamentService" as TournamentService
+participant "TournamentRepository" as TournamentRepository
+participant "PlayerService" as PlayerService
+participant "PlayerRepository" as PlayerRepository
+participant "SecurityContextHolder" as SecurityContextHolder
+
+Player -> TournamentController: registerPlayer(tournamentId, playerId)
+activate TournamentController
+TournamentController -> PlayerService: getPlayerById(playerId)
+activate PlayerService
+PlayerService --> TournamentController: return player
+deactivate PlayerService
+TournamentController -> Player: getUsername(player)
+activate Player
+Player --> TournamentController: returns username
+deactivate Player
+
+TournamentController -> SecurityContextHolder: .getContext().getAuthentication()
+activate SecurityContextHolder
+SecurityContextHolder --> TournamentController: return authentication
+deactivate SecurityContextHolder
+
+alt if wrong authentication
+    TournamentController -> Player: throw AccessDeniedException("You need authorisation to register for a tournament.")
+else if Admin trying to register
+    TournamentController -> Player: throw AccessDeniedException("Admins are not allowed to register for tournaments.")
+else no issue
+  TournamentController -> PlayerService: validateUserAccess(authentication.getName())
+  activate PlayerService
+  PlayerService --> TournamentController: validation passed or throw AccessDeniedException
+  deactivate PlayerService
+
+  TournamentController -> TournamentService: registerPlayer(playerId, tournamentId)
+  activate TournamentService
+  TournamentService -> TournamentService: getTournamentById(tournamentId)
+  activate TournamentService
+  TournamentService --> TournamentService: return tournament
+  deactivate TournamentService
+  TournamentService -> PlayerRepository: findById(playerId)
+  activate PlayerRepository
+  PlayerRepository --> TournamentService: return player or throw PlayerAvailabilityException
+  deactivate PlayerRepository
+
+  alt if player already registered
+      TournamentService -> TournamentService: throw PlayerAvailabilityException("ALREADY_IN_TOURNAMENT")
+  else if tournament is full
+      TournamentService -> TournamentService: throw TournamentFullException(tournamentId)
+  else no issue
+      TournamentService -> Tournament: add player to registeredPlayers
+      activate Tournament 
+      note right of Tournament
+        add player
+      end note
+      deactivate Tournament
+      TournamentService -> TournamentRepository: save(tournament)
+      activate TournamentRepository
+      TournamentRepository --> TournamentService: return saved tournament
+      deactivate TournamentRepository
+  end
+
+  TournamentService --> TournamentController: return updated tournament
+  deactivate TournamentService
+  TournamentController -> TournamentService: convertToDTO(updatedTournament)
+  activate TournamentService
+  TournamentService --> TournamentController: return tournamentDTO
+  deactivate TournamentService
+  TournamentController --> Player: return ResponseEntity with status OK
+  deactivate TournamentController
+end
+@enduml

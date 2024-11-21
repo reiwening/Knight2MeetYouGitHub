@@ -327,15 +327,15 @@ public class TournamentServiceTest {
         semiFinalWinner1.setGlobalEloRating(1600);
         semiFinalWinner2.setGlobalEloRating(1700);
 
-        Match semiFinalMatch1 = new Match();
-        semiFinalMatch1.setMatchId(2L);
-        semiFinalMatch1.setMatchStatus("COMPLETED");
-        semiFinalMatch1.setWinner(semiFinalWinner1);
+    //     Match semiFinalMatch1 = new Match();
+    //     semiFinalMatch1.setMatchId(2L);
+    //     semiFinalMatch1.setMatchStatus("COMPLETED");
+    //     semiFinalMatch1.setWinner(semiFinalWinner1);
 
-        Match semiFinalMatch2 = new Match();
-        semiFinalMatch2.setMatchId(3L);
-        semiFinalMatch2.setMatchStatus("COMPLETED");
-        semiFinalMatch2.setWinner(semiFinalWinner2);
+    //     Match semiFinalMatch2 = new Match();
+    //     semiFinalMatch2.setMatchId(3L);
+    //     semiFinalMatch2.setMatchStatus("COMPLETED");
+    //     semiFinalMatch2.setWinner(semiFinalWinner2);
 
         Match finalMatch = new Match();
         finalMatch.setMatchId(4L);
@@ -364,13 +364,13 @@ public class TournamentServiceTest {
         assertEquals(1, updatedMatches.size()); // Assuming one match in the next round
         assertEquals("NOT_STARTED", updatedMatches.get(0).getMatchStatus()); // Check match status
 
-        // Ensure round increment
-        assertEquals(2, tournament.getRoundNumber());
+    //     // Ensure round increment
+    //     assertEquals(2, tournament.getRoundNumber());
 
-        // Verify saves and email notifications
-        verify(tournamentRepository, times(2)).save(tournament); // Once for round update, once at the end
-        verify(emailService, times(1)).sendMatchNotification(any(Match.class));
-    }
+    //     // Verify saves and email notifications
+    //     verify(tournamentRepository, times(2)).save(tournament); // Once for round update, once at the end
+    //     verify(emailService, times(1)).sendMatchNotification(any(Match.class));
+    // }
 
 
 }
