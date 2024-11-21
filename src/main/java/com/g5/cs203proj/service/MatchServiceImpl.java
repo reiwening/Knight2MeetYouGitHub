@@ -168,11 +168,6 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public boolean sendMatchStartNotification() {
-        return false;
-    }
-
-    @Override
     public HashMap<String, Boolean> viewCheckedInStatus(Match match) {
         if (match == null || match.getPlayer1() == null || match.getPlayer2() == null) {
             throw new IllegalArgumentException("Match and both players must be non-null");

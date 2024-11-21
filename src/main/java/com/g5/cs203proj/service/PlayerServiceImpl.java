@@ -102,10 +102,12 @@ public class PlayerServiceImpl implements PlayerService {
         return player.getMatchHistory();
     }
 
+    @Override
     public List<Player> getAvailablePlayersForTournament(Long tournamentIdOfMatch){
         return playerRepository.findAllByTournamentIdAndNotInOngoingMatch(tournamentIdOfMatch);
     }
     
+    @Override
     public Player registerPlayer(Player playerToRegister ) {
         Optional<Player> existingPlayer = findPlayerByUsername(playerToRegister.getUsername()); 
         if (existingPlayer.isPresent()) {
@@ -128,7 +130,7 @@ public class PlayerServiceImpl implements PlayerService {
         return savePlayer(playerToRegister);
     }
 
-
+    @Override
     public PlayerDTO convertToPlayerDTO(Player player) {
         Set<Long> tournamentIds = player.getTournamentRegistered() == null ? Collections.emptySet() : player.getTournamentRegistered()
             .stream()
@@ -154,7 +156,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
 
-
+    @Override
     public Player convertToEntity(PlayerDTO playerDTO) {
         Player player = new Player();
     

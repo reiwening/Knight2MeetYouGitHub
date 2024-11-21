@@ -16,15 +16,11 @@ public interface MatchService {
     Match reassignPlayersToMatch(Long oldMatchId, Long newMatchId);
     List<Match> createRoundRobinMatches(Long tournamentId);
     List<Match> createSingleEliminationMatches(Long tournamentId);
-    boolean isPowerOfTwo(int numPlayers);
     void processMatchResult(Match match, Player winner, boolean isDraw);
 
 
     List<Match> getMatchesForTournament(Tournament tournament);
     List<Match> getMatchesForPlayer(Player player);
-
-    // Returns true if notification sent successfully
-    boolean sendMatchStartNotification();
 
     // View check-in status for both players for a match
     HashMap<String, Boolean> viewCheckedInStatus(Match match);
