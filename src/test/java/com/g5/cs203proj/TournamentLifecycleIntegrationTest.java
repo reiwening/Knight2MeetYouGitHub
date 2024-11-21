@@ -78,89 +78,100 @@ public class TournamentLifecycleIntegrationTest {
         }
     }
 
-    // @Test
-    // @Transactional
-    // void simulateSingleEliminationTournament() {
-    //     // Create tournament for this test
-    //     tournament = new Tournament();
-    //     tournament.setName("Single Elimination Test Tournament");
-    //     tournament.setTournamentStyle(Styles.RANDOM.getDisplayName());
-    //     tournament.setMinPlayers(4);
-    //     tournament.setMaxPlayers(8);
-    //     tournament.setMinElo(1000);
-    //     tournament.setMaxElo(2500);
-    //     tournament.setRegistrationCutOff(LocalDateTime.now().plusDays(1));
-    //     tournament.setTournamentStatus(Statuses.REGISTRATION.getDisplayName());
-    //     tournament.setRegisteredPlayers(new HashSet<>());
-    //     tournament.setTournamentMatchHistory(new ArrayList<>());
-    //     tournament.setRoundNumber(1);
+    @Test
+    @Transactional
+    void simulateSingleEliminationTournament() {
+        // Create tournament for this test
+        tournament = new Tournament();
+        tournament.setName("Single Elimination Test Tournament");
+        tournament.setTournamentStyle(Styles.RANDOM.getDisplayName());
+        tournament.setMinPlayers(4);
+        tournament.setMaxPlayers(8);
+        tournament.setMinElo(1000);
+        tournament.setMaxElo(2500);
+        tournament.setRegistrationCutOff(LocalDateTime.now().plusDays(1));
+        tournament.setTournamentStatus(Statuses.REGISTRATION.getDisplayName());
+        tournament.setRegisteredPlayers(new HashSet<>());
+        tournament.setTournamentMatchHistory(new ArrayList<>());
+        tournament.setRoundNumber(1);
         
-    //     tournament = tournamentService.createTournament(tournament);
-    //     System.out.println("Created Single Elimination tournament with ID: " + tournament.getId());
+        tournament = tournamentService.createTournament(tournament);
+        System.out.println("Created Single Elimination tournament with ID: " + tournament.getId());
 
-    //     // Register players
-    //     for (Player player : players) {
-    //         tournamentService.registerPlayer(player.getId(), tournament.getId());
-    //     }
+        // Register players
+        for (Player player : players) {
+            tournamentService.registerPlayer(player.getId(), tournament.getId());
+        }
         
-    //     tournament = tournamentService.startOrCancelTournament(tournament.getId());
+        tournament = tournamentService.startOrCancelTournament(tournament.getId());
         
-    //     // First round - Players 8,7,6,5 should win due to higher Elo
-    //     List<Match> firstRoundMatches = matchService.createSingleEliminationMatches(tournament.getId());
-    //     assertEquals(7, firstRoundMatches.size());
-    //     // Verify only first 4 matches are active for round 1
-    //     int activeMatches = 0;
-    //     for (Match match : firstRoundMatches) {
-    //         if (match.getPlayer1() != null && match.getPlayer2() != null) {
-    //             activeMatches++;
-    //         }
-    //     }
-    //     assertEquals(4, activeMatches);
+        // First round - Players 8,7,6,5 should win due to higher Elo
+        List<Match> allMatches = matchService.createSingleEliminationMatches(tournament.getId());
+        assertEquals(7, allMatches.size()); //all 7 matches are created at once
+        // Verify only first 4 matches are active for round 1
+        int activeMatches = 0;
+        for (Match match : allMatches) {
+            if (match.getPlayer1() != null && match.getPlayer2() != null) {
+                activeMatches++;
+            }
+        }
+        assertEquals(4, activeMatches);
         
-    //     // Simulate only the active matches
-    //     List<Match> activeFirstRoundMatches = firstRoundMatches.stream()
-    //         .filter(m -> m.getPlayer1() != null && m.getPlayer2() != null)
-    //         .collect(Collectors.toList());
-    //     simulateAndVerifyRound(activeFirstRoundMatches, 
-    //             Arrays.asList(players.get(7), players.get(6), players.get(5), players.get(4)));
-    //     verifyEliminatedPlayers(Arrays.asList(players.get(0), players.get(1), players.get(2), players.get(3)), 5);
+        // Simulate only the active matches
+        List<Match> activeFirstRoundMatches = allMatches.stream()
+            .filter(m -> m.getPlayer1() != null && m.getPlayer2() != null)
+            .collect(Collectors.toList());
+        List<Player> losers = simulateAndVerifyRound(activeFirstRoundMatches);
+        verifyEliminatedPlayers(losers, 5);
+displayRankings(1);
+        // Semifinals - Players 8,7 should win
+        // For subsequent rounds, only process matches with assigned players
+        List<Match> semifinals = tournamentService.processSingleEliminationRound(tournament.getId())
+            .stream()
+            .filter(m -> m.getPlayer1() != null && m.getPlayer2() != null)
+            .collect(Collectors.toList());
+        assertEquals(2, semifinals.size() - activeMatches);
+        activeMatches += 2; //1st round + semi finals = 6 matches total
+        losers = simulateAndVerifyRound(semifinals);
+        verifyEliminatedPlayers(losers, 3);
+        displayRankings(2);
+        // Finals - Player 8 should win
+        List<Match> finals = tournamentService.processSingleEliminationRound(tournament.getId())
+            .stream()
+            .filter(m -> m.getPlayer1() != null && m.getPlayer2() != null)
+            .collect(Collectors.toList());
+        assertEquals(1, finals.size() - activeMatches);
+        losers = simulateAndVerifyRound(finals);
+        verifyEliminatedPlayers(losers, 2);
+        displayRankings(3);
+        // Verify final rankings
+        tournament = tournamentService.getTournamentById(tournament.getId());
+        List<Ranking> finalRankings = tournament.getRankings();
+        Optional<Ranking> winnerRanking = finalRankings.stream()
+            .filter(r -> r.getPlayer().getId().equals(players.get(7).getId()))
+            .findFirst();
         
-    //     // Semifinals - Players 8,7 should win
-    //     // For subsequent rounds, only process matches with assigned players
-    //     List<Match> semifinals = tournamentService.processSingleEliminationRound(tournament.getId())
-    //         .stream()
-    //         .filter(m -> m.getPlayer1() != null && m.getPlayer2() != null)
-    //         .collect(Collectors.toList());
-    //     assertEquals(2, semifinals.size());
-    //     simulateAndVerifyRound(semifinals, Arrays.asList(players.get(7), players.get(6)));
-    //     verifyEliminatedPlayers(Arrays.asList(players.get(4), players.get(5)), 3);
-        
-    //     // Finals - Player 8 should win
-    //     List<Match> finals = tournamentService.processSingleEliminationRound(tournament.getId())
-    //         .stream()
-    //         .filter(m -> m.getPlayer1() != null && m.getPlayer2() != null)
-    //         .collect(Collectors.toList());
-    //     assertEquals(1, finals.size());
-    //     simulateAndVerifyRound(finals, Arrays.asList(players.get(7)));
-    //     verifyEliminatedPlayers(Arrays.asList(players.get(6)), 2);
+        assertTrue(winnerRanking.isPresent(), "Winner ranking should be present");
+        RandomRanking winner = (RandomRanking) winnerRanking.get();
+        assertEquals("WWW", winner.getMatchHistory());
+        assertEquals(1, winner.getRank());
+    }
 
-    //     // Verify final rankings
-    //     tournament = tournamentService.getTournamentById(tournament.getId());
-    //     List<Ranking> finalRankings = tournament.getRankings();
-    //     Optional<Ranking> winnerRanking = finalRankings.stream()
-    //         .filter(r -> r.getPlayer().equals(players.get(7)))
-    //         .findFirst();
-        
-    //     assertTrue(winnerRanking.isPresent(), "Winner ranking should be present");
-    //     RandomRanking winner = (RandomRanking) winnerRanking.get();
-    //     assertEquals("WWW", winner.getMatchHistory());
-    //     assertEquals(1, winner.getRank());
-    // }
+    private void displayRankings(int round) {
+        tournament = tournamentService.getTournamentById(tournament.getId());
+        System.out.println("Rankings for round " + round + ":");
+        for (Ranking ranking : tournament.getRankings()) {
+            System.out.println("Ranking: " + ranking.toString());
+        }
+    }
 
-    private void simulateAndVerifyRound(List<Match> matches, List<Player> expectedWinners) {
+    //set winners to be player1
+    private List<Player> simulateAndVerifyRound(List<Match> matches) {
+        List<Player> eliminatedPlayers = new ArrayList<>();
         for (int i = 0; i < matches.size(); i++) {
             Match match = matches.get(i);
-            Player winner = expectedWinners.get(i);
+            Player winner = match.getPlayer1();
+            eliminatedPlayers.add(match.getPlayer2());
             matchService.processMatchResult(match, winner, false);
             // Flush changes to ensure rankings are updated
             entityManager.flush();
@@ -169,14 +180,19 @@ public class TournamentLifecycleIntegrationTest {
             // Refresh tournament to get updated rankings
             tournament = tournamentService.getTournamentById(tournament.getId());
         }
+        return eliminatedPlayers;
     }
 
     private void verifyEliminatedPlayers(List<Player> eliminatedPlayers, int expectedRank) {
         // Refresh tournament to ensure we have latest rankings
         tournament = tournamentService.getTournamentById(tournament.getId());
+        //checking all rankiings
+        for (Ranking ranking : tournament.getRankings()) {
+            System.out.println("Ranking: " + ranking.getPlayer().getUsername() + " - " + ranking.getRank());
+        }
         for (Player player : eliminatedPlayers) {
             Optional<Ranking> rankingOpt = tournament.getRankings().stream()
-                .filter(r -> r.getPlayer().equals(player))
+                .filter(r -> r.getPlayer().getId().equals(player.getId()))
                 .findFirst();
             
             assertTrue(rankingOpt.isPresent(), 

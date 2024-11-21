@@ -15,6 +15,11 @@ We have created a FrontEnd website to display and demonstrate various features a
 ## Others
 
 ### To run the spring project on windows, use : mvnw.cmd spring-boot:run OR .\mvnw spring-boot:run
+### Before running the project, make sure to add the API key to the environment variables. It can be found from our report. Use the following commands in powershell:
+### For adding the API key:
+## $env:OPENAI_API_KEY="{API key taken from the docs}"
+### For checking the API key:
+## $env:OPENAI_API_KEY
 
 ### To get to the h2 database console, run the spring boot and type this in your browser : http://localhost:8080/h2-console
 
