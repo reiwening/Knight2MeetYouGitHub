@@ -385,20 +385,4 @@ public class MatchServiceTest {
     void convertToEntity_NullDTO() {
         assertThrows(IllegalArgumentException.class, () -> matchService.convertToEntity(null));
     }
-
-    // @Test
-    // void isPowerOfTwo_Success() {
-    //     assertTrue(matchService.isPowerOfTwo(2));
-    //     assertTrue(matchService.isPowerOfTwo(4));
-    //     assertTrue(matchService.isPowerOfTwo(8));
-    //     assertTrue(matchService.isPowerOfTwo(16));
-    // }
-
-    // @Test
-    // void isPowerOfTwo_Failure() {
-    //     assertFalse(matchService.isPowerOfTwo(0));
-    //     assertFalse(matchService.isPowerOfTwo(3));
-    //     assertFalse(matchService.isPowerOfTwo(5));
-    //     assertFalse(matchService.isPowerOfTwo(7));
-    // }
 }
