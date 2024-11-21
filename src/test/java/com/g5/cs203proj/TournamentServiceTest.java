@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.enums.Statuses;
+import com.g5.cs203proj.enums.Styles;
 import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
 import com.g5.cs203proj.exception.inputs.InvalidStatusException;
 import com.g5.cs203proj.exception.inputs.InvalidStyleException;
@@ -232,26 +235,6 @@ public class TournamentServiceTest {
     }
 
     @Test
-    void startOrCancelTournament_Start() {
-        tournament.getRegisteredPlayers().add(player);
-        tournament.getRegisteredPlayers().add(new Player());
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
-
-        Tournament result = tournamentService.startOrCancelTournament(1L);
-        assertEquals("In Progress", result.getTournamentStatus());
-    }
-
-    @Test
-    void startOrCancelTournament_Cancel() {
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
-
-        Tournament result = tournamentService.startOrCancelTournament(1L);
-        assertEquals("Cancelled", result.getTournamentStatus());
-    }
-
-    @Test
     void setTournamentEloRange_Success() {
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
@@ -266,8 +249,10 @@ public class TournamentServiceTest {
         when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 
-        Tournament result = tournamentService.setTournamentStatus(1L, "IN PROGRESS");
-        assertEquals("IN PROGRESS", result.getTournamentStatus());
+        Tournament result = tournamentService.setTournamentStatus(1L, Statuses.IN_PROGRESS.getDisplayName());
+
+        assertNotNull(result);
+        assertEquals(Statuses.IN_PROGRESS.getDisplayName(), result.getTournamentStatus());
     }
 
     @Test

@@ -1,11 +1,7 @@
 package com.g5.cs203proj.service;
 
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +10,7 @@ import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.DTO.PlayerDTO;
 import com.g5.cs203proj.entity.Match;
-import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.repository.PlayerRepository;
-import com.g5.cs203proj.service.TournamentService;
-import com.g5.cs203proj.service.MatchService;
-import com.g5.cs203proj.service.EmailService;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,7 +28,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     // constructor
     public PlayerServiceImpl(PlayerRepository playerRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
-            TournamentService tournamentServic, EmailService emailService, TokenService tokenService) {
+            TournamentService tournamentService, EmailService emailService, TokenService tokenService) {
         this.playerRepository = playerRepository;
         this.tournamentService = tournamentService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;

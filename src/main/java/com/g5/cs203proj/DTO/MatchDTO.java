@@ -1,7 +1,5 @@
 package com.g5.cs203proj.DTO;
 
-import com.g5.cs203proj.entity.Player;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;

@@ -1,24 +1,17 @@
 package com.g5.cs203proj.service;
 
 import com.g5.cs203proj.enums.*;
-import com.g5.cs203proj.exception.player.*;
 import com.g5.cs203proj.exception.tournament.*;
 import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
 import com.g5.cs203proj.exception.inputs.InvalidStatusException;
 import com.g5.cs203proj.exception.inputs.InvalidStyleException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
-// import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
-import com.g5.cs203proj.exception.tournament.*;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.*;
 import com.g5.cs203proj.repository.*;
 
-import jakarta.validation.OverridesAttribute;
-
-import org.hibernate.id.IntegralDataTypeHolder;
-import org.hibernate.mapping.Array;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +33,8 @@ public class TournamentServiceImpl implements TournamentService {
     private MatchRepository matchRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private RankingService rankingService;
 
 //Contructors
     public TournamentServiceImpl(){};
@@ -65,14 +60,16 @@ public class TournamentServiceImpl implements TournamentService {
         //make sure casing is correct
         tournament.setTournamentStatus(status);
         tournament.setTournamentStyle(style);
-        return tournamentRepository.save(tournament);
+
+        Tournament savedTournament = tournamentRepository.save(tournament);
+        System.out.println("Tournament saved with ID: " + savedTournament.getId());
+        return savedTournament;
     }
 
     // Update a tournament
     @Override
     public Tournament updateTournament(Long tournamentId, Tournament updatedTournament) {
-        Tournament existingTournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament existingTournament = getTournamentById(tournamentId);
 
         String status = updatedTournament.getTournamentStatus().toUpperCase();
         String style = updatedTournament.getTournamentStyle().toUpperCase();
@@ -116,8 +113,7 @@ public class TournamentServiceImpl implements TournamentService {
     // Delete a tournament
     @Override
     public void deleteTournament(Long tournamentId) {
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new TournamentNotFoundException(tournamentId));
+        Tournament tournament = getTournamentById(tournamentId);
         tournamentRepository.delete(tournament);
     }
 
@@ -138,36 +134,74 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentRepository.findByTournamentStatus("registration");
     }
 
+    /*
+     * Starts a tournament if it has enough players (In_PROGRESS), otherwise cancels it (CANCELLED). 
+     * Also initializes rankings for the tournament based on the type
+     * This ensures the rankings are always of the correct type and it is not changed anywhere else
+     * @param: tournamentId: id of the tournament to start or cancel
+     * @return: the updated tournament
+    */
     @Override
     public Tournament startOrCancelTournament(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
         if (tournament.getRegisteredPlayers().size() >= tournament.getMinPlayers()) {
-            tournament.setTournamentStatus("In Progress");
+            tournament.setTournamentStatus(Statuses.IN_PROGRESS.getDisplayName());
+            //Prepare rankings for the tournament (for round robin and random, the rest idk)
+            Set<Player> players = tournament.getRegisteredPlayers();
+            List<Ranking> ranking = new ArrayList<>(players.size());
+            if (tournament.getTournamentStyle().equals(Styles.ROUND_ROBIN.getDisplayName())){
+                for (Player player : players){
+                    ranking.add(new RoundRobinRanking(tournament, player));
+                }
+            }
+            else if (tournament.getTournamentStyle().equals(Styles.RANDOM.getDisplayName())){
+                for (Player player : players){
+                    ranking.add(new RandomRanking(tournament, player));
+                }
+            }
+            tournament.setRankings(ranking);
+
         } else {
-            tournament.setTournamentStatus("Cancelled");
+            tournament.setTournamentStatus(Statuses.CANCELLED.getDisplayName());
         }
         return tournamentRepository.save(tournament);
     }
 
     // Get tournament rankings
     @Override
-    public Map<Long, Integer> getTournamentRankings(Long tournamentId) {
+    public List<Ranking> getTournamentRankings(Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
         return tournament.getRankings();
     }
+
+    /*
+     * Called whenever a match is completed to update tournament rankings. rankingService handles
+     * different tournament styles, and returns updated ranking objects and correct order to be updated in tournament
+     * @param: tournament: tournament object to be updated
+     * @param: match: match object which affects rankings
+     */
+    @Override
+    public void updateTournamentRankings(Tournament tournament, Match match){
+        List<Ranking> newRankings = rankingService.updateRankings(tournament, match);
+        //update and save tournament rankings
+        tournament.setRankings(newRankings);
+        tournamentRepository.save(tournament);
+    }
+
+
 
     // Player management
     // Register a player to a tournament
     @Override
     public Tournament registerPlayer(Long playerId, Long tournamentId) {
         Tournament tournament = getTournamentById(tournamentId);
+        System.out.println("Found tournament for registration: " + tournament.getId());
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND));
 
 
         if (tournament.getRegisteredPlayers().contains(player)) {
             throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.ALREADY_IN_TOURNAMENT);
-            // throw new PlayerAlreadyInTournamentException(playerId, tournamentId);
         }
 
         if (tournament.getRegisteredPlayers().size() >= tournament.getMaxPlayers()) {
@@ -212,11 +246,6 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
 // Match management
-
-    @Override
-    public void scheduleMatches(Long tournamentId) {
-        //not sure how to implement
-    }
 
     @Override
     public List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId) {
@@ -276,17 +305,6 @@ public class TournamentServiceImpl implements TournamentService {
         t.addTestMatch(match);
         tournamentRepository.save(t);
         return true;
-    }
-
-    //if we store the matches in the most recent round, we can just iterate through that instead of having to pass in matches
-    public void sendMatchNotification(Long tournamentId, List<Match> matches) {
-        Tournament tournament = getTournamentById(tournamentId);
-        /*
-        for (Match match : matches){
-            match.matchService.sendNotification();
-        }
-        */
-        
     }
     
     @Override
@@ -451,13 +469,6 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentRepository.save(tournament);
     }
 
-    // Set Admin
-    // @Override
-    // public Tournament setAdmin(Long tournamentId, Admin newAdmin) {
-    //     Tournament tournament = getTournamentById(tournamentId);
-    //     tournament.setAdmin(newAdmin);
-    //     return tournamentRepository.save(tournament);
-    // }
 
     // Set Name
     @Override
@@ -548,16 +559,13 @@ public class TournamentServiceImpl implements TournamentService {
     private void playerRangeValidation(Tournament tournament, int minPlayers, int maxPlayers){
         if (minPlayers < 0 || maxPlayers < 0) {
             throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, "Player count cannot be negative" );
-            // throw new InvalidPlayerRangeException("Player count cannot be negative");
         }
         if (minPlayers > maxPlayers) {
             throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, "minPlayers cannot be greater than maxPlayers" );
-            // throw new InvalidPlayerRangeException("minPlayers cannot be greater than maxPlayers");
         }
         int playerCount = tournament.getRegisteredPlayers().size();
         if (playerCount > maxPlayers) {
             throw new PlayerRangeException(PlayerRangeException.RangeErrorType.INVALID_RANGE, String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers) );
-            // throw new InvalidPlayerRangeException(String.format("Tournament has more players(%d) than new maxPlayers(%d)", playerCount, maxPlayers));
         }
     }
 

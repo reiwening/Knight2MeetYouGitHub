@@ -1,15 +1,12 @@
 package com.g5.cs203proj.exception.global;
 
 import java.util.Map;
-import java.io.ObjectInputFilter.Status;
 import java.time.DateTimeException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,14 +19,8 @@ import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
 import com.g5.cs203proj.exception.inputs.InvalidStatusException;
 import com.g5.cs203proj.exception.inputs.InvalidStyleException;
 import com.g5.cs203proj.exception.match.MatchNotFoundException;
-// import com.g5.cs203proj.exception.player.InvalidPlayerRangeException;
-// import com.g5.cs203proj.exception.player.NotEnoughPlayersException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
 import com.g5.cs203proj.exception.player.PlayerRangeException;
-// import com.g5.cs203proj.exception.to_be_deleted.PlayerNotFoundException;
-// import com.g5.cs203proj.exception.to_be_deleted.PlayerAlreadyInTournamentException;
-// import com.g5.cs203proj.exception.to_be_deleted.PlayerNotFoundException;
-// import com.g5.cs203proj.exception.to_be_deleted.PlayerNotInTournamentException;
 import com.g5.cs203proj.exception.tournament.TournamentAlreadyRegisteredException;
 import com.g5.cs203proj.exception.tournament.TournamentFullException;
 import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
@@ -87,7 +78,7 @@ public class GlobalControllerExceptionHandler {
     }
     
     
-    //Tournament Exceptions
+//Tournament Exceptions
     // Handler for TournamentNotFoundException
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(TournamentNotFoundException.class)
@@ -135,33 +126,6 @@ public class GlobalControllerExceptionHandler {
         
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
-    
-        // // Handler for InvalidMatchWinnerException
-        // @ResponseStatus(HttpStatus.NOT_FOUND)
-        // @ExceptionHandler(InvalidMatchWinnerException.class)
-        // public ResponseEntity<Map<String, Object>> handleInvalidMatchWinnerException(InvalidMatchWinnerException ex) {
-        //     Map<String, Object> body = new HashMap<>();
-        //     body.put("error", ex.getMessage());
-        //     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-        // }
-    
-    // // Handler for PlayerAlreadyInTournamentException
-    // @ResponseStatus(HttpStatus.CONFLICT)
-    // @ExceptionHandler(NotEnoughPlayersException.class)
-    // public ResponseEntity<Map<String, Object>> handleNotEnoughPlayersException(NotEnoughPlayersException ex) {
-    //     Map<String, Object> body = new HashMap<>();
-    //     body.put("error", ex.getMessage());
-    //     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
-    // }
-    
-    // Handler for InvalidPlayerRangeException
-    // @ResponseStatus(HttpStatus.BAD_REQUEST)
-    // @ExceptionHandler(InvalidPlayerRangeException.class)
-    // public ResponseEntity<Map<String, Object>> handleInvalidPlayerRangeException(InvalidPlayerRangeException ex) {
-    //     Map<String, Object> body = new HashMap<>();
-    //     body.put("error", ex.getMessage());
-    //     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-    // }
 
     // Handler for PlayerAlreadyInTournamentException
     @ResponseStatus(HttpStatus.CONFLICT)
