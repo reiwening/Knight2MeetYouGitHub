@@ -371,6 +371,5 @@ public class TournamentServiceTest {
     //     verify(tournamentRepository, times(2)).save(tournament); // Once for round update, once at the end
     //     verify(emailService, times(1)).sendMatchNotification(any(Match.class));
     // }
-
-
+    }
 }
