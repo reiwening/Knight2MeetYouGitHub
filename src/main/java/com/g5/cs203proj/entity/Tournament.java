@@ -60,6 +60,7 @@ public class Tournament {
 
     // Constructors, getters, and setters
     public Tournament() {
+        this.rankings = new ArrayList<>();
     }
 
     public Tournament(String name, String tournamentStatus, String tournamentStyle, int maxPlayers, int minPlayers, int minElo, int maxElo, LocalDateTime registrationCutOff, int round) {
@@ -72,6 +73,7 @@ public class Tournament {
         this.maxElo = maxElo;
         this.registrationCutOff = registrationCutOff;
         this.roundNumber = round;
+        this.rankings = new ArrayList<>();
     }
 
     // Getters and setters for all fields

@@ -148,7 +148,7 @@ public class TournamentServiceImpl implements TournamentService {
             tournament.setTournamentStatus(Statuses.IN_PROGRESS.getDisplayName());
             //Prepare rankings for the tournament (for round robin and random, the rest idk)
             Set<Player> players = tournament.getRegisteredPlayers();
-            List<Ranking> ranking = new ArrayList<>(players.size());
+            List<Ranking> ranking = tournament.getRankings();
             if (tournament.getTournamentStyle().equals(Styles.ROUND_ROBIN.getDisplayName())){
                 for (Player player : players){
                     ranking.add(new RoundRobinRanking(tournament, player));
