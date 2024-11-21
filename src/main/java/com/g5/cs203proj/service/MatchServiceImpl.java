@@ -321,19 +321,19 @@ public class MatchServiceImpl implements MatchService {
         return matches;
     }
 
-    @Override
-    public boolean isPowerOfTwo(int numPlayers) {
-        if (numPlayers <= 0) {
-            return false;
-        }
+    // @Override
+    // public boolean isPowerOfTwo(int numPlayers) {
+    //     if (numPlayers <= 0) {
+    //         return false;
+    //     }
         
-        while (numPlayers > 1) {
-            if (numPlayers % 2 != 0) {
-                return false;
-            }
-            numPlayers /= 2;
-        }
+    //     while (numPlayers > 1) {
+    //         if (numPlayers % 2 != 0) {
+    //             return false;
+    //         }
+    //         numPlayers /= 2;
+    //     }
         
-        return true;
-    }
+    //     return true;
+    // }
 }
