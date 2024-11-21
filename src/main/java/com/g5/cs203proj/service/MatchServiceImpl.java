@@ -12,6 +12,7 @@ import com.g5.cs203proj.DTO.MatchDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
+import com.g5.cs203proj.enums.Statuses;
 import com.g5.cs203proj.exception.global.*;
 import com.g5.cs203proj.exception.inputs.*;
 import com.g5.cs203proj.exception.match.*;
@@ -135,18 +136,25 @@ public class MatchServiceImpl implements MatchService {
 // }
     
 
+    /*
+     * called whenever a match is completed. updates match details and tournament rankings based on result
+     * @param: match: match object to be updated
+     * @param: winner: player object who won the match
+     * @param: isDraw: boolean value indicating if the match is a draw
+     */
+
     @Override
     public void processMatchResult(Match match, Player winner, boolean isDraw) {
-        match.setMatchStatus("COMPLETED");
+        match.setMatchStatus(Statuses.COMPLETED.getDisplayName());
         match.setDraw(isDraw);
-
-        if (isDraw) {
-            match.setWinner(null);
-        } else {
-            match.setWinner(winner);
+        match.setWinner(winner);
+        if (!isDraw) {
+            match.setEloChange(winner);
+            tournamentService.updateTournamentRankings(match.getTournament(), match);
         }
-        
-        match.setEloChange(winner);
+        matchRepository.save(match);
+
+
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.service.TournamentService;
 import com.g5.cs203proj.DTO.MatchDTO;
-import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.service.MatchService;
 import com.g5.cs203proj.service.PlayerService;
@@ -18,7 +17,6 @@ import com.g5.cs203proj.exception.tournament.TournamentNotFoundException;
 
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +35,6 @@ public class MatchController {
     private PlayerService playerService;
     private TournamentService tournamentService;
 
-    @Autowired
     public MatchController(MatchService matchService, PlayerService playerService, TournamentService tournamentService ) {
         this.matchService = matchService;
         this.tournamentService = tournamentService;
@@ -129,7 +126,7 @@ public class MatchController {
         Long winnerId = winner.getId();
         if (!isDraw) {
             if (winnerId != match.getPlayer1().getId() && winnerId != match.getPlayer2().getId()) 
-            throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
+                throw new PlayerAvailabilityException(PlayerAvailabilityException.AvailabilityType.NOT_FOUND);
         }
         if (isDraw) {
             // Process current match results

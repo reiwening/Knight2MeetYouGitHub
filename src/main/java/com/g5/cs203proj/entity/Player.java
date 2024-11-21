@@ -1,8 +1,6 @@
 package com.g5.cs203proj.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.g5.cs203proj.entity.Match;
-
 import java.util.*;
 
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +11,6 @@ import jakarta.validation.constraints.Email;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.fasterxml.jackson.annotation.*;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

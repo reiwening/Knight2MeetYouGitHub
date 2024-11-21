@@ -7,6 +7,7 @@ import java.util.*;
 import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
+import com.g5.cs203proj.entity.Ranking;
 import com.g5.cs203proj.entity.Tournament;
 
 public interface TournamentService {
@@ -18,7 +19,8 @@ public interface TournamentService {
     List<Tournament> getAllTournaments();
     List<Tournament> getAllRegisterableTournaments();
     Tournament startOrCancelTournament(Long tournamentId);
-    Map<Long, Integer> getTournamentRankings(Long tournamentId);
+    List<Ranking> getTournamentRankings(Long tournamentId);
+    void updateTournamentRankings(Tournament tournament, Match match);
 
     // Player Management
     Tournament registerPlayer(Long playerId, Long tournamentId);
@@ -27,11 +29,8 @@ public interface TournamentService {
     Set<Player> getRegisteredPlayers(Long tournamentId);
 
 //match management
-    void scheduleMatches(Long tournamentId);
     List<ArrayList<String>> getTournamentMatchHistory(Long tournamentId);
     boolean addTestMatchToTournament(Long tournamentId, Match match);
-    void sendMatchNotification(Long tournamentId, List<Match> matches);
-        //uses sendNotification inside MatchService
     List<Match> processSingleEliminationRound(Long tournamentId);
     List<Player> getWinnersForCurrentRound(Long tournamentId, int roundNumber); 
 
