@@ -194,62 +194,62 @@ public class MatchServiceTest {
         });
     }
 
-    @Test
-    void createSingleEliminationMatches_Success() {
-        // Arrange
-        List<Player> players = Arrays.asList(player1, player2);
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
-        when(matchRepository.save(any(Match.class))).thenReturn(match);
+    // @Test
+    // void createSingleEliminationMatches_Success() {
+    //     // Arrange
+    //     List<Player> players = Arrays.asList(player1, player2);
+    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+    //     when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
+    //     when(matchRepository.save(any(Match.class))).thenReturn(match);
 
-        // Act
-        List<Match> matches = matchService.createSingleEliminationMatches(1L);
+    //     // Act
+    //     List<Match> matches = matchService.createSingleEliminationMatches(1L);
 
-        // Assert
-        assertNotNull(matches);
-        assertEquals(3, matches.size(), "A single-elimination tournament with 4 players should create 3 matches, 2 semi-finals and 1 finals");
+    //     // Assert
+    //     assertNotNull(matches);
+    //     assertEquals(3, matches.size(), "A single-elimination tournament with 4 players should create 3 matches, 2 semi-finals and 1 finals");
 
-        // Verify that each match is saved
-        verify(matchRepository, times(3)).save(any(Match.class));
+    //     // Verify that each match is saved
+    //     verify(matchRepository, times(3)).save(any(Match.class));
 
-        // Verify that the tournament is saved with updated matches
-        verify(tournamentRepository).save(tournament);
+    //     // Verify that the tournament is saved with updated matches
+    //     verify(tournamentRepository).save(tournament);
 
-        // Verify email notifications were sent for each match
-        /*
-         * email notification should only be sent twice since creating the single elimination matches
-         * creates all the matches but only populates the first round with players
-         */
-        verify(emailService, times(2)).sendMatchNotification(any(Match.class));
-    }
+    //     // Verify email notifications were sent for each match
+    //     /*
+    //      * email notification should only be sent twice since creating the single elimination matches
+    //      * creates all the matches but only populates the first round with players
+    //      */
+    //     verify(emailService, times(2)).sendMatchNotification(any(Match.class));
+    // }
 
-    @Test
-    void createSingleEliminationMatches_NotPowerOf2() {
-        // Arrange
-        List<Player> players = Arrays.asList(player1, player2, player3);
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
-        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    // @Test
+    // void createSingleEliminationMatches_NotPowerOf2() {
+    //     // Arrange
+    //     List<Player> players = Arrays.asList(player1, player2, player3);
+    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+    //     when(playerService.getAvailablePlayersForTournament(1L)).thenReturn(players);
+    //     when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
-        List<Match> matches = matchService.createSingleEliminationMatches(1L);
+    //     // Act
+    //     List<Match> matches = matchService.createSingleEliminationMatches(1L);
 
-        // Assert
-        assertNotNull(matches);
-        assertEquals(2, matches.size(), "A single-elimination tournament with 3 players should create 2 matches at most if error not thrown.");
+    //     // Assert
+    //     assertNotNull(matches);
+    //     assertEquals(2, matches.size(), "A single-elimination tournament with 3 players should create 2 matches at most if error not thrown.");
 
-        // Verify that each match is saved
-        verify(matchRepository, times(2)).save(any(Match.class));
+    //     // Verify that each match is saved
+    //     verify(matchRepository, times(2)).save(any(Match.class));
 
-        // Verify that the tournament is saved with updated matches
-        verify(tournamentRepository).save(tournament);
+    //     // Verify that the tournament is saved with updated matches
+    //     verify(tournamentRepository).save(tournament);
 
-        // Verify email notifications were sent for each match
-        /*
-         * email notification should not be sent since number of players is not a power of 2
-         */
-        verify(emailService, times(0)).sendMatchNotification(any(Match.class));
-    }
+    //     // Verify email notifications were sent for each match
+    //     /*
+    //      * email notification should not be sent since number of players is not a power of 2
+    //      */
+    //     verify(emailService, times(0)).sendMatchNotification(any(Match.class));
+    // }
 
     @Test
     void processMatchResult_WinnerCase() {

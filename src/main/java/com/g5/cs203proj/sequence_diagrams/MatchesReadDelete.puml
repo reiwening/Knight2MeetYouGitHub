@@ -1,4 +1,6 @@
 @startuml
+skinparam SequenceMessageFontSize 20
+
 actor "Admin" as Client
 participant "MatchController" as MC
 participant "MatchService" as MS
@@ -12,25 +14,30 @@ activate MC
 
 MC -> TournamentService: getTournamentById(tournamentId)
 activate TournamentService
-TournamentService -> TournamentRepository: fetch tournament by ID
+TournamentService -> TournamentRepository: findById(tournamentId)
 activate TournamentRepository
 TournamentRepository --> TournamentService: return tournament
 deactivate TournamentRepository
+TournamentService --> MC: return tournament
 deactivate TournamentService
 
 alt If tournament has no matches
     MC --> Client: return empty list
 else If tournament has matches
     MC -> Tournament: tournament.getTournamentMatchHistory()
+    activate Tournament
+    Tournament --> MC: returns tournament matches
+    deactivate Tournament
     MC -> MC: Convert matches to stream
     MC -> MS: Loop through matches and convertToDTO(match)
     activate MS
     MS --> MC: return list of MatchDTOs
     deactivate MS
+    MC --> Client: return List<MatchDTO>
+    deactivate MC
 end
 
-MC --> Client: return List<MatchDTO>
-deactivate MC
+
 
 
 
@@ -44,10 +51,11 @@ activate MS
 
 MS -> MR: delete(match)
 activate MR
-MR --> MS: match deleted
+note right of MR
+  Deletes persisted match
+end note
 deactivate MR
 
-MS --> MC: return success message
 deactivate MS
 
 MC --> Client: return success message

@@ -1,0 +1,94 @@
+@startuml
+actor "Admin" as Client
+participant "TournamentController" as Controller
+participant "MatchService" as MatchService
+participant "MatchRepository" as MatchRepository
+participant "TournamentService" as TournamentService
+participant "EmailService" as EmailService
+participant "TournamentRepository" as TournamentRepository
+
+Client -> Controller: processSingleEliminationRound(tournamentId)
+activate Controller
+
+Controller -> TournamentService: processSingleEliminationRound(tournamentId)
+activate TournamentService
+
+TournamentService -> TournamentService: getTournamentById(tournamentId)
+activate TournamentService
+TournamentService -> TournamentRepository: fetch tournament
+activate TournamentRepository
+TournamentRepository --> TournamentService: return tournament
+deactivate TournamentRepository
+TournamentService --> TournamentService: return tournament
+deactivate TournamentService
+
+
+TournamentService -> Tournament: getTournamentMatchHistory()
+activate Tournament
+Tournament --> TournamentService: return matches
+deactivate Tournament
+
+alt If no match found
+    TournamentService --> Controller: throw "No NOT_STARTED matches available for the next round"
+    Controller --> Client: handle error
+end
+
+TournamentService -> Tournament: get current round number
+activate Tournament
+Tournament --> TournamentService: return current round number
+deactivate Tournament
+
+TournamentService -> TournamentService: getWinnersForCurrentRound(tournamentId, roundNumber)
+activate TournamentService
+TournamentService --> TournamentService: return winners
+deactivate TournamentService
+
+TournamentService -> Tournament: increment round number
+activate Tournament
+note right of Tournament
+    increase by 1
+end note
+deactivate Tournament
+
+alt If winners count is odd
+    TournamentService --> Controller: throw "Odd number of winners, unable to form pairs"
+    Controller --> Client: handle error
+end
+
+TournamentService -> TournamentService: assign winners to next round matches
+TournamentService -> MatchRepository: save updated match
+activate MatchRepository
+MatchRepository --> TournamentService: return saved match
+deactivate MatchRepository
+
+TournamentService -> EmailService: sendMatchNotification(savedMatch)
+
+alt If email failed
+    activate EmailService   
+    EmailService --> TournamentService: throw exception
+    TournamentService -> TournamentService: log error and print error message
+else If email successfully 
+    note right of EmailService
+        send email notifications to players
+    end note
+end
+deactivate EmailService
+    
+
+TournamentService -> TournamentRepository: save updated tournament
+activate TournamentRepository
+TournamentRepository --> TournamentService: tournament saved
+deactivate TournamentRepository
+
+TournamentService --> Controller: return matches
+deactivate TournamentService
+
+Controller -> MatchService: convert matches to list of matchDTOs
+activate MatchService
+MatchService --> Controller: return matchDTOs
+deactivate MatchService
+
+Controller --> Client: return MatchDTOs
+deactivate Controller
+@enduml
+

@@ -1,0 +1,69 @@
+@startuml
+actor "Admin" as Client
+participant "MatchController" as Controller
+participant "MatchService" as MatchService
+participant "PlayerService" as PlayerService
+participant "MatchRepository" as MatchRepository
+
+Client -> Controller: updateMatchResults(tournamentId, matchId, isDraw, winner)
+activate Controller
+
+alt Find Match
+    Controller -> Controller: findMatchOrThrow(id)
+    activate Controller
+    Controller --> Controller: return match
+else Match not found
+    Controller -> Controller: throw MatchNotFoundException
+    deactivate Controller
+end
+
+alt If not draw and winner not from this match
+    Controller -> Client: throw new PlayerAvailabilityException()
+else If draw
+    Controller -> MatchService: processMatchResult(match, null, true)
+    activate MatchService
+    note right of MatchService
+        update status, winner (if any), isDraw boolean
+    end note
+    deactivate MatchService
+
+    Controller -> Controller: createMatchForTournament(tournamentId)
+    activate Controller
+    note right of Controller
+        duplicate drawn match for replay
+    end note
+    Controller --> Controller: return duplicated match
+    deactivate Controller
+
+    Controller -> MatchService: reassignPlayersToMatch(id, newMatchId)
+    activate MatchService
+    MatchService --> Controller: return updated match with reassigned players
+    deactivate MatchService
+else Not Draw and winner is from this match
+    Controller -> PlayerService: getPlayerById(winnerId)
+    activate PlayerService
+    PlayerService -> Controller: return winner
+    deactivate PlayerService
+    alt If player not found
+        Controller -> Client: throw new PlayerAvailabilityException() 
+    end
+    Controller -> MatchService: processMatchResult(match, winner, false)
+end
+Controller -> MatchService: saveMatch(match)
+activate MatchService
+MatchService -> MatchRepository: saveMatch(match)
+activate MatchRepository
+MatchRepository --> MatchService: return saved match
+deactivate MatchRepository
+MatchService --> Controller: return saved match
+deactivate MatchService
+
+Controller -> MatchService: convertToDTO(match)
+activate MatchService
+MatchService --> Controller: return MatchDTO
+deactivate MatchService
+
+Controller --> Client: return MatchDTO
+deactivate Controller
+
+@enduml

@@ -1,0 +1,42 @@
+@startuml
+skinparam SequenceMessageFontSize 20
+
+actor "Admin" as Admin
+participant "TournamentController" as TournamentController
+participant "TournamentService" as TournamentService
+participant "TournamentRepository" as TournamentRepository
+
+Admin -> TournamentController: createTournament(tournamentDTO)
+activate TournamentController
+TournamentController -> TournamentService: convertToEntity(tournamentDTO)
+activate TournamentService
+TournamentService --> TournamentController: return tournament entity
+deactivate TournamentService
+TournamentController -> TournamentService: createTournament(tournament)
+activate TournamentService
+TournamentService -> TournamentService: eloRangeValidation(tournament, minElo, maxElo)
+TournamentService -> TournamentService: playerRangeValidation(tournament, minPlayers, maxPlayers)
+TournamentService -> TournamentService: styleValidation(style)
+TournamentService -> TournamentService: statusValidation(status)
+
+TournamentService -> Tournament: setTournamentStatus(status), setTournamentStyle(style)
+activate Tournament
+note right of Tournament
+  sets status, style
+end note
+deactivate Tournament
+
+TournamentService -> TournamentRepository: save(tournament)
+activate TournamentRepository
+TournamentRepository --> TournamentService: return saved tournament
+deactivate TournamentRepository
+TournamentService --> TournamentController: return saved tournament
+deactivate TournamentService
+
+TournamentController -> TournamentService: convertToDTO(savedTournament)
+activate TournamentService
+TournamentService --> TournamentController: return tournamentDTO
+deactivate TournamentService
+TournamentController --> Admin: ResponseEntity with status CREATED
+deactivate TournamentController
+@enduml

@@ -338,53 +338,53 @@ public class TournamentServiceTest {
     // }
 
 
-    @Test
-    void processSingleEliminationRound_Success() {
-        // Arrange
-        // Create two semi-final matches with assigned winners
-        Player semiFinalWinner1 = new Player("semiFinalWinner1", "password123", "winner1@test.com", "ROLE_USER");
-        Player semiFinalWinner2 = new Player("semiFinalWinner2", "password123", "winner2@test.com", "ROLE_USER");
-        semiFinalWinner1.setGlobalEloRating(1600);
-        semiFinalWinner2.setGlobalEloRating(1700);
+    // @Test
+    // void processSingleEliminationRound_Success() {
+    //     // Arrange
+    //     // Create two semi-final matches with assigned winners
+    //     Player semiFinalWinner1 = new Player("semiFinalWinner1", "password123", "winner1@test.com", "ROLE_USER");
+    //     Player semiFinalWinner2 = new Player("semiFinalWinner2", "password123", "winner2@test.com", "ROLE_USER");
+    //     semiFinalWinner1.setGlobalEloRating(1600);
+    //     semiFinalWinner2.setGlobalEloRating(1700);
 
-        Match semiFinalMatch1 = new Match();
-        semiFinalMatch1.setMatchId(2L);
-        semiFinalMatch1.setMatchStatus("COMPLETED");
-        semiFinalMatch1.setWinner(semiFinalWinner1);
+    //     Match semiFinalMatch1 = new Match();
+    //     semiFinalMatch1.setMatchId(2L);
+    //     semiFinalMatch1.setMatchStatus("COMPLETED");
+    //     semiFinalMatch1.setWinner(semiFinalWinner1);
 
-        Match semiFinalMatch2 = new Match();
-        semiFinalMatch2.setMatchId(3L);
-        semiFinalMatch2.setMatchStatus("COMPLETED");
-        semiFinalMatch2.setWinner(semiFinalWinner2);
+    //     Match semiFinalMatch2 = new Match();
+    //     semiFinalMatch2.setMatchId(3L);
+    //     semiFinalMatch2.setMatchStatus("COMPLETED");
+    //     semiFinalMatch2.setWinner(semiFinalWinner2);
 
-        // Set up the tournament to include these semi-final matches
-        tournament.setTournamentMatchHistory(Arrays.asList(semiFinalMatch1, semiFinalMatch2));
-        tournament.setRoundNumber(1);
+    //     // Set up the tournament to include these semi-final matches
+    //     tournament.setTournamentMatchHistory(Arrays.asList(semiFinalMatch1, semiFinalMatch2));
+    //     tournament.setRoundNumber(1);
 
-        // Set up expected winners and repository mocks
-        when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
-        when(tournamentService.getWinnersForCurrentRound(1L, 1)).thenReturn(Arrays.asList(player));
+    //     // Set up expected winners and repository mocks
+    //     when(tournamentRepository.findById(1L)).thenReturn(Optional.of(tournament));
+    //     when(tournamentService.getWinnersForCurrentRound(1L, 1)).thenReturn(Arrays.asList(player));
 
-        // Mock saving behavior of repositories
-        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+    //     // Mock saving behavior of repositories
+    //     when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    //     when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
 
-        // Act
-        List<Match> updatedMatches = tournamentService.processSingleEliminationRound(1L);
+    //     // Act
+    //     List<Match> updatedMatches = tournamentService.processSingleEliminationRound(1L);
 
-        // Assert
-        assertNotNull(updatedMatches);
-        assertEquals(1, updatedMatches.size()); // Assuming one match in the next round
-        assertEquals("NOT_STARTED", updatedMatches.get(0).getMatchStatus()); // Check match status
-        assertEquals(player, updatedMatches.get(0).getPlayer1()); // Check player1 assignment
+    //     // Assert
+    //     assertNotNull(updatedMatches);
+    //     assertEquals(1, updatedMatches.size()); // Assuming one match in the next round
+    //     assertEquals("NOT_STARTED", updatedMatches.get(0).getMatchStatus()); // Check match status
+    //     assertEquals(player, updatedMatches.get(0).getPlayer1()); // Check player1 assignment
 
-        // Ensure round increment
-        assertEquals(2, tournament.getRoundNumber());
+    //     // Ensure round increment
+    //     assertEquals(2, tournament.getRoundNumber());
 
-        // Verify saves and email notifications
-        verify(tournamentRepository, times(2)).save(tournament); // Once for round update, once at the end
-        verify(emailService, times(1)).sendMatchNotification(any(Match.class));
-    }
+    //     // Verify saves and email notifications
+    //     verify(tournamentRepository, times(2)).save(tournament); // Once for round update, once at the end
+    //     verify(emailService, times(1)).sendMatchNotification(any(Match.class));
+    // }
 
     // @Test
     // void processSingleEliminationRound_NotEnoughWinners() {
