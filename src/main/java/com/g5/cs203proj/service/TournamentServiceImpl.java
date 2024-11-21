@@ -322,8 +322,6 @@ public class TournamentServiceImpl implements TournamentService {
                 break;
             }
         }
-        // System.out.println("first match of next round: " + firstMatchOfNextRoundIdx);
-        // System.out.println("matches size: " + matches.size());
 
         if (firstMatchOfNextRoundIdx == -1) {
             throw new IllegalStateException("No NOT_STARTED matches available for the next round");
@@ -332,7 +330,6 @@ public class TournamentServiceImpl implements TournamentService {
         // Get current round number and winners from all matches in current round
         int roundNumber = tournament.getRoundNumber();
         List<Player> winners = getWinnersForCurrentRound(tournamentId, roundNumber);
-        // System.out.println("winners size: " + winners.size());
         roundNumber = roundNumber + 1;
         tournament.setRoundNumber(roundNumber);
         tournamentRepository.save(tournament);

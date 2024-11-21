@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +19,9 @@ import com.g5.cs203proj.entity.Match;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.enums.Statuses;
-import com.g5.cs203proj.enums.Styles;
 import com.g5.cs203proj.exception.inputs.InvalidEloValueException;
-import com.g5.cs203proj.exception.inputs.InvalidStatusException;
 import com.g5.cs203proj.exception.inputs.InvalidStyleException;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
-import com.g5.cs203proj.exception.player.PlayerRangeException;
 import com.g5.cs203proj.exception.tournament.*;
 import com.g5.cs203proj.repository.MatchRepository;
 import com.g5.cs203proj.repository.PlayerRepository;

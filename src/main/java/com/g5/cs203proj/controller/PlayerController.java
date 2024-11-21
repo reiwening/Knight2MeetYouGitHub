@@ -4,14 +4,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.RestController;
-
-import com.g5.cs203proj.DTO.TournamentDTO;
 import com.g5.cs203proj.entity.Player;
 import com.g5.cs203proj.DTO.PlayerDTO;
-import com.g5.cs203proj.entity.Tournament;
 import com.g5.cs203proj.exception.player.PlayerAvailabilityException;
-import com.g5.cs203proj.repository.PlayerRepository;
-import com.g5.cs203proj.service.PlayerDetailsService;
 import com.g5.cs203proj.service.PlayerService;
 
 import jakarta.validation.Valid;
@@ -21,20 +16,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.security.core.Authentication;
 
 
 
